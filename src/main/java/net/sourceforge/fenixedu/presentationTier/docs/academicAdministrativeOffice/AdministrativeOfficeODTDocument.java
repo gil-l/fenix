@@ -81,7 +81,8 @@ public class AdministrativeOfficeODTDocument extends Template {
         if (adminOfficeName == null || adminOfficeName.trim().isEmpty()) {
             adminOfficeName = adminOfficeUnit.getPartyName().getContent();
         }
-        addParameter("administrativeOfficeName", adminOfficeName.toUpperCase(getLocale()));
+        addParameter("administrativeOfficeName", adminOfficeName);
+        addParameter("administrativeOfficeNameCaps", adminOfficeName.toUpperCase(getLocale()));
         String universityName = universityUnit.getPartyName().getContent(Language.valueOf(getLocale().getLanguage()));
         if (universityName == null) {
             universityName = universityUnit.getPartyName().getContent();
