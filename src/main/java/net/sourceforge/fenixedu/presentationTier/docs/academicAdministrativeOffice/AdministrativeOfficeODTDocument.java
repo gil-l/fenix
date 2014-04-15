@@ -40,7 +40,6 @@ public class AdministrativeOfficeODTDocument extends Template {
         setUp();
     }
 
-    @Override
     public String getReportFileName() {
         final StringBuilder result = new StringBuilder();
 
@@ -80,29 +79,30 @@ public class AdministrativeOfficeODTDocument extends Template {
 
         String adminOfficeName = adminOfficeUnit.getPartyName().getContent(Language.valueOf(getLocale().getLanguage()));
         if (adminOfficeName == null || adminOfficeName.trim().isEmpty()) {
-            adminOfficeName = adminOfficeUnit.getPartyName().getPreferedContent();
+            adminOfficeName = adminOfficeUnit.getPartyName().getContent();
         }
-        addParameter("administrativeOfficeName", adminOfficeName.toUpperCase());
+        addParameter("administrativeOfficeName", adminOfficeName.toUpperCase(getLocale()));
         String universityName = universityUnit.getPartyName().getContent(Language.valueOf(getLocale().getLanguage()));
         if (universityName == null) {
-            universityName = universityUnit.getPartyName().getPreferedContent();
+            universityName = universityUnit.getPartyName().getContent();
         }
-        addParameter("universityName", universityName.toUpperCase());
+        addParameter("universityName", universityName.toUpperCase(getLocale()));
         String institutionName = institutionUnit.getPartyName().getContent(Language.valueOf(getLocale().getLanguage()));
         if (institutionName == null) {
-            institutionName = institutionUnit.getPartyName().getPreferedContent();
+            institutionName = institutionUnit.getPartyName().getContent();
         }
-        addParameter("institutionName", institutionName.toUpperCase());
+        addParameter("institutionName", institutionName);
+        addParameter("institutionNameCaps", institutionName.toUpperCase(getLocale()));
 
         addParameter("studentGender", student.getPerson().getGender());
         addParameter("studentNumber", registration.getNumber());
-        addParameter("fullName", student.getPerson().getName().toUpperCase());
+        addParameter("fullName", student.getPerson().getName().toUpperCase(getLocale()));
         addParameter("idDocType", student.getPerson().getIdDocumentType().getLocalizedName(getLocale()));
         addParameter("idDocNumber", student.getPerson().getDocumentIdNumber());
         addParameter("parishOfBirth", StringFormatter.prettyPrint(student.getPerson().getParishOfBirth()));
         addParameter("districtSubdivisionOfBirth",
                 StringFormatter.prettyPrint(student.getPerson().getDistrictSubdivisionOfBirth()));
-        addParameter("nationality", student.getPerson().getCountry().getFilteredNationality(getLocale()).toUpperCase());
+        addParameter("nationality", student.getPerson().getCountry().getFilteredNationality(getLocale()).toUpperCase(getLocale()));
         addParameter("isRegistered", new Boolean(executionYear.containsDate(new DateTime())));
 
         addParameter("schoolYear", executionYear.getYear());
@@ -123,7 +123,7 @@ public class AdministrativeOfficeODTDocument extends Template {
 
             studentCurricularYear =
                     ResourceBundle.getBundle("resources.EnumerationResources", getLocale())
-                            .getString(curricularYear.toString() + ".ordinal").toUpperCase();
+                            .getString(curricularYear.toString() + ".ordinal").toUpperCase(getLocale());
         }
         addParameter("studentCurricularYear", studentCurricularYear);
     }

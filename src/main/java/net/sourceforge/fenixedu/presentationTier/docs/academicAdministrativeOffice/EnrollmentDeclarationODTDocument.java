@@ -2,7 +2,6 @@ package net.sourceforge.fenixedu.presentationTier.docs.academicAdministrativeOff
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 import net.sourceforge.fenixedu.domain.Enrolment;
@@ -22,8 +21,6 @@ public class EnrollmentDeclarationODTDocument extends DeclarationODTDocument {
     }
 
     private void setUp(EnrolmentDeclarationRequest documentRequest) {
-        addReportName(Locale.ENGLISH, "Enrollment Decalaration");
-        addReportName(new Locale("pt"), "Declaração de Inscrição");
 
         addCurricularYear(documentRequest);
         final List<Enrolment> enrolments =
