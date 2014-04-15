@@ -1,6 +1,8 @@
 package net.sourceforge.fenixedu.presentationTier.docs.academicAdministrativeOffice;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -14,6 +16,7 @@ import net.sourceforge.fenixedu.domain.student.Registration;
 import net.sourceforge.fenixedu.domain.student.Student;
 import net.sourceforge.fenixedu.util.StringFormatter;
 
+import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.oddjet.Template;
 import org.joda.time.DateTime;
@@ -22,13 +25,46 @@ import pt.utl.ist.fenix.tools.util.i18n.Language;
 
 public class AdministrativeOfficeODTDocument extends Template {
 
+    private DocumentRequest documentRequest;
+
+    static final protected String EMPTY_STR = StringUtils.EMPTY;
+
+    static final protected String SINGLE_SPACE = " ";
+
+    static final protected String YYYYMMMDD = "yyyyMMdd";
+
     public AdministrativeOfficeODTDocument(String templatePath, DocumentRequest documentRequest) throws SecurityException,
             IOException {
-        super(documentRequest.getClass().getResourceAsStream(templatePath), new Locale(documentRequest.getLanguage().name()));
-        setUp(documentRequest);
+        super(getTemplateAsResource(templatePath, documentRequest), new Locale(documentRequest.getLanguage().name()));
+        this.documentRequest = documentRequest;
+        setUp();
     }
 
-    private void setUp(DocumentRequest documentRequest) {
+    @Override
+    public String getReportFileName() {
+        final StringBuilder result = new StringBuilder();
+
+        result.append(documentRequest.getPerson().getIstUsername());
+        result.append("-");
+        result.append(new DateTime().toString(YYYYMMMDD, getLocale()));
+        result.append("-");
+        result.append(documentRequest.getDescription().replace(":", EMPTY_STR).replace(SINGLE_SPACE, EMPTY_STR));
+        result.append("-");
+        result.append(getLocale().toString());
+
+        return result.toString();
+    }
+
+    public static InputStream getTemplateAsResource(String templatePath, DocumentRequest documentRequest)
+            throws FileNotFoundException {
+        InputStream template = documentRequest.getClass().getResourceAsStream(templatePath);
+        if (template == null) {
+            throw new FileNotFoundException("Missing template file: " + templatePath);
+        }
+        return template;
+    }
+
+    private void setUp() {
 
         Unit adminOfficeUnit = documentRequest.getAdministrativeOffice().getUnit();
         Unit institutionUnit = Bennu.getInstance().getInstitutionUnit();

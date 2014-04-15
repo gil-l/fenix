@@ -168,19 +168,23 @@ public abstract class DocumentRequest extends DocumentRequest_Base implements ID
         try {
             switch (getDocumentRequestType()) {
             case ENROLMENT_DECLARATION:
-                return new EnrollmentDeclarationODTDocument("/odtreports/enrollment/declaration/DeclaracaoInscricao"
-                        + getLanguage().name().toUpperCase() + ".odt", (EnrolmentDeclarationRequest) this)
+                return new EnrollmentDeclarationODTDocument(
+                        "/odtreports/academicOffice/enrollment/declaration/DeclaracaoInscricao"
+                                + getLanguage().name().toUpperCase() + ".odt", (EnrolmentDeclarationRequest) this)
                         .getInstancePDFByteArray();
             case ENROLMENT_CERTIFICATE:
-                return new EnrollmentCertificateODTDocument("/odtreports/enrollment/certificate/CertidaoInscricao"
+                return new EnrollmentCertificateODTDocument("/odtreports/academicOffice/enrollment/certificate/CertidaoInscricao"
                         + getLanguage().name().toUpperCase() + ".odt", (EnrolmentCertificateRequest) this)
                         .getInstancePDFByteArray();
             case SCHOOL_REGISTRATION_CERTIFICATE:
-                return new RegistrationCertificateODTDocument("/odtreports/registration/certificate/CertidaoMatricula"
-                        + getLanguage().name().toUpperCase() + ".odt", (CertificateRequest) this).getInstancePDFByteArray();
+                return new RegistrationCertificateODTDocument(
+                        "/odtreports/academicOffice/registration/certificate/CertidaoMatricula"
+                                + getLanguage().name().toUpperCase() + ".odt", (CertificateRequest) this)
+                        .getInstancePDFByteArray();
             case SCHOOL_REGISTRATION_DECLARATION:
-                return new RegistrationDeclarationODTDocument("/odtreports/registration/declaration/DeclaracaoMatricula"
-                        + getLanguage().name().toUpperCase() + ".odt", this).getInstancePDFByteArray();
+                return new RegistrationDeclarationODTDocument(
+                        "/odtreports/academicOffice/registration/declaration/DeclaracaoMatricula"
+                                + getLanguage().name().toUpperCase() + ".odt", this).getInstancePDFByteArray();
             default:
                 List<AdministrativeOfficeDocument> documents =
                         AdministrativeOfficeDocument.AdministrativeOfficeDocumentCreator.create(this);
@@ -198,8 +202,31 @@ public abstract class DocumentRequest extends DocumentRequest_Base implements ID
 
     @Override
     public String getReportFileName() {
-        return AdministrativeOfficeDocument.AdministrativeOfficeDocumentCreator.create(this).iterator().next()
-                .getReportFileName();
+        try {
+            switch (getDocumentRequestType()) {
+            case ENROLMENT_DECLARATION:
+                return new EnrollmentDeclarationODTDocument(
+                        "/odtreports/academicOffice/enrollment/declaration/DeclaracaoInscricao"
+                                + getLanguage().name().toUpperCase() + ".odt", (EnrolmentDeclarationRequest) this)
+                        .getReportFileName();
+            case ENROLMENT_CERTIFICATE:
+                return new EnrollmentCertificateODTDocument("/odtreports/academicOffice/enrollment/certificate/CertidaoInscricao"
+                        + getLanguage().name().toUpperCase() + ".odt", (EnrolmentCertificateRequest) this).getReportFileName();
+            case SCHOOL_REGISTRATION_CERTIFICATE:
+                return new RegistrationCertificateODTDocument(
+                        "/odtreports/academicOffice/registration/certificate/CertidaoMatricula"
+                                + getLanguage().name().toUpperCase() + ".odt", (CertificateRequest) this).getReportFileName();
+            case SCHOOL_REGISTRATION_DECLARATION:
+                return new RegistrationDeclarationODTDocument(
+                        "/odtreports/academicOffice/registration/declaration/DeclaracaoMatricula"
+                                + getLanguage().name().toUpperCase() + ".odt", this).getReportFileName();
+            default:
+                return AdministrativeOfficeDocument.AdministrativeOfficeDocumentCreator.create(this).iterator().next()
+                        .getReportFileName();
+            }
+        } catch (SecurityException | IOException e) {
+            throw new DomainException("error.documentRequest.errorGeneratingDocument", e);
+        }
     }
 
     @Deprecated
