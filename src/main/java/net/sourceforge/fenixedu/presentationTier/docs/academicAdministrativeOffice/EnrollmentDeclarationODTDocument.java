@@ -36,9 +36,7 @@ public class EnrollmentDeclarationODTDocument extends DeclarationODTDocument {
             Registration registration = documentRequest.getRegistration();
 
             boolean transition = registration.isTransition(executionYear);
-            boolean isFirstTime = registration.isFirstTime(executionYear) && !transition;
-            addParameter("isFirstTime", isFirstTime);
-            if (!isFirstTime) {
+            if (!registration.isFirstTime(executionYear) || transition) {
                 final Registration registrationToInspect = transition ? registration.getSourceRegistration() : registration;
                 addParameter("hasApprovement", registrationToInspect.hasApprovement(executionYear.getPreviousExecutionYear()));
                 addParameter("previousExecutionYear", executionYear.getPreviousExecutionYear().getYear());
@@ -46,9 +44,7 @@ public class EnrollmentDeclarationODTDocument extends DeclarationODTDocument {
         }
 
         String documentPurpose = "";
-        boolean hasPurpose = documentRequest.getDocumentPurposeType() != null;
-        addParameter("hasPurpose", hasPurpose);
-        if (hasPurpose) {
+        if (documentRequest.getDocumentPurposeType() != null) {
             if (documentRequest.getDocumentPurposeType() == DocumentPurposeType.OTHER
                     && !StringUtils.isEmpty(documentRequest.getOtherDocumentPurposeTypeDescription())) {
                 documentPurpose = documentRequest.getOtherDocumentPurposeTypeDescription().toUpperCase();
