@@ -28,15 +28,17 @@ public class EnrollmentDeclarationODTDocument extends DeclarationODTDocument {
         Integer numberEnrolments = Integer.valueOf(enrolments.size());
         addParameter("totalEnrolledCourses", numberEnrolments);
 
-        boolean purposePPRE = documentRequest.getDocumentPurposeType() == DocumentPurposeType.PPRE;
-        addParameter("isPurposePPRE", purposePPRE);
+        addParameter("isFirstTime", "");
         addParameter("previousExecutionYear", "");
-        if (purposePPRE) {
+        addParameter("hasApprovement", "");
+        if (documentRequest.getDocumentPurposeType() == DocumentPurposeType.PPRE) {
             ExecutionYear executionYear = getExecutionYear(documentRequest);
             Registration registration = documentRequest.getRegistration();
 
             boolean transition = registration.isTransition(executionYear);
-            if (!registration.isFirstTime(executionYear) || transition) {
+            boolean isFirstTime = registration.isFirstTime(executionYear) && !transition;
+            addParameter("isFirstTime", isFirstTime);
+            if (!isFirstTime) {
                 final Registration registrationToInspect = transition ? registration.getSourceRegistration() : registration;
                 addParameter("hasApprovement", registrationToInspect.hasApprovement(executionYear.getPreviousExecutionYear()));
                 addParameter("previousExecutionYear", executionYear.getPreviousExecutionYear().getYear());
