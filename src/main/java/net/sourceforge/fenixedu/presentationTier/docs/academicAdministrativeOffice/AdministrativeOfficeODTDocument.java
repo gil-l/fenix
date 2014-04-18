@@ -25,7 +25,7 @@ import pt.utl.ist.fenix.tools.util.i18n.Language;
 
 public class AdministrativeOfficeODTDocument extends Template {
 
-    private DocumentRequest documentRequest;
+    protected DocumentRequest documentRequest;
 
     static final protected String EMPTY_STR = StringUtils.EMPTY;
 
@@ -70,7 +70,7 @@ public class AdministrativeOfficeODTDocument extends Template {
         Unit universityUnit = UniversityUnit.getInstitutionsUniversityUnitByDate(new DateTime());
         Person coordinator = adminOfficeUnit.getActiveUnitCoordinator();
         Registration registration = documentRequest.getRegistration();
-        ExecutionYear executionYear = getExecutionYear(documentRequest);
+        ExecutionYear executionYear = getExecutionYear();
         Student student = registration.getStudent();
         DegreeType degreeType = registration.getDegreeType();
 
@@ -115,11 +115,11 @@ public class AdministrativeOfficeODTDocument extends Template {
         addParameter("civilYear", documentRequest.getAcademicServiceRequestYear().getYear());
     }
 
-    final protected void addCurricularYear(DocumentRequest documentRequest) {
+    protected void addCurricularYear() {
         addParameter("hasOnlyOneCurricularYear", documentRequest.getDegreeType().hasExactlyOneCurricularYear());
         String studentCurricularYear = "";
         if (!documentRequest.getDegreeType().hasExactlyOneCurricularYear()) {
-            ExecutionYear executionYear = getExecutionYear(documentRequest);
+            ExecutionYear executionYear = getExecutionYear();
             final Integer curricularYear = Integer.valueOf(documentRequest.getRegistration().getCurricularYear(executionYear));
 
             studentCurricularYear =
@@ -129,7 +129,7 @@ public class AdministrativeOfficeODTDocument extends Template {
         addParameter("studentCurricularYear", studentCurricularYear);
     }
 
-    final protected ExecutionYear getExecutionYear(DocumentRequest documentRequest) {
+    protected ExecutionYear getExecutionYear() {
         return documentRequest.hasExecutionYear() ? documentRequest.getExecutionYear() : ExecutionYear
                 .readByDateTime(documentRequest.getRequestDate());
     }

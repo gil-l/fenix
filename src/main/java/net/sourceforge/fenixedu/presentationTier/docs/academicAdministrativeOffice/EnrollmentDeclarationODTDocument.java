@@ -22,9 +22,9 @@ public class EnrollmentDeclarationODTDocument extends DeclarationODTDocument {
 
     private void setUp(EnrolmentDeclarationRequest documentRequest) {
 
-        addCurricularYear(documentRequest);
-        final List<Enrolment> enrolments =
-                (List<Enrolment>) documentRequest.getRegistration().getEnrolments(getExecutionYear(documentRequest));
+        addCurricularYear();
+
+        final List<Enrolment> enrolments = (List<Enrolment>) documentRequest.getRegistration().getEnrolments(getExecutionYear());
         Integer numberEnrolments = Integer.valueOf(enrolments.size());
         addParameter("totalEnrolledCourses", numberEnrolments);
 
@@ -32,7 +32,7 @@ public class EnrollmentDeclarationODTDocument extends DeclarationODTDocument {
         addParameter("previousExecutionYear", "");
         addParameter("hasApprovement", "");
         if (documentRequest.getDocumentPurposeType() == DocumentPurposeType.PPRE) {
-            ExecutionYear executionYear = getExecutionYear(documentRequest);
+            ExecutionYear executionYear = getExecutionYear();
             Registration registration = documentRequest.getRegistration();
 
             boolean transition = registration.isTransition(executionYear);

@@ -9,10 +9,10 @@ public class DeclarationODTDocument extends AdministrativeOfficeODTDocument {
 
     public DeclarationODTDocument(String template, DocumentRequest documentRequest) throws SecurityException, IOException {
         super(template, documentRequest);
-        setUp(documentRequest);
+        setUp();
     }
 
-    private void setUp(DocumentRequest documentRequest) {
+    private void setUp() {
         addParameter(
                 "supervisingUnit",
                 ResourceBundle.getBundle("resources.AcademicAdminOffice", getLocale()).getString(

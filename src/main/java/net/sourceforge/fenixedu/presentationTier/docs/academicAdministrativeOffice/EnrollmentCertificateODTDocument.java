@@ -27,7 +27,7 @@ public class EnrollmentCertificateODTDocument extends CertificateODTDocument {
 
     private void setUp(EnrolmentCertificateRequest documentRequest) {
 
-        addCurricularYear(documentRequest);
+        addCurricularYear();
 
         addParameter("isDetailed", documentRequest.getDetailed());
         if (documentRequest.getDetailed()) {
@@ -35,50 +35,23 @@ public class EnrollmentCertificateODTDocument extends CertificateODTDocument {
                     new TreeSet<Enrolment>(Enrolment.COMPARATOR_BY_EXECUTION_YEAR_AND_NAME_AND_ID);
 
             enrollments.addAll(documentRequest.getEntriesToReport());
-            List<Object> name = new ArrayList<>();
-            List<Object> ects = new ArrayList<>();
-            String creditsDescription = "";
-            if (documentRequest.isToShowCredits()) {
-                creditsDescription =
-                        documentRequest.isRequestForRegistration() ? documentRequest.getDegreeType().getCreditsDescription() : "";
-                addEnrollmentData(enrollments, name, ects, creditsDescription);
-            } else {
-                addEnrollmentData(enrollments, name);
-            }
 
-            Map<String, List<Object>> enrolledCourses = new HashMap<>();
-            addTableDataSource("enrolledCourses", new CategoricalTableData(enrolledCourses));
+            addTableDataSource("enrolledCourses", getEnrollmentTableData(enrollments));
 
             enrollments.clear();
             enrollments.addAll(documentRequest.getExtraCurricularEntriesToReport());
             if (!enrollments.isEmpty()) {
-                name = new ArrayList<>();
-                ects = new ArrayList<>();
-                enrolledCourses = new HashMap<>();
                 addParameter("hasExtraCurricular", true);
-                if (documentRequest.isToShowCredits()) {
-                    addEnrollmentData(enrollments, name, ects, creditsDescription);
-                } else {
-                    addEnrollmentData(enrollments, name);
-                }
-                addTableDataSource("enrolledCoursesExtra", new CategoricalTableData(enrolledCourses));
+                addTableDataSource("enrolledCoursesExtra", getEnrollmentTableData(enrollments));
             } else {
-                addParameter("hasExtraCurricular", true);
+                addParameter("hasExtraCurricular", false);
             }
 
             enrollments.clear();
             enrollments.addAll(documentRequest.getPropaedeuticEntriesToReport());
             if (!enrollments.isEmpty()) {
-                name = new ArrayList<>();
-                ects = new ArrayList<>();
-                enrolledCourses = new HashMap<>();
                 addParameter("hasPropaedeutics", true);
-                if (documentRequest.isToShowCredits()) {
-                    addEnrollmentData(enrollments, name, ects, creditsDescription);
-                } else {
-                    addEnrollmentData(enrollments, name);
-                }
-                addTableDataSource("enrolledCoursesProp", new CategoricalTableData(enrolledCourses));
+                addTableDataSource("enrolledCoursesProp", getEnrollmentTableData(enrollments));
             } else {
                 addParameter("hasPropaedeutics", false);
             }
@@ -99,6 +72,23 @@ public class EnrollmentCertificateODTDocument extends CertificateODTDocument {
         }
     }
 
+    private CategoricalTableData getEnrollmentTableData(Collection<Enrolment> enrollments) {
+        Map<String, List<Object>> enrolledCourses = new HashMap<>();
+        List<Object> name = new ArrayList<>();
+        List<Object> ects = new ArrayList<>();
+        if (documentRequest.isToShowCredits()) {
+            String creditsDescription = "";
+            creditsDescription =
+                    documentRequest.isRequestForRegistration() ? documentRequest.getDegreeType().getCreditsDescription() : "";
+            addEnrollmentData(enrollments, name, ects, creditsDescription);
+        } else {
+            addEnrollmentData(enrollments, name);
+        }
+        enrolledCourses.put("name", name);
+        enrolledCourses.put("ects", ects);
+        return new CategoricalTableData(enrolledCourses);
+    }
+
     private Object getEnrollmentName(Enrolment e) {
         final MultiLanguageString eNameMLS;
         if (e instanceof OptionalEnrolment) {
@@ -111,7 +101,7 @@ public class EnrollmentCertificateODTDocument extends CertificateODTDocument {
         if (eName == null || eName.trim().isEmpty()) {
             eName = eNameMLS.getPreferedContent();
         }
-        return eName;
+        return eName.toUpperCase();
     }
 
 }
