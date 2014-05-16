@@ -303,6 +303,11 @@
 			<version>3.0.1</version>
 		</dependency>
 		<dependency>
+			<groupId>org.fenixedu</groupId>
+            <artifactId>oddjet</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
 			<version>2.3</version>

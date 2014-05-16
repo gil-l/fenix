@@ -1,5 +1,6 @@
 package net.sourceforge.fenixedu.domain.serviceRequests.documentRequests;
 
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -14,7 +15,15 @@ import net.sourceforge.fenixedu.domain.exceptions.DomainException;
 import net.sourceforge.fenixedu.domain.serviceRequests.AcademicServiceRequest;
 import net.sourceforge.fenixedu.domain.serviceRequests.RegistryCode;
 import net.sourceforge.fenixedu.presentationTier.docs.academicAdministrativeOffice.AdministrativeOfficeDocument;
+import net.sourceforge.fenixedu.presentationTier.docs.academicAdministrativeOffice.EnrollmentCertificateODTDocument;
+import net.sourceforge.fenixedu.presentationTier.docs.academicAdministrativeOffice.EnrollmentDeclarationODTDocument;
+import net.sourceforge.fenixedu.presentationTier.docs.academicAdministrativeOffice.RegistrationCertificateODTDocument;
+import net.sourceforge.fenixedu.presentationTier.docs.academicAdministrativeOffice.RegistrationDeclarationODTDocument;
 import net.sourceforge.fenixedu.util.report.ReportsUtils;
+
+import org.fenixedu.oddjet.exception.DocumentLoadException;
+import org.fenixedu.oddjet.exception.DocumentSaveException;
+import org.fenixedu.oddjet.exception.OpenOfficeConnectionException;
 
 public abstract class DocumentRequest extends DocumentRequest_Base implements IDocumentRequest {
     public static Comparator<AcademicServiceRequest> COMPARATOR_BY_REGISTRY_NUMBER = new Comparator<AcademicServiceRequest>() {
@@ -157,22 +166,67 @@ public abstract class DocumentRequest extends DocumentRequest_Base implements ID
     @Override
     public byte[] generateDocument() {
         try {
-            List<AdministrativeOfficeDocument> documents =
-                    AdministrativeOfficeDocument.AdministrativeOfficeDocumentCreator.create(this);
-            final AdministrativeOfficeDocument[] array = {};
-            byte[] data = ReportsUtils.exportMultipleToPdfAsByteArray(documents.toArray(array));
-            DocumentRequestGeneratedDocument.store(this, documents.iterator().next().getReportFileName() + ".pdf", data);
+            switch (getDocumentRequestType()) {
+            case ENROLMENT_DECLARATION:
+                return new EnrollmentDeclarationODTDocument(
+                        "/odtreports/academicOffice/enrollment/declaration/DeclaracaoInscricao"
+                                + getLanguage().name().toUpperCase() + ".odt", (EnrolmentDeclarationRequest) this)
+                        .getInstancePDFByteArray();
+            case ENROLMENT_CERTIFICATE:
+                return new EnrollmentCertificateODTDocument("/odtreports/academicOffice/enrollment/certificate/CertidaoInscricao"
+                        + getLanguage().name().toUpperCase() + ".odt", (EnrolmentCertificateRequest) this)
+                        .getInstancePDFByteArray();
+            case SCHOOL_REGISTRATION_CERTIFICATE:
+                return new RegistrationCertificateODTDocument(
+                        "/odtreports/academicOffice/registration/certificate/CertidaoMatricula"
+                                + getLanguage().name().toUpperCase() + ".odt", (CertificateRequest) this)
+                        .getInstancePDFByteArray();
+            case SCHOOL_REGISTRATION_DECLARATION:
+                return new RegistrationDeclarationODTDocument(
+                        "/odtreports/academicOffice/registration/declaration/DeclaracaoMatricula"
+                                + getLanguage().name().toUpperCase() + ".odt", this).getInstancePDFByteArray();
+            default:
+                List<AdministrativeOfficeDocument> documents =
+                        AdministrativeOfficeDocument.AdministrativeOfficeDocumentCreator.create(this);
+                final AdministrativeOfficeDocument[] array = {};
+                byte[] data = ReportsUtils.exportMultipleToPdfAsByteArray(documents.toArray(array));
+                DocumentRequestGeneratedDocument.store(this, documents.iterator().next().getReportFileName() + ".pdf", data);
 
-            return data;
-        } catch (JRException e) {
+                return data;
+            }
+        } catch (JRException | SecurityException | DocumentLoadException | DocumentSaveException | OpenOfficeConnectionException
+                | IOException e) {
             throw new DomainException("error.documentRequest.errorGeneratingDocument", e);
         }
     }
 
     @Override
     public String getReportFileName() {
-        return AdministrativeOfficeDocument.AdministrativeOfficeDocumentCreator.create(this).iterator().next()
-                .getReportFileName();
+        try {
+            switch (getDocumentRequestType()) {
+            case ENROLMENT_DECLARATION:
+                return new EnrollmentDeclarationODTDocument(
+                        "/odtreports/academicOffice/enrollment/declaration/DeclaracaoInscricao"
+                                + getLanguage().name().toUpperCase() + ".odt", (EnrolmentDeclarationRequest) this)
+                        .getReportFileName();
+            case ENROLMENT_CERTIFICATE:
+                return new EnrollmentCertificateODTDocument("/odtreports/academicOffice/enrollment/certificate/CertidaoInscricao"
+                        + getLanguage().name().toUpperCase() + ".odt", (EnrolmentCertificateRequest) this).getReportFileName();
+            case SCHOOL_REGISTRATION_CERTIFICATE:
+                return new RegistrationCertificateODTDocument(
+                        "/odtreports/academicOffice/registration/certificate/CertidaoMatricula"
+                                + getLanguage().name().toUpperCase() + ".odt", (CertificateRequest) this).getReportFileName();
+            case SCHOOL_REGISTRATION_DECLARATION:
+                return new RegistrationDeclarationODTDocument(
+                        "/odtreports/academicOffice/registration/declaration/DeclaracaoMatricula"
+                                + getLanguage().name().toUpperCase() + ".odt", this).getReportFileName();
+            default:
+                return AdministrativeOfficeDocument.AdministrativeOfficeDocumentCreator.create(this).iterator().next()
+                        .getReportFileName();
+            }
+        } catch (SecurityException | IOException e) {
+            throw new DomainException("error.documentRequest.errorGeneratingDocument", e);
+        }
     }
 
     @Deprecated

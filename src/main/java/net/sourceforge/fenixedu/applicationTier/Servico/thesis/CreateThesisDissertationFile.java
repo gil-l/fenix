@@ -40,6 +40,7 @@ public class CreateThesisDissertationFile extends CreateThesisFile {
         file.setLanguage(language);
 
         thesis.setDissertation(file);
+
     }
 
     // Service Invokers migrated from Berserk

@@ -12,7 +12,15 @@ import net.sourceforge.fenixedu.applicationTier.Servico.exceptions.NotAuthorized
 import net.sourceforge.fenixedu.domain.ExecutionYear;
 import net.sourceforge.fenixedu.domain.Person;
 import net.sourceforge.fenixedu.domain.ScientificCommission;
+<<<<<<< HEAD
 import net.sourceforge.fenixedu.domain.organizationalStructure.Unit;
+=======
+import net.sourceforge.fenixedu.domain.contacts.PhysicalAddress;
+import net.sourceforge.fenixedu.domain.organizationalStructure.Unit;
+import net.sourceforge.fenixedu.domain.person.RoleType;
+import net.sourceforge.fenixedu.domain.research.result.ResearchResultDocumentFile.FileResultPermittedGroupType;
+import net.sourceforge.fenixedu.domain.research.result.publication.Thesis.ThesisType;
+>>>>>>> b4cdd239dd5c957c0e2096a58f8849a14bed20aa
 import net.sourceforge.fenixedu.domain.thesis.Thesis;
 import net.sourceforge.fenixedu.domain.thesis.ThesisSite;
 import net.sourceforge.fenixedu.injectionCode.AccessControl;
