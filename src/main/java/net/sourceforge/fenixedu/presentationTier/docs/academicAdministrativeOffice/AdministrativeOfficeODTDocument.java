@@ -1,9 +1,7 @@
 package net.sourceforge.fenixedu.presentationTier.docs.academicAdministrativeOffice;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 import net.sourceforge.fenixedu.domain.ExecutionYear;
@@ -16,42 +14,20 @@ import net.sourceforge.fenixedu.domain.student.Registration;
 import net.sourceforge.fenixedu.domain.student.Student;
 import net.sourceforge.fenixedu.util.StringFormatter;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.oddjet.Template;
+import org.fenixedu.oddjet.exception.DocumentLoadException;
 import org.joda.time.DateTime;
-
-import pt.utl.ist.fenix.tools.util.i18n.Language;
 
 public class AdministrativeOfficeODTDocument extends Template {
 
     protected DocumentRequest documentRequest;
 
-    static final protected String EMPTY_STR = StringUtils.EMPTY;
-
-    static final protected String SINGLE_SPACE = " ";
-
-    static final protected String YYYYMMMDD = "yyyyMMdd";
-
-    public AdministrativeOfficeODTDocument(String templatePath, DocumentRequest documentRequest) throws SecurityException,
-            IOException {
-        super(getTemplateAsResource(templatePath, documentRequest), new Locale(documentRequest.getLanguage().name()));
+    public AdministrativeOfficeODTDocument(String templatePath, DocumentRequest documentRequest) throws DocumentLoadException,
+    FileNotFoundException {
+        super(getTemplateAsResource(templatePath, documentRequest), documentRequest.getLanguage());
         this.documentRequest = documentRequest;
-        setUp();
-    }
-
-    public String getReportFileName() {
-        final StringBuilder result = new StringBuilder();
-
-        result.append(documentRequest.getPerson().getIstUsername());
-        result.append("-");
-        result.append(new DateTime().toString(YYYYMMMDD, getLocale()));
-        result.append("-");
-        result.append(documentRequest.getDescription().replace(":", EMPTY_STR).replace(SINGLE_SPACE, EMPTY_STR));
-        result.append("-");
-        result.append(getLocale().toString());
-
-        return result.toString();
+        setup();
     }
 
     public static InputStream getTemplateAsResource(String templatePath, DocumentRequest documentRequest)
@@ -63,7 +39,7 @@ public class AdministrativeOfficeODTDocument extends Template {
         return template;
     }
 
-    private void setUp() {
+    private void setup() {
 
         Unit adminOfficeUnit = documentRequest.getAdministrativeOffice().getUnit();
         Unit institutionUnit = Bennu.getInstance().getInstitutionUnit();
@@ -74,59 +50,50 @@ public class AdministrativeOfficeODTDocument extends Template {
         Student student = registration.getStudent();
         DegreeType degreeType = registration.getDegreeType();
 
-        addParameter("administrativeOfficeCoordinator", coordinator.getName());
-        addParameter("coordinatorGender", coordinator.getGender());
+        //coordinator info
+        addParameter("coordinator", coordinator);
 
-        String adminOfficeName = adminOfficeUnit.getPartyName().getContent(Language.valueOf(getLocale().getLanguage()));
-        if (adminOfficeName == null || adminOfficeName.trim().isEmpty()) {
-            adminOfficeName = adminOfficeUnit.getPartyName().getContent();
-        }
-        addParameter("administrativeOfficeName", adminOfficeName);
-        addParameter("administrativeOfficeNameCaps", adminOfficeName.toUpperCase(getLocale()));
-        String universityName = universityUnit.getPartyName().getContent(Language.valueOf(getLocale().getLanguage()));
-        if (universityName == null) {
-            universityName = universityUnit.getPartyName().getContent();
-        }
-        addParameter("universityName", universityName.toUpperCase(getLocale()));
-        String institutionName = institutionUnit.getPartyName().getContent(Language.valueOf(getLocale().getLanguage()));
-        if (institutionName == null) {
-            institutionName = institutionUnit.getPartyName().getContent();
-        }
-        addParameter("institutionName", institutionName);
-        addParameter("institutionNameCaps", institutionName.toUpperCase(getLocale()));
+        //units info
+        addParameter("administrativeOfficeName", adminOfficeUnit.getPartyName());
+        addParameter("universityName", universityUnit.getPartyName());
+        addParameter("institutionName", institutionUnit.getPartyName());
 
-        addParameter("studentGender", student.getPerson().getGender());
-        addParameter("studentNumber", registration.getNumber());
-        addParameter("fullName", student.getPerson().getName().toUpperCase(getLocale()));
+        //student general info
+        addParameter("student", student.getPerson());
+        //getLocalizedName is not forseen by Oddjet (when getContent(Locale) is available delete parameter and use student.idDocumentType
         addParameter("idDocType", student.getPerson().getIdDocumentType().getLocalizedName(getLocale()));
-        addParameter("idDocNumber", student.getPerson().getDocumentIdNumber());
+        //Once pretty print is no longer necessary delete parameters and use student.parishOfBirth and student.districtSubdivisionOfBirth
         addParameter("parishOfBirth", StringFormatter.prettyPrint(student.getPerson().getParishOfBirth()));
         addParameter("districtSubdivisionOfBirth",
                 StringFormatter.prettyPrint(student.getPerson().getDistrictSubdivisionOfBirth()));
-        addParameter("nationality", student.getPerson().getCountry().getFilteredNationality(getLocale()).toUpperCase(getLocale()));
-        addParameter("isRegistered", new Boolean(executionYear.containsDate(new DateTime())));
 
-        addParameter("schoolYear", executionYear.getYear());
+        //registration and year related info
+        //a student's number may vary between registrations (for old students mostly)
+        addParameter("registrationStudentNumber", registration.getNumber());
         addParameter("degreeDescription", registration.getDegreeDescription(executionYear,
                 degreeType.hasExactlyOneCycleType() ? degreeType.getCycleType() : registration.getCycleType(executionYear),
                 getLocale()));
+        addParameter("isRegistered", new Boolean(executionYear.containsDate(new DateTime())));
+        addParameter("schoolYear", executionYear.getYear());
 
+        //document request info
         addParameter("documentNumber", documentRequest.getServiceRequestNumber());
         addParameter("civilYear", documentRequest.getAcademicServiceRequestYear().getYear());
     }
 
     protected void addCurricularYear() {
+        //curricular year info
         addParameter("hasOnlyOneCurricularYear", documentRequest.getDegreeType().hasExactlyOneCurricularYear());
-        String studentCurricularYear = "";
+        String registrationCurricularYear = "";
         if (!documentRequest.getDegreeType().hasExactlyOneCurricularYear()) {
             ExecutionYear executionYear = getExecutionYear();
             final Integer curricularYear = Integer.valueOf(documentRequest.getRegistration().getCurricularYear(executionYear));
 
-            studentCurricularYear =
-                    ResourceBundle.getBundle("resources.EnumerationResources", getLocale())
-                            .getString(curricularYear.toString() + ".ordinal").toUpperCase(getLocale());
+            registrationCurricularYear =
+                    ResourceBundle.getBundle("resources.EnumerationResources", getLocale()).getString(
+                            curricularYear.toString() + ".ordinal");
         }
-        addParameter("studentCurricularYear", studentCurricularYear);
+        addParameter("registrationCurricularYear", registrationCurricularYear);
     }
 
     protected ExecutionYear getExecutionYear() {

@@ -1,6 +1,6 @@
 package net.sourceforge.fenixedu.presentationTier.docs.academicAdministrativeOffice;
 
-import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 
 import net.sourceforge.fenixedu.domain.accounting.postingRules.serviceRequests.CertificateRequestPR;
@@ -9,14 +9,17 @@ import net.sourceforge.fenixedu.domain.serviceRequests.AcademicServiceRequestSit
 import net.sourceforge.fenixedu.domain.serviceRequests.documentRequests.CertificateRequest;
 import net.sourceforge.fenixedu.util.Money;
 
+import org.fenixedu.oddjet.exception.DocumentLoadException;
+
 public class CertificateODTDocument extends AdministrativeOfficeODTDocument {
 
-    public CertificateODTDocument(String templatePath, CertificateRequest documentRequest) throws SecurityException, IOException {
+    public CertificateODTDocument(String templatePath, CertificateRequest documentRequest) throws DocumentLoadException,
+            FileNotFoundException {
         super(templatePath, documentRequest);
-        setUp(documentRequest);
+        setup(documentRequest);
     }
 
-    private void setUp(CertificateRequest documentRequest) {
+    private void setup(CertificateRequest documentRequest) {
         boolean hasPrice =
                 documentRequest.getAcademicServiceRequestSituationType() == AcademicServiceRequestSituationType.PROCESSING
                         && !documentRequest.isFree() || documentRequest.hasEvent();

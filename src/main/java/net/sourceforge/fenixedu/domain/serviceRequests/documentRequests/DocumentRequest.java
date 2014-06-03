@@ -17,13 +17,16 @@ import net.sourceforge.fenixedu.domain.serviceRequests.RegistryCode;
 import net.sourceforge.fenixedu.presentationTier.docs.academicAdministrativeOffice.AdministrativeOfficeDocument;
 import net.sourceforge.fenixedu.presentationTier.docs.academicAdministrativeOffice.EnrollmentCertificateODTDocument;
 import net.sourceforge.fenixedu.presentationTier.docs.academicAdministrativeOffice.EnrollmentDeclarationODTDocument;
+import net.sourceforge.fenixedu.presentationTier.docs.academicAdministrativeOffice.IRSDeclarationODTDocument;
 import net.sourceforge.fenixedu.presentationTier.docs.academicAdministrativeOffice.RegistrationCertificateODTDocument;
 import net.sourceforge.fenixedu.presentationTier.docs.academicAdministrativeOffice.RegistrationDeclarationODTDocument;
 import net.sourceforge.fenixedu.util.report.ReportsUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.fenixedu.oddjet.exception.DocumentLoadException;
 import org.fenixedu.oddjet.exception.DocumentSaveException;
 import org.fenixedu.oddjet.exception.OpenOfficeConnectionException;
+import org.joda.time.DateTime;
 
 public abstract class DocumentRequest extends DocumentRequest_Base implements IDocumentRequest {
     public static Comparator<AcademicServiceRequest> COMPARATOR_BY_REGISTRY_NUMBER = new Comparator<AcademicServiceRequest>() {
@@ -170,22 +173,26 @@ public abstract class DocumentRequest extends DocumentRequest_Base implements ID
             case ENROLMENT_DECLARATION:
                 return new EnrollmentDeclarationODTDocument(
                         "/odtreports/academicOffice/enrollment/declaration/DeclaracaoInscricao"
-                                + getLanguage().name().toUpperCase() + ".odt", (EnrolmentDeclarationRequest) this)
+                                + getLanguage().getLanguage().toUpperCase() + ".odt", (EnrolmentDeclarationRequest) this)
                         .getInstancePDFByteArray();
             case ENROLMENT_CERTIFICATE:
                 return new EnrollmentCertificateODTDocument("/odtreports/academicOffice/enrollment/certificate/CertidaoInscricao"
-                        + getLanguage().name().toUpperCase() + ".odt", (EnrolmentCertificateRequest) this)
+                        + getLanguage().getLanguage().toUpperCase() + ".odt", (EnrolmentCertificateRequest) this)
                         .getInstancePDFByteArray();
             case SCHOOL_REGISTRATION_CERTIFICATE:
                 return new RegistrationCertificateODTDocument(
                         "/odtreports/academicOffice/registration/certificate/CertidaoMatricula"
-                                + getLanguage().name().toUpperCase() + ".odt", (CertificateRequest) this)
+                                + getLanguage().getLanguage().toUpperCase() + ".odt", (CertificateRequest) this)
                         .getInstancePDFByteArray();
             case SCHOOL_REGISTRATION_DECLARATION:
                 return new RegistrationDeclarationODTDocument(
                         "/odtreports/academicOffice/registration/declaration/DeclaracaoMatricula"
-                                + getLanguage().name().toUpperCase() + ".odt", this).getInstancePDFByteArray();
+                                + getLanguage().getLanguage().toUpperCase() + ".odt", this).getInstancePDFByteArray();
+            case IRS_DECLARATION:
+                return new IRSDeclarationODTDocument("/odtreports/academicOffice/irs/declaration/DeclaracaoIRS"
+                        + getLanguage().getLanguage().toUpperCase() + ".odt", this).getInstancePDFByteArray();
             default:
+
                 List<AdministrativeOfficeDocument> documents =
                         AdministrativeOfficeDocument.AdministrativeOfficeDocumentCreator.create(this);
                 final AdministrativeOfficeDocument[] array = {};
@@ -205,26 +212,24 @@ public abstract class DocumentRequest extends DocumentRequest_Base implements ID
         try {
             switch (getDocumentRequestType()) {
             case ENROLMENT_DECLARATION:
-                return new EnrollmentDeclarationODTDocument(
-                        "/odtreports/academicOffice/enrollment/declaration/DeclaracaoInscricao"
-                                + getLanguage().name().toUpperCase() + ".odt", (EnrolmentDeclarationRequest) this)
-                        .getReportFileName();
             case ENROLMENT_CERTIFICATE:
-                return new EnrollmentCertificateODTDocument("/odtreports/academicOffice/enrollment/certificate/CertidaoInscricao"
-                        + getLanguage().name().toUpperCase() + ".odt", (EnrolmentCertificateRequest) this).getReportFileName();
             case SCHOOL_REGISTRATION_CERTIFICATE:
-                return new RegistrationCertificateODTDocument(
-                        "/odtreports/academicOffice/registration/certificate/CertidaoMatricula"
-                                + getLanguage().name().toUpperCase() + ".odt", (CertificateRequest) this).getReportFileName();
             case SCHOOL_REGISTRATION_DECLARATION:
-                return new RegistrationDeclarationODTDocument(
-                        "/odtreports/academicOffice/registration/declaration/DeclaracaoMatricula"
-                                + getLanguage().name().toUpperCase() + ".odt", this).getReportFileName();
+            case IRS_DECLARATION:
+                final StringBuilder result = new StringBuilder();
+                result.append(this.getPerson().getIstUsername());
+                result.append("-");
+                result.append(new DateTime().toString("yyyyMMdd", getLocale()));
+                result.append("-");
+                result.append(this.getDescription().replaceAll("[\\s:]", StringUtils.EMPTY));
+                result.append("-");
+                result.append(getLocale().toString());
+                return result.toString();
             default:
                 return AdministrativeOfficeDocument.AdministrativeOfficeDocumentCreator.create(this).iterator().next()
                         .getReportFileName();
             }
-        } catch (SecurityException | IOException e) {
+        } catch (SecurityException e) {
             throw new DomainException("error.documentRequest.errorGeneratingDocument", e);
         }
     }

@@ -1,6 +1,6 @@
 package net.sourceforge.fenixedu.presentationTier.docs.academicAdministrativeOffice;
 
-import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,20 +12,20 @@ import net.sourceforge.fenixedu.domain.Enrolment;
 import net.sourceforge.fenixedu.domain.OptionalEnrolment;
 import net.sourceforge.fenixedu.domain.serviceRequests.documentRequests.EnrolmentCertificateRequest;
 
+import org.fenixedu.oddjet.exception.DocumentLoadException;
 import org.fenixedu.oddjet.table.CategoricalTableData;
 
-import pt.utl.ist.fenix.tools.util.i18n.Language;
 import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
 public class EnrollmentCertificateODTDocument extends CertificateODTDocument {
 
     public EnrollmentCertificateODTDocument(String templatePath, EnrolmentCertificateRequest documentRequest)
-            throws SecurityException, IOException {
+            throws DocumentLoadException, FileNotFoundException {
         super(templatePath, documentRequest);
-        setUp(documentRequest);
+        setup(documentRequest);
     }
 
-    private void setUp(EnrolmentCertificateRequest documentRequest) {
+    private void setup(EnrolmentCertificateRequest documentRequest) {
 
         addCurricularYear();
 
@@ -73,14 +73,14 @@ public class EnrollmentCertificateODTDocument extends CertificateODTDocument {
     }
 
     private CategoricalTableData getEnrollmentTableData(Collection<Enrolment> enrollments) {
-        Map<String, List<Object>> enrolledCourses = new HashMap<>();
+        Map<String, List> enrolledCourses = new HashMap<>();
         List<Object> name = new ArrayList<>();
         List<Object> ects = new ArrayList<>();
         if (documentRequest.isToShowCredits()) {
             String creditsDescription = "";
             creditsDescription =
                     documentRequest.isRequestForRegistration() ? documentRequest.getDegreeType().getCreditsDescription() : "";
-            addEnrollmentData(enrollments, name, ects, creditsDescription);
+                    addEnrollmentData(enrollments, name, ects, creditsDescription);
         } else {
             addEnrollmentData(enrollments, name);
         }
@@ -97,7 +97,7 @@ public class EnrollmentCertificateODTDocument extends CertificateODTDocument {
         } else {
             eNameMLS = e.getName();
         }
-        String eName = eNameMLS.getContent(Language.valueOf(getLocale().getLanguage()));
+        String eName = eNameMLS.getContent(getLocale());
         if (eName == null || eName.trim().isEmpty()) {
             eName = eNameMLS.getPreferedContent();
         }

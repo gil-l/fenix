@@ -17,10 +17,10 @@ public class EnrollmentDeclarationODTDocument extends DeclarationODTDocument {
     public EnrollmentDeclarationODTDocument(String templatePath, EnrolmentDeclarationRequest documentRequest)
             throws SecurityException, IOException {
         super(templatePath, documentRequest);
-        setUp(documentRequest);
+        setup(documentRequest);
     }
 
-    private void setUp(EnrolmentDeclarationRequest documentRequest) {
+    private void setup(EnrolmentDeclarationRequest documentRequest) {
 
         addCurricularYear();
 

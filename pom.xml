@@ -304,8 +304,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.fenixedu</groupId>
-            <artifactId>oddjet</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+    		<artifactId>oddjet</artifactId>
+    		<version>1.0.0</version>
         </dependency>
         <dependency>
 			<groupId>joda-time</groupId>
