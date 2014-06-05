@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain;
 
 import java.math.BigDecimal;
@@ -35,7 +53,6 @@ import org.apache.commons.collections.comparators.ReverseComparator;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.util.CoreConfiguration;
 import org.fenixedu.spaces.domain.Space;
-import org.fenixedu.spaces.domain.UnavailableException;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
@@ -626,7 +643,7 @@ public class Lesson extends Lesson_Base {
     private YearMonthDay getValidBeginDate(YearMonthDay startDate) {
         YearMonthDay lessonBegin =
                 startDate.toDateTimeAtMidnight().withDayOfWeek(getDiaSemana().getDiaSemanaInDayOfWeekJodaFormat())
-                        .toYearMonthDay();
+                .toYearMonthDay();
         if (lessonBegin.isBefore(startDate)) {
             lessonBegin = lessonBegin.plusDays(NUMBER_OF_DAYS_IN_WEEK);
         }
@@ -643,21 +660,16 @@ public class Lesson extends Lesson_Base {
     }
 
     public Space getLessonCampus() {
-        try {
-            if (!wasFinished()) {
-                return hasSala() ? SpaceUtils.getSpaceCampus(getSala()) : null;
+        if (!wasFinished()) {
+            return hasSala() ? SpaceUtils.getSpaceCampus(getSala()) : null;
+        } else {
+            LessonInstance lastLessonInstance = getLastLessonInstance();
+            if (lastLessonInstance != null && lastLessonInstance.getRoom() != null) {
+                return SpaceUtils.getSpaceCampus(lastLessonInstance.getRoom());
             } else {
-                LessonInstance lastLessonInstance = getLastLessonInstance();
-                if (lastLessonInstance != null && lastLessonInstance.getRoom() != null) {
-                    return SpaceUtils.getSpaceCampus(lastLessonInstance.getRoom());
-                } else {
-                    return null;
-                }
+                return null;
             }
-        } catch (UnavailableException e) {
-            return null;
         }
-
     }
 
     public YearMonthDay getNextPossibleSummaryDate() {
@@ -821,21 +833,21 @@ public class Lesson extends Lesson_Base {
             final int dayIncrement =
                     getFrequency() == FrequencyType.BIWEEKLY ? FrequencyType.WEEKLY.getNumberOfDays() : getFrequency()
                             .getNumberOfDays();
-            boolean shouldAdd = true;
-            while (true) {
-                if (isDayValid(startDateToSearch, lessonCampus)) {
-                    if (getFrequency() != FrequencyType.BIWEEKLY || shouldAdd) {
-                        if (!isHoliday(startDateToSearch, lessonCampus)) {
-                            result.add(startDateToSearch);
+                    boolean shouldAdd = true;
+                    while (true) {
+                        if (isDayValid(startDateToSearch, lessonCampus)) {
+                            if (getFrequency() != FrequencyType.BIWEEKLY || shouldAdd) {
+                                if (!isHoliday(startDateToSearch, lessonCampus)) {
+                                    result.add(startDateToSearch);
+                                }
+                            }
+                            shouldAdd = !shouldAdd;
+                        }
+                        startDateToSearch = startDateToSearch.plusDays(dayIncrement);
+                        if (startDateToSearch.isAfter(endDateToSearch)) {
+                            break;
                         }
                     }
-                    shouldAdd = !shouldAdd;
-                }
-                startDateToSearch = startDateToSearch.plusDays(dayIncrement);
-                if (startDateToSearch.isAfter(endDateToSearch)) {
-                    break;
-                }
-            }
         }
         return result;
     }
@@ -1166,8 +1178,8 @@ public class Lesson extends Lesson_Base {
                 intervals.add(new Interval(day.toLocalDate().toDateTime(
                         new LocalTime(getBeginHourMinuteSecond().getHour(), getBeginHourMinuteSecond().getMinuteOfHour(),
                                 getBeginHourMinuteSecond().getSecondOfMinute())), day.toLocalDate().toDateTime(
-                        new LocalTime(getEndHourMinuteSecond().getHour(), getEndHourMinuteSecond().getMinuteOfHour(),
-                                getEndHourMinuteSecond().getSecondOfMinute()))));
+                                        new LocalTime(getEndHourMinuteSecond().getHour(), getEndHourMinuteSecond().getMinuteOfHour(),
+                                                getEndHourMinuteSecond().getSecondOfMinute()))));
             }
         }
         return intervals;

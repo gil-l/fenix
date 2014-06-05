@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.phd.migration;
 
 import java.util.Map;
@@ -19,8 +37,6 @@ import org.fenixedu.bennu.core.domain.Bennu;
 
 public class PhdMigrationGuiding extends PhdMigrationGuiding_Base {
     public static final String IST_INSTITUTION_CODE = "1518";
-
-    private transient PhdMigrationGuidingBean guidingBean;
 
     protected PhdMigrationGuiding() {
         super();
@@ -101,21 +117,8 @@ public class PhdMigrationGuiding extends PhdMigrationGuiding_Base {
 
     }
 
-    public boolean hasPersonalBean() {
-        return guidingBean != null;
-    }
-
     public PhdMigrationGuidingBean getGuidingBean() {
-        if (hasPersonalBean()) {
-            return guidingBean;
-        }
-
-        guidingBean = new PhdMigrationGuidingBean(getData());
-        return guidingBean;
-    }
-
-    public void setGuidingBean(PhdMigrationGuidingBean guidingBean) {
-        this.guidingBean = guidingBean;
+        return new PhdMigrationGuidingBean(getData());
     }
 
     public void parseAndSetNumber(Map<String, String> INSTITUTION_MAP) {
@@ -123,10 +126,6 @@ public class PhdMigrationGuiding extends PhdMigrationGuiding_Base {
 
         setTeacherNumber(guidingBean.getTeacherCode());
         setInstitution(INSTITUTION_MAP.get(guidingBean.getInstitutionCode()));
-    }
-
-    public void parse() {
-        getGuidingBean();
     }
 
     public boolean isExternal() {

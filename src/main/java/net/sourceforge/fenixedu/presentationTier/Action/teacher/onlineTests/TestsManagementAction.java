@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 /*
  * Created on 14/Ago/2003
  */
@@ -13,7 +31,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.servlet.ServletOutputStream;
@@ -70,6 +87,7 @@ import net.sourceforge.fenixedu.domain.student.Registration;
 import net.sourceforge.fenixedu.presentationTier.Action.exceptions.FenixActionException;
 import net.sourceforge.fenixedu.presentationTier.Action.teacher.ManageExecutionCourseDA;
 import net.sourceforge.fenixedu.presentationTier.Action.teacher.executionCourse.ExecutionCourseBaseAction;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.tests.CardinalityType;
 import net.sourceforge.fenixedu.util.tests.CorrectionAvailability;
 import net.sourceforge.fenixedu.util.tests.CorrectionFormula;
@@ -91,7 +109,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.apache.struts.util.LabelValueBean;
-import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -101,6 +119,7 @@ import pt.ist.fenixWebFramework.struts.annotations.Input;
 import pt.ist.fenixWebFramework.struts.annotations.Mapping;
 import pt.ist.fenixframework.FenixFramework;
 
+import com.google.common.base.Strings;
 import com.google.common.io.BaseEncoding;
 
 /**
@@ -366,7 +385,7 @@ public class TestsManagementAction extends ExecutionCourseBaseAction {
             } catch (FenixServiceException e) {
                 throw new FenixActionException(e);
             }
-        } else if (optionShuffle != null) {
+        } else if (optionShuffle != null && !Strings.isNullOrEmpty(testCode)) {
             try {
                 img = ReadQuestionImage.run(testCode, exerciseCode, optionShuffle, imgCode, feedbackCode);
             } catch (FenixServiceException e) {
@@ -872,7 +891,7 @@ public class TestsManagementAction extends ExecutionCourseBaseAction {
             classification = 0;
         }
         request.setAttribute("classification", (new DecimalFormat("#0.##").format(classification)));
-        return doForward(request, "showStudentTest");
+        return doForward(request, "showStudentTestCorrection");
     }
 
     public ActionForward showStudentTestLog(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -1089,7 +1108,7 @@ public class TestsManagementAction extends ExecutionCourseBaseAction {
             request.setAttribute("changesType", changesType);
             return chooseAnotherExercise(mapping, form, request, response);
         }
-        return doForward(request, "showStudentTest");
+        return doForward(request, "showStudentTestCorrection");
     }
 
     public ActionForward prepareChangeStudentTestQuestionValue(ActionMapping mapping, ActionForm form,
@@ -1121,7 +1140,7 @@ public class TestsManagementAction extends ExecutionCourseBaseAction {
         }
         request.setAttribute("distributedTestCode", distributedTestCode);
         request.setAttribute("studentCode", studentCode);
-        return doForward(request, "showStudentTest");
+        return doForward(request, "showStudentTestCorrection");
     }
 
     public ActionForward prepareChangeStudentTestQuestionMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -1153,7 +1172,7 @@ public class TestsManagementAction extends ExecutionCourseBaseAction {
         }
         request.setAttribute("distributedTestCode", distributedTestCode);
         request.setAttribute("studentCode", studentCode);
-        return doForward(request, "showStudentTest");
+        return doForward(request, "showStudentTestCorrection");
     }
 
     public ActionForward chooseTestSimulationOptions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -1420,13 +1439,11 @@ public class TestsManagementAction extends ExecutionCourseBaseAction {
     }
 
     private String createDefaultDistributedTestInfo(Test test) {
-        ResourceBundle bundle = ResourceBundle.getBundle("resources.ApplicationResources");
-        return MessageFormat.format(bundle.getString("message.distributeTest.evaluation"), new Object[] { test.getTitle(),
-                test.getTestQuestions().size() });
+        return MessageFormat.format(BundleUtil.getString(Bundle.APPLICATION, "message.distributeTest.evaluation"), new Object[] {
+                test.getTitle(), test.getTestQuestions().size() });
     }
 
     private String createDefaultDistributedInquiryInfo() {
-        ResourceBundle bundle = ResourceBundle.getBundle("resources.ApplicationResources", I18N.getLocale());
-        return bundle.getString("message.distributeTest.inquiry");
+        return BundleUtil.getString(Bundle.APPLICATION, "message.distributeTest.inquiry");
     }
 }

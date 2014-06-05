@@ -1,4 +1,22 @@
 /**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
+/**
  * 
  */
 package net.sourceforge.fenixedu.applicationTier.Servico.messaging;
@@ -6,7 +24,6 @@ package net.sourceforge.fenixedu.applicationTier.Servico.messaging;
 import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import net.sourceforge.fenixedu.domain.Person;
@@ -17,11 +34,15 @@ import net.sourceforge.fenixedu.domain.person.RoleType;
 import net.sourceforge.fenixedu.domain.util.email.Message;
 import net.sourceforge.fenixedu.domain.util.email.Recipient;
 import net.sourceforge.fenixedu.domain.util.email.SystemSender;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.HtmlToTextConverterUtil;
 
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.UserGroup;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
+
+import pt.ist.fenixframework.FenixFramework;
 
 /**
  * @author <a href="mailto:goncalo@ist.utl.pt"> Goncalo Luiz</a><br/>
@@ -32,8 +53,9 @@ public abstract class ForumService {
 
     protected static final Locale DEFAULT_LOCALE = new Locale("pt");
 
-    protected static final ResourceBundle GLOBAL_RESOURCES = ResourceBundle
-            .getBundle("resources.GlobalResources", DEFAULT_LOCALE);
+    private static String getString(final String key) {
+        return BundleUtil.getString(Bundle.GLOBAL, DEFAULT_LOCALE, key);
+    }
 
     protected void sendNotifications(ConversationMessage conversationMessage) {
         this.notifyEmailSubscribers(conversationMessage);
@@ -99,8 +121,7 @@ public abstract class ForumService {
 
     private void sendEmailToPersons(Set<Person> persons, String personsName, String subject, String body) {
         if (!persons.isEmpty()) {
-            final Recipient recipient =
-                    new Recipient(GLOBAL_RESOURCES.getString("label.teachers"), UserGroup.of(Person.convertToUsers(persons)));
+            final Recipient recipient = new Recipient(getString("label.teachers"), UserGroup.of(Person.convertToUsers(persons)));
             SystemSender systemSender = Bennu.getInstance().getSystemSender();
             new Message(systemSender, systemSender.getConcreteReplyTos(), recipient.asCollection(), subject, body, "");
         }
@@ -110,15 +131,12 @@ public abstract class ForumService {
             ConversationMessage conversationMessage) {
         final String emailSubject = getEmailFormattedSubject(conversationMessage.getConversationThread());
 
-        sendEmailToPersons(teachers, GLOBAL_RESOURCES.getString("label.teachers"), emailSubject,
-                getEmailFormattedBody(conversationMessage, true));
-        sendEmailToPersons(students, GLOBAL_RESOURCES.getString("label.students"), emailSubject,
-                getEmailFormattedBody(conversationMessage, false));
+        sendEmailToPersons(teachers, getString("label.teachers"), emailSubject, getEmailFormattedBody(conversationMessage, true));
+        sendEmailToPersons(students, getString("label.students"), emailSubject, getEmailFormattedBody(conversationMessage, false));
     }
 
     private String getEmailFormattedSubject(ConversationThread conversationThread) {
-        String emailSubject =
-                MessageFormat.format(GLOBAL_RESOURCES.getString("forum.email.subject"), conversationThread.getTitle());
+        String emailSubject = MessageFormat.format(getString("forum.email.subject"), conversationThread.getTitle());
 
         return emailSubject;
     }
@@ -127,7 +145,7 @@ public abstract class ForumService {
         String emailBodyAsText = HtmlToTextConverterUtil.convertToText(conversationMessage.getBody().getContent());
 
         String emailFormattedBody =
-                MessageFormat.format(GLOBAL_RESOURCES.getString("forum.email.body"), conversationMessage.getCreator().getName(),
+                MessageFormat.format(getString("forum.email.body"), conversationMessage.getCreator().getName(),
                         conversationMessage.getConversationThread().getTitle(), conversationMessage.getConversationThread()
                                 .getForum().getName(), emailBodyAsText);
 

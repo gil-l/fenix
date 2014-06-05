@@ -1,19 +1,37 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.util.email;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Set;
 
+import net.sourceforge.fenixedu.util.Bundle;
+
 import org.apache.commons.lang.StringUtils;
-import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;
 import pt.utl.ist.fenix.tools.util.EMail;
-import java.util.Locale;
 
 public class EmailBean implements Serializable {
 
@@ -134,11 +152,9 @@ public class EmailBean implements Serializable {
     }
 
     public String validate() {
-        final ResourceBundle resourceBundle = ResourceBundle.getBundle("resources.ApplicationResources", I18N.getLocale());
-
         String bccs = getBccs();
         if (getRecipients().isEmpty() && StringUtils.isEmpty(bccs)) {
-            return resourceBundle.getString("error.email.validation.no.recipients");
+            return BundleUtil.getString(Bundle.APPLICATION, "error.email.validation.no.recipients");
         }
 
         if (!StringUtils.isEmpty(bccs)) {
@@ -146,7 +162,7 @@ public class EmailBean implements Serializable {
             for (String emailString : emails) {
                 final String email = emailString.trim();
                 if (!email.matches(EMail.W3C_EMAIL_SINTAX_VALIDATOR)) {
-                    StringBuilder builder = new StringBuilder(resourceBundle.getString("error.email.validation.bcc.invalid"));
+                    StringBuilder builder = new StringBuilder(BundleUtil.getString(Bundle.APPLICATION, "error.email.validation.bcc.invalid"));
                     builder.append(email);
                     return builder.toString();
                 }
@@ -154,11 +170,11 @@ public class EmailBean implements Serializable {
         }
 
         if (StringUtils.isEmpty(getSubject())) {
-            return resourceBundle.getString("error.email.validation.subject.empty");
+            return BundleUtil.getString(Bundle.APPLICATION, "error.email.validation.subject.empty");
         }
 
         if (StringUtils.isEmpty(getMessage()) && StringUtils.isEmpty(getHtmlMessage())) {
-            return resourceBundle.getString("error.email.validation.message.empty");
+            return BundleUtil.getString(Bundle.APPLICATION, "error.email.validation.message.empty");
         }
 
         return null;
@@ -174,15 +190,13 @@ public class EmailBean implements Serializable {
 
     @Atomic
     public Message send() {
-        final ResourceBundle resourceBundle = ResourceBundle.getBundle("resources.ApplicationResources", I18N.getLocale());
-
         final StringBuilder message = new StringBuilder();
         if (getMessage() != null && !getMessage().trim().isEmpty()) {
             message.append(getMessage());
             message.append("\n\n---\n");
-            message.append(resourceBundle.getString("message.email.footer.prefix"));
+            message.append(BundleUtil.getString(Bundle.APPLICATION, "message.email.footer.prefix"));
             message.append(getSender().getFromName());
-            message.append(resourceBundle.getString("message.email.footer.prefix.suffix"));
+            message.append(BundleUtil.getString(Bundle.APPLICATION, "message.email.footer.prefix.suffix"));
             for (final Recipient recipient : getRecipients()) {
                 message.append("\n\t");
                 message.append(recipient.getToName());

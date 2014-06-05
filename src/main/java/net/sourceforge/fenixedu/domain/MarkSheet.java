@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain;
 
 import static net.sourceforge.fenixedu.injectionCode.AccessControl.check;
@@ -11,7 +29,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -28,18 +45,18 @@ import net.sourceforge.fenixedu.domain.exceptions.InDebtEnrolmentsException;
 import net.sourceforge.fenixedu.domain.person.RoleType;
 import net.sourceforge.fenixedu.domain.student.Student;
 import net.sourceforge.fenixedu.predicates.MarkSheetPredicates;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.EnrolmentEvaluationState;
 import net.sourceforge.fenixedu.util.FenixDigestUtils;
 import net.sourceforge.fenixedu.util.report.ReportsUtils;
 
 import org.apache.commons.collections.comparators.ComparatorChain;
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;
 import pt.utl.ist.fenix.tools.util.DateFormatUtil;
-import java.util.Locale;
 
 public class MarkSheet extends MarkSheet_Base {
 
@@ -633,10 +650,9 @@ public class MarkSheet extends MarkSheet_Base {
         parameters.put("checkSum", FenixDigestUtils.getPrettyCheckSum(markSheet.getCheckSum()));
         parameters.put("rectification", rectification);
         parameters.put("rectified", rectification.getRectified());
-        ResourceBundle bundle = ResourceBundle.getBundle("resources.ReportsResources", I18N.getLocale());
 
         boolean result =
-                ReportsUtils.printReport("markSheetRectification", parameters, bundle, Collections.emptyList(), printerName);
+                ReportsUtils.printReport("markSheetRectification", parameters, Collections.emptyList(), printerName);
         if (!result) {
             throw new UnableToPrintServiceException("error.print.failed");
         }
@@ -646,11 +662,10 @@ public class MarkSheet extends MarkSheet_Base {
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("markSheet", markSheet);
         parameters.put("checkSum", FenixDigestUtils.getPrettyCheckSum(markSheet.getCheckSum()));
-        ResourceBundle bundle = ResourceBundle.getBundle("resources.ReportsResources", I18N.getLocale());
         List<EnrolmentEvaluation> evaluations = new ArrayList<EnrolmentEvaluation>(markSheet.getEnrolmentEvaluations());
         Collections.sort(evaluations, EnrolmentEvaluation.SORT_BY_STUDENT_NUMBER);
 
-        boolean result = ReportsUtils.printReport("markSheet", parameters, bundle, evaluations, printerName);
+        boolean result = ReportsUtils.printReport("markSheet", parameters, evaluations, printerName);
         if (!result) {
             throw new UnableToPrintServiceException("error.print.failed");
         }
@@ -961,13 +976,9 @@ public class MarkSheet extends MarkSheet_Base {
 
     public String getStateDiscription() {
         StringBuilder stringBuilder = new StringBuilder();
-        final ResourceBundle enumerationResources =
-                ResourceBundle.getBundle("resources.EnumerationResources", I18N.getLocale());
-        stringBuilder.append(enumerationResources.getString(getMarkSheetState().getName()).trim());
+        stringBuilder.append(BundleUtil.getString(Bundle.ENUMERATION, getMarkSheetState().getName()).trim());
         if (getSubmittedByTeacher()) {
-            final ResourceBundle academicResources =
-                    ResourceBundle.getBundle("resources.AcademicAdminOffice", I18N.getLocale());
-            stringBuilder.append(" (").append(academicResources.getString("label.markSheet.submittedByTeacher").trim())
+            stringBuilder.append(" (").append(BundleUtil.getString(Bundle.ACADEMIC, "label.markSheet.submittedByTeacher").trim())
                     .append(")");
         }
         return stringBuilder.toString();

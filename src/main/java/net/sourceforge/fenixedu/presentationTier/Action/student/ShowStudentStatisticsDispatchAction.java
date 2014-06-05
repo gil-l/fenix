@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.student;
 
 import java.util.ArrayList;
@@ -6,7 +24,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,18 +41,18 @@ import net.sourceforge.fenixedu.domain.student.Student;
 import net.sourceforge.fenixedu.domain.time.calendarStructure.AcademicInterval;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction;
 import net.sourceforge.fenixedu.presentationTier.Action.student.StudentApplication.StudentViewApp;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.portal.EntryPoint;
 import org.fenixedu.bennu.portal.StrutsFunctionality;
-import org.fenixedu.commons.i18n.I18N;
 
 import pt.ist.fenixWebFramework.struts.annotations.Forward;
 import pt.ist.fenixWebFramework.struts.annotations.Forwards;
 import pt.ist.fenixWebFramework.struts.annotations.Mapping;
-import java.util.Locale;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -334,14 +351,12 @@ public class ShowStudentStatisticsDispatchAction extends FenixDispatchAction {
     }
 
     private JsonObject computeFinalGrades(ExecutionCourse executionCourse) {
-        ResourceBundle bundle = ResourceBundle.getBundle("resources.StudentResources", I18N.getLocale());
-
         List<Enrolment> enrolments = executionCourse.getActiveEnrollments();
         if (enrolments.isEmpty()) {
             return null;
         }
         JsonObject enrolmentsJsonObject = new JsonObject();
-        enrolmentsJsonObject.addProperty("name", bundle.getString("label.student.statistics.marksheet"));
+        enrolmentsJsonObject.addProperty("name", BundleUtil.getString(Bundle.STUDENT, "label.student.statistics.marksheet"));
         GradeScale gradeScale = enrolments.get(0).getGradeScale();
         enrolmentsJsonObject.addProperty("grade-scale", gradeScale.name());
         populateMinAndMaxGrade(gradeScale, enrolmentsJsonObject);

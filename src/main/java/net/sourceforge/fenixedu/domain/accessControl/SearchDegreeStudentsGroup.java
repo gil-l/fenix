@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.accessControl;
 
 import java.io.Serializable;
@@ -6,7 +24,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -18,9 +35,11 @@ import net.sourceforge.fenixedu.domain.contacts.EmailAddress;
 import net.sourceforge.fenixedu.domain.student.Registration;
 import net.sourceforge.fenixedu.domain.student.registrationStates.RegistrationState;
 import net.sourceforge.fenixedu.domain.student.registrationStates.RegistrationStateType;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.bennu.core.groups.UserGroup;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import pt.ist.fenixframework.FenixFramework;
 
@@ -218,8 +237,7 @@ public class SearchDegreeStudentsGroup implements Serializable {
                 users.add(user);
             }
         }
-//        return UserGroup.of(users);
-        return null;
+        return UserGroup.of(users);
     }
 
     private Comparator<StudentCurricularPlan> determineComparatorKind() {
@@ -424,7 +442,7 @@ public class SearchDegreeStudentsGroup implements Serializable {
             return false;
         }
 
-        final double arithmeticMean = studentCurricularPlan.getRegistration().getArithmeticMean();
+        final double arithmeticMean = studentCurricularPlan.getRegistration().getCurriculum().getAverage().doubleValue();
 
         if (minGrade != null && minGrade > arithmeticMean) {
             return false;
@@ -468,7 +486,7 @@ public class SearchDegreeStudentsGroup implements Serializable {
     }
 
     public String getApplicationResourcesString(String name) {
-        return ResourceBundle.getBundle("resources/ApplicationResources", I18N.getLocale()).getString(name);
+        return BundleUtil.getString(Bundle.APPLICATION, name);
     }
 
     public String getLabel() {

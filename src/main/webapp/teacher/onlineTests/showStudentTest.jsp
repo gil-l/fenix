@@ -1,3 +1,23 @@
+<%--
+
+    Copyright © 2002 Instituto Superior Técnico
+
+    This file is part of FenixEdu Core.
+
+    FenixEdu Core is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    FenixEdu Core is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+
+--%>
 <%@ page language="java" %>
 <%@ taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <html:xhtml/>
@@ -6,9 +26,9 @@
 <logic:present name="studentTestQuestionList">
 <logic:notEmpty name="studentTestQuestionList" >
 
-<bean:define id="testCode" value='<%=request.getParameter("testCode")%>'/>
-<bean:define id="pageType" value='<%=request.getParameter("pageType")%>'/>
-<bean:define id="correctionType" value='<%=request.getParameter("correctionType")%>'/>
+<bean:define id="testCode" value="${pageContext.request.getParameter('distributedTestCode')}"/>
+<bean:define id="pageType" value="${pageContext.request.getParameter('pageType')}"/>
+<bean:define id="correctionType" value="${pageContext.request.getParameter('correctionType')}"/>
 
 <span class="error"><!-- Error messages go here --><html:errors /></span>
 <br/>

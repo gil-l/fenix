@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.BolonhaManager;
 
 import static net.sourceforge.fenixedu.injectionCode.AccessControl.check;
@@ -30,7 +48,8 @@ import net.sourceforge.fenixedu.injectionCode.AccessControl;
 import net.sourceforge.fenixedu.predicates.RolePredicates;
 import net.sourceforge.fenixedu.presentationTier.Action.BolonhaManager.BolonhaManagerApplication.CompetenceCourseManagementApp;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
@@ -367,10 +386,10 @@ public class ManageCompetenceCourseInformationVersions extends FenixDispatchActi
 
             final Spreadsheet spreadsheet = new Spreadsheet("list");
             spreadsheet
-                    .setHeader(BundleUtil.getStringFromResourceBundle("resources.BolonhaManagerResources", "competenceCourse"));
-            spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.BolonhaManagerResources", "curricularPlan"));
-            spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.BolonhaManagerResources", "curricularYear"));
-            spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.BolonhaManagerResources", "label.semester"));
+                    .setHeader(BundleUtil.getString(Bundle.BOLONHA, "competenceCourse"));
+            spreadsheet.setHeader(BundleUtil.getString(Bundle.BOLONHA, "curricularPlan"));
+            spreadsheet.setHeader(BundleUtil.getString(Bundle.BOLONHA, "curricularYear"));
+            spreadsheet.setHeader(BundleUtil.getString(Bundle.BOLONHA, "label.semester"));
 
             for (final CompetenceCourse competenceCourse : competenceCourses) {
                 if (competenceCourse.getCurricularStage() == CurricularStage.APPROVED) {

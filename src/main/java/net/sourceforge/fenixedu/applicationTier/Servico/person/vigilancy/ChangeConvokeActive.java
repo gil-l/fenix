@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.applicationTier.Servico.person.vigilancy;
 
 import java.util.Collections;
@@ -13,7 +31,8 @@ import net.sourceforge.fenixedu.domain.util.email.PersonSender;
 import net.sourceforge.fenixedu.domain.util.email.Recipient;
 import net.sourceforge.fenixedu.domain.vigilancy.Vigilancy;
 import net.sourceforge.fenixedu.domain.vigilancy.VigilantGroup;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import org.joda.time.DateTime;
 
@@ -27,7 +46,7 @@ public class ChangeConvokeActive {
         convoke.setActive(bool);
         sendEmailNotification(bool, person, convoke);
         for (ExecutionCourse ec : convoke.getAssociatedExecutionCourses()) {
-            EvaluationManagementLog.createLog(ec, "resources.MessagingResources",
+            EvaluationManagementLog.createLog(ec, Bundle.MESSAGING,
                     "log.executionCourse.evaluation.generic.edited.vigilancy", convoke.getWrittenEvaluation()
                             .getPresentationName(), ec.getName(), ec.getDegreePresentationString());
         }
@@ -54,7 +73,7 @@ public class ChangeConvokeActive {
         String beginDateString = date.getDayOfMonth() + "-" + date.getMonthOfYear() + "-" + date.getYear();
 
         String subject =
-                BundleUtil.getStringFromResourceBundle("resources.VigilancyResources", "email.convoke.subject", new String[] {
+                BundleUtil.getString(Bundle.VIGILANCY, "email.convoke.subject", new String[] {
                         writtenEvaluation.getName(), group.getName(), beginDateString, time });
 
         new Message(PersonSender.newInstance(person), new ConcreteReplyTo(replyTo).asCollection(), new Recipient(
@@ -69,14 +88,14 @@ public class ChangeConvokeActive {
         DateTime beginDate = writtenEvaluation.getBeginningDateTime();
         String date = beginDate.getDayOfMonth() + "-" + beginDate.getMonthOfYear() + "-" + beginDate.getYear();
 
-        return BundleUtil.getStringFromResourceBundle(
-                "resources.VigilancyResources",
+        return BundleUtil.getString(
+                Bundle.VIGILANCY,
                 "email.convoke.active.body",
                 new String[] {
                         convoke.getVigilantWrapper().getPerson().getName(),
-                        (bool) ? BundleUtil.getStringFromResourceBundle("resources.VigilancyResources",
-                                "email.convoke.convokedAgain") : BundleUtil.getStringFromResourceBundle(
-                                "resources.VigilancyResources", "email.convoke.uncovoked"), writtenEvaluation.getFullName(),
+                        (bool) ? BundleUtil.getString(Bundle.VIGILANCY,
+                                "email.convoke.convokedAgain") : BundleUtil.getString(
+                                Bundle.VIGILANCY, "email.convoke.uncovoked"), writtenEvaluation.getFullName(),
                         date, writtenEvaluation.getBeginningDateHourMinuteSecond().toString() });
     }
 }

@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.contacts;
 
 import static net.sourceforge.fenixedu.injectionCode.AccessControl.check;
@@ -14,7 +32,8 @@ import net.sourceforge.fenixedu.domain.exceptions.DomainException;
 import net.sourceforge.fenixedu.domain.organizationalStructure.Party;
 import net.sourceforge.fenixedu.domain.person.RoleType;
 import net.sourceforge.fenixedu.predicates.RolePredicates;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
@@ -336,7 +355,7 @@ public abstract class PartyContact extends PartyContact_Base {
     }
 
     protected void logCreateAux(Person person, String typeKey) {
-        final String infoLabel = BundleUtil.getStringFromResourceBundle("resources.ApplicationResources", typeKey);
+        final String infoLabel = BundleUtil.getString(Bundle.APPLICATION, typeKey);
         final String personViewed = PersonInformationLog.getPersonNameForLogDescription(person);
 
         final String descriptionKey;
@@ -346,7 +365,7 @@ public abstract class PartyContact extends PartyContact_Base {
             descriptionKey = "log.personInformation.contact.generic.create";
         }
 
-        PersonInformationLog.createLog(person, "resources.MessagingResources", descriptionKey, infoLabel,
+        PersonInformationLog.createLog(person, Bundle.MESSAGING, descriptionKey, infoLabel,
                 this.getPresentationValue(), personViewed);
     }
 
@@ -355,7 +374,7 @@ public abstract class PartyContact extends PartyContact_Base {
 
     protected void logEditAux(Person person, boolean propertiesChanged, boolean valueChanged, boolean createdNewContact,
             String newValue, String typeKey) {
-        final String infoLabel = BundleUtil.getStringFromResourceBundle("resources.ApplicationResources", typeKey);
+        final String infoLabel = BundleUtil.getString(Bundle.APPLICATION, typeKey);
         final String personViewed = PersonInformationLog.getPersonNameForLogDescription(person);
 
         boolean oldValueDiffersFromNew = false;
@@ -369,18 +388,18 @@ public abstract class PartyContact extends PartyContact_Base {
             // only properties were changed
             if (hasPrevPartyContact()) {
                 // editing a contact with pending changes (replacing changes)
-                PersonInformationLog.createLog(person, "resources.MessagingResources",
+                PersonInformationLog.createLog(person, Bundle.MESSAGING,
                         "log.personInformation.contact.generic.edit.need.valid.newEdit", infoLabel, this.getPresentationValue(),
                         personViewed);
             } else {
                 // editing an existing contact with no pending changes
                 if (isValid()) {
-                    PersonInformationLog.createLog(person, "resources.MessagingResources",
+                    PersonInformationLog.createLog(person, Bundle.MESSAGING,
                             "log.personInformation.contact.generic.edit", infoLabel, this.getPresentationValue(), personViewed);
 
                 } else {
                     // editing an existing pending contact (creation)
-                    PersonInformationLog.createLog(person, "resources.MessagingResources",
+                    PersonInformationLog.createLog(person, Bundle.MESSAGING,
                             "log.personInformation.contact.generic.create.need.valid.edited", infoLabel,
                             this.getPresentationValue(), personViewed);
                 }
@@ -393,34 +412,34 @@ public abstract class PartyContact extends PartyContact_Base {
                     if (oldValueDiffersFromNew && createdNewContact) {
                         // new value differs from old, and a new temporary
                         // contact was created
-                        PersonInformationLog.createLog(person, "resources.MessagingResources",
+                        PersonInformationLog.createLog(person, Bundle.MESSAGING,
                                 "log.personInformation.contact.generic.edit.need.valid.values", infoLabel, getPrevPartyContact()
                                         .getPresentationValue(), newValue, personViewed);
                     } else if (createdNewContact) {
                         // only a new temporary contact was created
-                        PersonInformationLog.createLog(person, "resources.MessagingResources",
+                        PersonInformationLog.createLog(person, Bundle.MESSAGING,
                                 "log.personInformation.contact.generic.edit.need.valid", infoLabel, this.getPresentationValue(),
                                 personViewed);
                     } else if (oldValueDiffersFromNew) {
                         // only the values differ (temp contact already exists)
-                        PersonInformationLog.createLog(person, "resources.MessagingResources",
+                        PersonInformationLog.createLog(person, Bundle.MESSAGING,
                                 "log.personInformation.contact.generic.edit.need.valid.values.newEdit", infoLabel,
                                 getPrevPartyContact().getPresentationValue(), newValue, personViewed);
                     } else {
                         // only physical address details changed (temp contact
                         // already exists)
-                        PersonInformationLog.createLog(person, "resources.MessagingResources",
+                        PersonInformationLog.createLog(person, Bundle.MESSAGING,
                                 "log.personInformation.contact.generic.edit.need.valid.newEdit", infoLabel,
                                 this.getPresentationValue(), personViewed);
                     }
                 } else {
-                    PersonInformationLog.createLog(person, "resources.MessagingResources",
+                    PersonInformationLog.createLog(person, Bundle.MESSAGING,
                             "log.personInformation.contact.generic.edit.need.valid.values.newEdit", infoLabel,
                             this.getPresentationValue(), newValue, personViewed);
                 }
             } else {
                 // pending creation value was changed
-                PersonInformationLog.createLog(person, "resources.MessagingResources",
+                PersonInformationLog.createLog(person, Bundle.MESSAGING,
                         "log.personInformation.contact.generic.create.need.valid.values.edited", infoLabel,
                         this.getPresentationValue(), newValue, personViewed);
             }
@@ -431,17 +450,17 @@ public abstract class PartyContact extends PartyContact_Base {
     }
 
     public void logDeleteAux(Person person, String typeKey) {
-        final String infoLabel = BundleUtil.getStringFromResourceBundle("resources.ApplicationResources", typeKey);
+        final String infoLabel = BundleUtil.getString(Bundle.APPLICATION, typeKey);
         final String personViewed = PersonInformationLog.getPersonNameForLogDescription(person);
 
         if (isValid()) {
             // it is valid, so it is not a pending change or creation
-            PersonInformationLog.createLog(person, "resources.MessagingResources",
+            PersonInformationLog.createLog(person, Bundle.MESSAGING,
                     "log.personInformation.contact.generic.remove", infoLabel, this.getPresentationValue(), personViewed);
         } else {
             if (!hasPrevPartyContact()) {
                 // no previous contact = new contact being created
-                PersonInformationLog.createLog(person, "resources.MessagingResources",
+                PersonInformationLog.createLog(person, Bundle.MESSAGING,
                         "log.personInformation.contact.generic.create.need.valid.canceled", infoLabel,
                         this.getPresentationValue(), personViewed);
             } else {
@@ -449,12 +468,12 @@ public abstract class PartyContact extends PartyContact_Base {
                 String oldValue = getPrevPartyContact().getPresentationValue();
                 if (oldValue.compareTo(getPresentationValue()) == 0) {
                     // previous value is the same
-                    PersonInformationLog.createLog(person, "resources.MessagingResources",
+                    PersonInformationLog.createLog(person, Bundle.MESSAGING,
                             "log.personInformation.contact.generic.edit.need.valid.canceled", infoLabel,
                             this.getPresentationValue(), personViewed);
                 } else {
                     // previous is different, display previous value
-                    PersonInformationLog.createLog(person, "resources.MessagingResources",
+                    PersonInformationLog.createLog(person, Bundle.MESSAGING,
                             "log.personInformation.contact.generic.edit.need.valid.values.canceled", infoLabel,
                             getPrevPartyContact().getPresentationValue(), this.getPresentationValue(), personViewed);
                 }
@@ -466,12 +485,12 @@ public abstract class PartyContact extends PartyContact_Base {
     }
 
     public void logValidAux(Person person, String typeKey) {
-        final String infoLabel = BundleUtil.getStringFromResourceBundle("resources.ApplicationResources", typeKey);
+        final String infoLabel = BundleUtil.getString(Bundle.APPLICATION, typeKey);
         final String personViewed = PersonInformationLog.getPersonNameForLogDescription(person);
 
         if (!hasPrevPartyContact()) {
             // no previous contact = new contact being created
-            PersonInformationLog.createLog(person, "resources.MessagingResources",
+            PersonInformationLog.createLog(person, Bundle.MESSAGING,
                     "log.personInformation.contact.generic.create.need.valid.accepted", infoLabel, this.getPresentationValue(),
                     personViewed);
         } else {
@@ -479,12 +498,12 @@ public abstract class PartyContact extends PartyContact_Base {
             String oldValue = getPrevPartyContact().getPresentationValue();
             if (oldValue.compareTo(getPresentationValue()) == 0) {
                 // previous value is the same
-                PersonInformationLog.createLog(person, "resources.MessagingResources",
+                PersonInformationLog.createLog(person, Bundle.MESSAGING,
                         "log.personInformation.contact.generic.edit.need.valid.accepted", infoLabel, this.getPresentationValue(),
                         personViewed);
             } else {
                 // previous is different, display previous value
-                PersonInformationLog.createLog(person, "resources.MessagingResources",
+                PersonInformationLog.createLog(person, Bundle.MESSAGING,
                         "log.personInformation.contact.generic.edit.need.valid.values.accepted", infoLabel, getPrevPartyContact()
                                 .getPresentationValue(), this.getPresentationValue(), personViewed);
             }
@@ -495,12 +514,12 @@ public abstract class PartyContact extends PartyContact_Base {
     }
 
     public void logRefuseAux(Person person, String typeKey) {
-        final String infoLabel = BundleUtil.getStringFromResourceBundle("resources.ApplicationResources", typeKey);
+        final String infoLabel = BundleUtil.getString(Bundle.APPLICATION, typeKey);
         final String personViewed = PersonInformationLog.getPersonNameForLogDescription(person);
 
         if (!hasPrevPartyContact()) {
             // no previous contact = new contact being created
-            PersonInformationLog.createLog(person, "resources.MessagingResources",
+            PersonInformationLog.createLog(person, Bundle.MESSAGING,
                     "log.personInformation.contact.generic.create.need.valid.rejected", infoLabel, this.getPresentationValue(),
                     personViewed);
         } else {
@@ -508,12 +527,12 @@ public abstract class PartyContact extends PartyContact_Base {
             String oldValue = getPrevPartyContact().getPresentationValue();
             if (oldValue.compareTo(getPresentationValue()) == 0) {
                 // previous value is the same
-                PersonInformationLog.createLog(person, "resources.MessagingResources",
+                PersonInformationLog.createLog(person, Bundle.MESSAGING,
                         "log.personInformation.contact.generic.edit.need.valid.rejected", infoLabel, this.getPresentationValue(),
                         personViewed);
             } else {
                 // previous is different, display previous value
-                PersonInformationLog.createLog(person, "resources.MessagingResources",
+                PersonInformationLog.createLog(person, Bundle.MESSAGING,
                         "log.personInformation.contact.generic.edit.need.valid.values.rejected", infoLabel, getPrevPartyContact()
                                 .getPresentationValue(), this.getPresentationValue(), personViewed);
             }

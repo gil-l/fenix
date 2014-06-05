@@ -1,15 +1,37 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.person;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
+
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.struts.util.LabelValueBean;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 public class GenderHelper {
 
-    public static final String GENDER_RESOURCE_BUNDLE = "resources.ApplicationResources";
+    @Deprecated
+    // remove on move to major version 4.0.0
+    public static final String GENDER_RESOURCE_BUNDLE = Bundle.APPLICATION;
 
     private GenderHelper() {
         super();
@@ -26,18 +48,19 @@ public class GenderHelper {
             return labelValueBeans;
         }
 
-        final ResourceBundle resourceBundle = ResourceBundle.getBundle(GENDER_RESOURCE_BUNDLE, locale);
         labelValueBeans =
-                new LabelValueBean[] { new LabelValueBean(resourceBundle.getString(Gender.MALE.name()), Gender.MALE.name()),
-                        new LabelValueBean(resourceBundle.getString(Gender.FEMALE.name()), Gender.FEMALE.name()) };
+                new LabelValueBean[] {
+                        new LabelValueBean(BundleUtil.getString(Bundle.APPLICATION, locale, Gender.MALE.name()),
+                                Gender.MALE.name()),
+                        new LabelValueBean(BundleUtil.getString(Bundle.APPLICATION, locale, Gender.FEMALE.name()),
+                                Gender.FEMALE.name()) };
         sexLabelValuesByLocale.put(locale, labelValueBeans);
         return labelValueBeans;
     }
 
     public static String toLocalizedString(Gender gender, Locale locale) {
         try {
-            final ResourceBundle resourceBundle = ResourceBundle.getBundle(GENDER_RESOURCE_BUNDLE, locale);
-            return resourceBundle.getString(gender.name());
+            return BundleUtil.getString(Bundle.APPLICATION, locale, gender.name());
         } catch (Exception swallowed) {
             return null;
         }

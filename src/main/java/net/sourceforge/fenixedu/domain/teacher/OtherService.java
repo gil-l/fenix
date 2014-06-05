@@ -1,8 +1,27 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.teacher;
 
 import net.sourceforge.fenixedu.domain.ExecutionSemester;
 import net.sourceforge.fenixedu.domain.exceptions.DomainException;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import pt.ist.fenixframework.Atomic;
 
 public class OtherService extends OtherService_Base {
@@ -30,7 +49,7 @@ public class OtherService extends OtherService_Base {
         setReason(reason);
         setCorrectedExecutionSemester(correctedExecutionSemester != null ? correctedExecutionSemester : teacherService
                 .getExecutionPeriod());
-        new TeacherServiceLog(teacherService, BundleUtil.getStringFromResourceBundle("resources.TeacherCreditsSheetResources",
+        new TeacherServiceLog(teacherService, BundleUtil.getString(Bundle.TEACHER_CREDITS,
                 "label.teacher.otherService", credits.toString(), reason, getCorrectedExecutionSemester().getExecutionYear()
                         .getQualifiedName()));
     }
@@ -38,8 +57,8 @@ public class OtherService extends OtherService_Base {
     @Override
     @Atomic
     public void delete() {
-        new TeacherServiceLog(getTeacherService(), BundleUtil.getStringFromResourceBundle(
-                "resources.TeacherCreditsSheetResources", "label.teacher.otherService.delete", getCredits().toString(),
+        new TeacherServiceLog(getTeacherService(), BundleUtil.getString(
+                Bundle.TEACHER_CREDITS, "label.teacher.otherService.delete", getCredits().toString(),
                 getReason(), getCorrectedExecutionSemester().getExecutionYear().getQualifiedName()));
         setTeacherService(null);
         setCorrectedExecutionSemester(null);

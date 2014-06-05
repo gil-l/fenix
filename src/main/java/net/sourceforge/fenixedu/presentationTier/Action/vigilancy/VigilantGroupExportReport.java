@@ -1,9 +1,25 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.vigilancy;
 
 import java.io.OutputStream;
 import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,10 +28,12 @@ import net.sourceforge.fenixedu.dataTransferObject.WrittenEvaluationVigilancyVie
 import net.sourceforge.fenixedu.domain.WrittenEvaluation;
 import net.sourceforge.fenixedu.domain.vigilancy.VigilantGroup;
 import net.sourceforge.fenixedu.domain.vigilancy.VigilantWrapper;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import pt.ist.fenixWebFramework.struts.annotations.Mapping;
 import pt.ist.fenixframework.FenixFramework;
@@ -84,30 +102,28 @@ public class VigilantGroupExportReport extends VigilantGroupManagement {
     }
 
     private Spreadsheet getSpreadsheet(Boolean withNames) {
-        final ResourceBundle enumResourceBundle =
-                ResourceBundle.getBundle("resources.VigilancyResources", new Locale("pt", "PT"));
         final Spreadsheet spreadsheet = new Spreadsheet("Report");
-        spreadsheet.setHeader(enumResourceBundle.getString("label.vigilancy.writtenEvaluation.header"));
-        spreadsheet.setHeader(enumResourceBundle.getString("label.totalVigilancies"));
-        spreadsheet.setHeader(enumResourceBundle.getString("label.vigilanciesFromTeachers"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.VIGILANCY, "label.vigilancy.writtenEvaluation.header"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.VIGILANCY, "label.totalVigilancies"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.VIGILANCY, "label.vigilanciesFromTeachers"));
         if (withNames) {
-            spreadsheet.setHeader(enumResourceBundle.getString("label.teachersVigilants"));
+            spreadsheet.setHeader(BundleUtil.getString(Bundle.VIGILANCY, "label.teachersVigilants"));
         }
-        spreadsheet.setHeader(enumResourceBundle.getString("label.vigilanciesFromOthers"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.VIGILANCY, "label.vigilanciesFromOthers"));
         if (withNames) {
-            spreadsheet.setHeader(enumResourceBundle.getString("label.otherVigilants"));
+            spreadsheet.setHeader(BundleUtil.getString(Bundle.VIGILANCY, "label.otherVigilants"));
         }
-        spreadsheet.setHeader(enumResourceBundle.getString("label.numberOfCancelledConvokes"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.VIGILANCY, "label.numberOfCancelledConvokes"));
         if (withNames) {
-            spreadsheet.setHeader(enumResourceBundle.getString("label.cancelledConvokes"));
+            spreadsheet.setHeader(BundleUtil.getString(Bundle.VIGILANCY, "label.cancelledConvokes"));
         }
-        spreadsheet.setHeader(enumResourceBundle.getString("label.numberOfConfirmedConvokes"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.VIGILANCY, "label.numberOfConfirmedConvokes"));
         if (withNames) {
-            spreadsheet.setHeader(enumResourceBundle.getString("label.confirmedConvokes"));
+            spreadsheet.setHeader(BundleUtil.getString(Bundle.VIGILANCY, "label.confirmedConvokes"));
         }
-        spreadsheet.setHeader(enumResourceBundle.getString("label.numberOfAttendedConvokes"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.VIGILANCY, "label.numberOfAttendedConvokes"));
         if (withNames) {
-            spreadsheet.setHeader(enumResourceBundle.getString("label.attendedConvokes"));
+            spreadsheet.setHeader(BundleUtil.getString(Bundle.VIGILANCY, "label.attendedConvokes"));
         }
 
         return spreadsheet;

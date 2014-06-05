@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.webServices.jersey.beans.publico;
 
 import java.util.List;
@@ -6,8 +24,6 @@ import java.util.Set;
 import net.sourceforge.fenixedu.domain.space.SpaceUtils;
 
 import org.fenixedu.spaces.domain.Space;
-import org.fenixedu.spaces.domain.SpaceClassification;
-import org.fenixedu.spaces.domain.UnavailableException;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -20,9 +36,9 @@ import com.google.common.collect.FluentIterable;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({ @JsonSubTypes.Type(value = FenixSpace.Campus.class, name = "CAMPUS"),
-        @JsonSubTypes.Type(value = FenixSpace.Building.class, name = "BUILDING"),
-        @JsonSubTypes.Type(value = FenixSpace.Floor.class, name = "FLOOR"),
-        @JsonSubTypes.Type(value = FenixSpace.Room.class, name = "ROOM") })
+    @JsonSubTypes.Type(value = FenixSpace.Building.class, name = "BUILDING"),
+    @JsonSubTypes.Type(value = FenixSpace.Floor.class, name = "FLOOR"),
+    @JsonSubTypes.Type(value = FenixSpace.Room.class, name = "ROOM") })
 public class FenixSpace {
 
     public static class Campus extends FenixSpace {
@@ -118,13 +134,10 @@ public class FenixSpace {
                 List<FenixRoomEvent> events) {
             super(allocationSpace, withParentAndContainedSpaces);
             if (withDescriptionAndCapacity) {
-                try {
-                    this.description = allocationSpace.getName();
-                    this.capacity =
-                            new RoomCapacity(allocationSpace.getAllocatableCapacity(),
-                                    (Integer) allocationSpace.getMetadata("examCapacity"));
-                } catch (UnavailableException e) {
-                }
+                this.description = allocationSpace.getName();
+                this.capacity =
+                        new RoomCapacity(allocationSpace.getAllocatableCapacity(), allocationSpace.<Integer> getMetadata(
+                                "examCapacity").orElse(0));
             }
             this.events = events;
         }
@@ -163,14 +176,13 @@ public class FenixSpace {
     }
 
     private void setContainedSpaces(Space space) {
-        this.containedSpaces =
-                FluentIterable.from(SpaceUtils.getActiveChildrenSet(space)).transform(new Function<Space, FenixSpace>() {
+        this.containedSpaces = FluentIterable.from(space.getChildren()).transform(new Function<Space, FenixSpace>() {
 
-                    @Override
-                    public FenixSpace apply(Space input) {
-                        return getSimpleSpace(input);
-                    }
-                }).toSet();
+            @Override
+            public FenixSpace apply(Space input) {
+                return getSimpleSpace(input);
+            }
+        }).toSet();
     }
 
     private void setParentSpace(Space space) {
@@ -181,23 +193,18 @@ public class FenixSpace {
         if (space == null) {
             return null;
         }
-        try {
-            if (SpaceClassification.getByName("Campus").equals(space.getClassification())) {
-                return new FenixSpace.Campus(space, withParentAndContainedSpaces);
-            }
-            if (SpaceClassification.getByName("Building").equals(space.getClassification())) {
-                return new FenixSpace.Building(space, withParentAndContainedSpaces);
-            }
-            if (SpaceClassification.getByName("Floor").equals(space.getClassification())) {
-                return new FenixSpace.Floor(space, withParentAndContainedSpaces);
-            }
+        if (SpaceUtils.isCampus(space)) {
+            return new FenixSpace.Campus(space, withParentAndContainedSpaces);
+        }
+        if (SpaceUtils.isBuilding(space)) {
+            return new FenixSpace.Building(space, withParentAndContainedSpaces);
+        }
+        if (SpaceUtils.isFloor(space)) {
+            return new FenixSpace.Floor(space, withParentAndContainedSpaces);
+        }
 
-            if (SpaceUtils.isRoom(space)) {
-                return new FenixSpace.Room((Space) space, withParentAndContainedSpaces);
-            }
-
-        } catch (UnavailableException e) {
-            return null;
+        if (SpaceUtils.isRoom(space)) {
+            return new FenixSpace.Room(space, withParentAndContainedSpaces);
         }
 
         return null;

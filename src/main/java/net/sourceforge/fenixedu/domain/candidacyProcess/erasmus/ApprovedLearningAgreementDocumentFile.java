@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.candidacyProcess.erasmus;
 
 import java.util.ArrayList;
@@ -5,7 +23,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import net.sourceforge.fenixedu.domain.candidacyProcess.IndividualCandidacy;
 import net.sourceforge.fenixedu.domain.candidacyProcess.IndividualCandidacyDocumentFileType;
 import net.sourceforge.fenixedu.domain.candidacyProcess.mobility.MobilityIndividualApplicationProcess;
 
@@ -30,14 +47,6 @@ public class ApprovedLearningAgreementDocumentFile extends ApprovedLearningAgree
     private ApprovedLearningAgreementDocumentFile() {
         super();
         this.setCandidacyFileActive(Boolean.TRUE);
-    }
-
-    public ApprovedLearningAgreementDocumentFile(IndividualCandidacy candidacy, byte[] contents, String filename) {
-        this();
-        this.setCandidacyFileActive(Boolean.TRUE);
-        addIndividualCandidacy(candidacy);
-        setCandidacyFileType(IndividualCandidacyDocumentFileType.APPROVED_LEARNING_AGREEMENT);
-        init(filename, filename, contents, NobodyGroup.get());
     }
 
     protected ApprovedLearningAgreementDocumentFile(byte[] contents, String filename) {

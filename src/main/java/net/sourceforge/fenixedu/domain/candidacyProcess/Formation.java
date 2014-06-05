@@ -1,15 +1,31 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.candidacyProcess;
 
 import java.util.Formatter;
-import java.util.ResourceBundle;
 
 import net.sourceforge.fenixedu.domain.exceptions.DomainException;
 import net.sourceforge.fenixedu.domain.organizationalStructure.Unit;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.commons.lang.StringUtils;
-import org.fenixedu.commons.i18n.I18N;
-
-import java.util.Locale;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 public class Formation extends Formation_Base {
 
@@ -65,15 +81,15 @@ public class Formation extends Formation_Base {
     }
 
     public void exportValues(StringBuilder result) {
-        final ResourceBundle bundle = ResourceBundle.getBundle("resources.CandidateResources", I18N.getLocale());
         Formatter formatter = new Formatter(result);
-        formatter.format("\n%s:\n", bundle.getString("title.other.academic.titles"));
-        formatter.format("%s: %s\n", bundle.getString("label.other.academic.titles.program.name"), getDesignation());
-        formatter.format("%s: %s\n", bundle.getString("label.other.academic.titles.institution"), getInstitution().getName());
-        formatter.format("%s: %s\n", bundle.getString("label.other.academic.titles.conclusion.date"),
+        formatter.format("\n%s:\n", BundleUtil.getString(Bundle.CANDIDATE, "title.other.academic.titles"));
+        formatter.format("%s: %s\n", BundleUtil.getString(Bundle.CANDIDATE, "label.other.academic.titles.program.name"), getDesignation());
+        formatter.format("%s: %s\n", BundleUtil.getString(Bundle.CANDIDATE, "label.other.academic.titles.institution"), getInstitution().getName());
+        formatter.format("%s: %s\n", BundleUtil.getString(Bundle.CANDIDATE, "label.other.academic.titles.conclusion.date"),
                 StringUtils.isEmpty(getYear()) ? StringUtils.EMPTY : getYear());
-        formatter.format("%s: %s\n", bundle.getString("label.other.academic.titles.conclusion.grade"),
+        formatter.format("%s: %s\n", BundleUtil.getString(Bundle.CANDIDATE, "label.other.academic.titles.conclusion.grade"),
                 StringUtils.isEmpty(getConclusionGrade()) ? StringUtils.EMPTY : getConclusionGrade());
+        formatter.close();
     }
 
     @Deprecated

@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.mobility.outbound;
 
 import java.math.BigDecimal;
@@ -22,7 +40,8 @@ import net.sourceforge.fenixedu.domain.period.CandidacyPeriod;
 import net.sourceforge.fenixedu.domain.student.Registration;
 import net.sourceforge.fenixedu.domain.student.RegistrationAgreement;
 import net.sourceforge.fenixedu.domain.student.curriculum.ICurriculum;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
@@ -181,12 +200,12 @@ public class OutboundMobilityCandidacyPeriod extends OutboundMobilityCandidacyPe
 
     public Spreadsheet getSelectedCandidateSpreadSheet(final OutboundMobilityCandidacyPeriod period) {
         final String filename =
-                BundleUtil.getStringFromResourceBundle("resources.AcademicAdminOffice",
+                BundleUtil.getString(Bundle.ACADEMIC,
                         "label.mobility.outbound.period.export.selected.candiadates.filename");
 
         final Spreadsheet spreadsheetCandidates = new Spreadsheet(filename);
         final Spreadsheet spreadsheetOtherCurricularInfo =
-                spreadsheetCandidates.addSpreadsheet(BundleUtil.getStringFromResourceBundle("resources.AcademicAdminOffice",
+                spreadsheetCandidates.addSpreadsheet(BundleUtil.getString(Bundle.ACADEMIC,
                         "label.other.curricular.info"));
         for (final OutboundMobilityCandidacySubmission submission : getOutboundMobilityCandidacySubmissionSet()) {
             final OutboundMobilityCandidacy candidacy = submission.getSelectedCandidacy();
@@ -263,7 +282,7 @@ public class OutboundMobilityCandidacyPeriod extends OutboundMobilityCandidacyPe
     }
 
     private String getString(final String key, final String... args) {
-        return BundleUtil.getStringFromResourceBundle("resources.AcademicAdminOffice", key, args);
+        return BundleUtil.getString(Bundle.ACADEMIC, key, args);
     }
 
     @Atomic

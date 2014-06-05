@@ -1,16 +1,29 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.accessControl;
+
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import net.sourceforge.fenixedu.domain.DegreeCurricularPlan;
 import net.sourceforge.fenixedu.domain.ExecutionSemester;
-import pt.ist.fenixframework.Atomic;
-import pt.ist.fenixframework.Atomic.TxMode;
-
-import com.google.common.base.Objects;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.base.Supplier;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Iterables;
 
 public abstract class PersistentTeachersWithIncompleteEvaluationWorkGroup extends
         PersistentTeachersWithIncompleteEvaluationWorkGroup_Base {
@@ -30,27 +43,11 @@ public abstract class PersistentTeachersWithIncompleteEvaluationWorkGroup extend
         super.gc();
     }
 
-    protected static <T extends PersistentTeachersWithIncompleteEvaluationWorkGroup> T getInstance(Class<T> type,
-            ExecutionSemester period, final DegreeCurricularPlan degreeCurricularPlan, Supplier<T> maker) {
-        Optional<T> instance = select(type, period, degreeCurricularPlan);
-        return instance.isPresent() ? instance.get() : transactionalMake(type, period, degreeCurricularPlan, maker);
-    }
-
-    @Atomic(mode = TxMode.WRITE)
-    private static <T extends PersistentTeachersWithIncompleteEvaluationWorkGroup> T transactionalMake(Class<T> type,
-            ExecutionSemester period, final DegreeCurricularPlan degreeCurricularPlan, Supplier<? extends T> maker) {
-        Optional<T> instance = select(type, period, degreeCurricularPlan);
-        return instance.or(maker);
-    }
-
-    private static <T extends PersistentTeachersWithIncompleteEvaluationWorkGroup> Optional<T> select(Class<T> type,
-            ExecutionSemester period, final DegreeCurricularPlan degreeCurricularPlan) {
-        FluentIterable<T> byPeriod = FluentIterable.from(period.getTeachersWithIncompleteEvaluationWorkGroupSet()).filter(type);
-        return Iterables.tryFind(byPeriod, new Predicate<T>() {
-            @Override
-            public boolean apply(T group) {
-                return Objects.equal(group.getDegreeCurricularPlan(), degreeCurricularPlan);
-            }
-        });
+    protected static <T extends PersistentTeachersWithIncompleteEvaluationWorkGroup> T singleton(Class<T> type,
+            ExecutionSemester period, final DegreeCurricularPlan degreeCurricularPlan, Supplier<T> creator) {
+        return singleton(
+                () -> ((Optional<T>) period.getTeachersWithIncompleteEvaluationWorkGroupSet().stream()
+                        .filter(group -> Objects.equals(group.getDegreeCurricularPlan(), degreeCurricularPlan)).findAny()),
+                creator);
     }
 }

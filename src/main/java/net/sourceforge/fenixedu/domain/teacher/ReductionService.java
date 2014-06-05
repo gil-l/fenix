@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.teacher;
 
 import java.math.BigDecimal;
@@ -9,7 +27,8 @@ import net.sourceforge.fenixedu.domain.teacher.evaluation.ApprovedTeacherEvaluat
 import net.sourceforge.fenixedu.domain.teacher.evaluation.FacultyEvaluationProcessYear;
 import net.sourceforge.fenixedu.domain.teacher.evaluation.TeacherEvaluationMark;
 import net.sourceforge.fenixedu.domain.teacher.evaluation.TeacherEvaluationProcess;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
@@ -200,15 +219,15 @@ public class ReductionService extends ReductionService_Base {
 
     private void log(final String key, BigDecimal credits) {
         final StringBuilder log = new StringBuilder();
-        log.append(BundleUtil.getStringFromResourceBundle("resources.TeacherCreditsSheetResources", key));
+        log.append(BundleUtil.getString(Bundle.TEACHER_CREDITS, key));
         log.append(credits);
         new TeacherServiceLog(getTeacherService(), log.toString());
     }
 
     private void log(final String key, Boolean requested) {
         final StringBuilder log = new StringBuilder();
-        log.append(BundleUtil.getStringFromResourceBundle("resources.TeacherCreditsSheetResources", key));
-        log.append(BundleUtil.getStringFromResourceBundle("resources.TeacherCreditsSheetResources",
+        log.append(BundleUtil.getString(Bundle.TEACHER_CREDITS, key));
+        log.append(BundleUtil.getString(Bundle.TEACHER_CREDITS,
                 requested ? "message.yes" : "message.no"));
         new TeacherServiceLog(getTeacherService(), log.toString());
     }

@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.mobility.outbound;
 
 import net.sourceforge.fenixedu.domain.exceptions.DomainException;
@@ -5,7 +23,8 @@ import net.sourceforge.fenixedu.domain.student.Registration;
 import net.sourceforge.fenixedu.domain.util.email.Message;
 import net.sourceforge.fenixedu.domain.util.email.Recipient;
 import net.sourceforge.fenixedu.domain.util.email.SystemSender;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.UserGroup;
@@ -85,8 +104,8 @@ public class OutboundMobilityCandidacy extends OutboundMobilityCandidacy_Base im
         if (sender != null) {
             final Registration registration = getOutboundMobilityCandidacySubmission().getRegistration();
             final Recipient recipient = new Recipient(UserGroup.of(registration.getPerson().getUser()));
-            new Message(sender, recipient, BundleUtil.getStringFromResourceBundle("resources.StudentResources",
-                    "label.email.deleted.contest.subject"), BundleUtil.getStringFromResourceBundle("resources.StudentResources",
+            new Message(sender, recipient, BundleUtil.getString(Bundle.STUDENT,
+                    "label.email.deleted.contest.subject"), BundleUtil.getString(Bundle.STUDENT,
                     "label.email.deleted.contest.body", getOutboundMobilityCandidacyContest().getMobilityAgreement()
                             .getUniversityUnit().getPresentationName()));
         }

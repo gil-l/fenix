@@ -1,7 +1,26 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.gep.a3es;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -9,7 +28,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.ws.rs.client.Client;
@@ -47,9 +65,10 @@ import net.sourceforge.fenixedu.domain.teacher.DegreeTeachingServiceCorrection;
 import net.sourceforge.fenixedu.domain.teacher.OtherService;
 import net.sourceforge.fenixedu.domain.teacher.TeacherService;
 import net.sourceforge.fenixedu.domain.thesis.ThesisEvaluationParticipant;
+import net.sourceforge.fenixedu.util.Bundle;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -131,7 +150,7 @@ public class A3ESDegreeProcess implements Serializable {
     }
 
     public void initialize() {
-        base64Hash = new String(Base64.encodeBase64((user + ":" + password).getBytes()));
+        base64Hash = new String(Base64.getEncoder().encode((user + ":" + password).getBytes()));
         JSONArray processes = invoke(webResource().path(API_PROCESS));
         JSONObject json = (JSONObject) processes.iterator().next();
         id = (String) json.get("id");
@@ -316,10 +335,8 @@ public class A3ESDegreeProcess implements Serializable {
                 json.put("q-6.2.1.5", q6215);
 
                 JSONObject q6216 = new JSONObject();
-                q6216.put("en",
-                        ResourceBundle.getBundle("resources.GEPResources", Locale.ENGLISH).getString("label.gep.a3es.q6-2-1-6"));
-                q6216.put("pt",
-                        ResourceBundle.getBundle("resources.GEPResources", new Locale("pt")).getString("label.gep.a3es.q6-2-1-6"));
+                q6216.put("en", BundleUtil.getString(Bundle.GEP, Locale.ENGLISH, "label.gep.a3es.q6-2-1-6"));
+                q6216.put("pt", BundleUtil.getString(Bundle.GEP, new Locale("pt"), "label.gep.a3es.q6-2-1-6"));
                 json.put("q-6.2.1.6", q6216);
 
                 JSONObject q6217 = new JSONObject();
@@ -328,10 +345,8 @@ public class A3ESDegreeProcess implements Serializable {
                 json.put("q-6.2.1.7", q6217);
 
                 JSONObject q6218 = new JSONObject();
-                q6218.put("en",
-                        ResourceBundle.getBundle("resources.GEPResources", Locale.ENGLISH).getString("label.gep.a3es.q6-2-1-8"));
-                q6218.put("pt",
-                        ResourceBundle.getBundle("resources.GEPResources", new Locale("pt")).getString("label.gep.a3es.q6-2-1-8"));
+                q6218.put("en", BundleUtil.getString(Bundle.GEP, Locale.ENGLISH, "label.gep.a3es.q6-2-1-8"));
+                q6218.put("pt", BundleUtil.getString(Bundle.GEP, new Locale("pt"), "label.gep.a3es.q6-2-1-8"));
                 json.put("q-6.2.1.8", q6218);
 
                 List<String> references = new ArrayList<String>();

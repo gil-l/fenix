@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.teacher;
 
 import java.math.BigDecimal;
@@ -5,7 +23,8 @@ import java.math.BigDecimal;
 import net.sourceforge.fenixedu.domain.ExecutionSemester;
 import net.sourceforge.fenixedu.domain.Professorship;
 import net.sourceforge.fenixedu.domain.exceptions.DomainException;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 public class DegreeTeachingServiceCorrection extends DegreeTeachingServiceCorrection_Base {
 
@@ -25,8 +44,8 @@ public class DegreeTeachingServiceCorrection extends DegreeTeachingServiceCorrec
         }
         setCorrectedExecutionSemester(correctedExecutionSemester != null ? correctedExecutionSemester : teacherService
                 .getExecutionPeriod());
-        new TeacherServiceLog(getTeacherService(), BundleUtil.getStringFromResourceBundle(
-                "resources.TeacherCreditsSheetResources", "label.teacher.schedule.correction", getProfessorship()
+        new TeacherServiceLog(getTeacherService(), BundleUtil.getString(
+                Bundle.TEACHER_CREDITS, "label.teacher.schedule.correction", getProfessorship()
                         .getExecutionCourse().getName(), getProfessorship().getExecutionCourse().getDegreePresentationString(),
                 getReason(), correctionString));
     }

@@ -1,3 +1,23 @@
+<%--
+
+    Copyright © 2002 Instituto Superior Técnico
+
+    This file is part of FenixEdu Core.
+
+    FenixEdu Core is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    FenixEdu Core is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+
+--%>
 <%@ page language="java" %>
 <%@ taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@page import="java.util.HashMap"%>
@@ -34,7 +54,7 @@ padding: 0;
 					<logic:iterate id="curricularCourse" name="executionCourse" property="curricularCoursesSortedByDegreeAndCurricularCourseName">		
 						<bean:define id="degreeCurricularPlanOID" name="curricularCourse" property="degreeCurricularPlan.externalId"/>
 						<li>
-							<html:link page="<%= "/executionCourse.do?method=dispatchToInquiriesResultPage&executionCourseOID=" + executionCourse.getExternalId() + 
+							<html:link page="<%= "/executionCourse.do?method=dispatchToInquiriesResultPage&executionCourseID=" + executionCourse.getExternalId() + 
 								"&degreeCurricularPlanOID=" + degreeCurricularPlanOID %>" target="_blank">
 								Resultados da UC (<bean:write name="curricularCourse" property="degreeCurricularPlan.degree.sigla"/>)
 							</html:link>
@@ -56,8 +76,7 @@ padding: 0;
 					<ul>			
 						<logic:iterate id="teacherInquiryByShift" name="teacherInquiry" property="value">
 							<li>
-								<html:link page="<%= "/executionCourse.do?method=dispatchToTeacherInquiriesResultPage&professorshipOID=" + professorshipOID + 
-										"&shiftType=" + teacherInquiryByShift %>" target="_blank">
+								<html:link page="/executionCourse.do?method=dispatchToTeacherInquiriesResultPage&professorshipOID=${professorshipOID}&shiftType=${teacherInquiryByShift}&executionCourseID=${executionCourse.externalId}" target="_blank">
 									<bean:message name="teacherInquiryByShift" property="name" bundle="ENUMERATION_RESOURCES"/>
 								</html:link>
 							</li>

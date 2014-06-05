@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain;
 
 import java.text.ParseException;
@@ -6,7 +24,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import net.sourceforge.fenixedu.applicationTier.Servico.credits.ReadAllTeacherCredits;
@@ -28,6 +45,7 @@ import net.sourceforge.fenixedu.domain.teacher.TeacherAdviseService;
 import net.sourceforge.fenixedu.domain.teacher.TeacherMasterDegreeService;
 import net.sourceforge.fenixedu.domain.teacher.TeacherService;
 import net.sourceforge.fenixedu.domain.thesis.ThesisEvaluationParticipant;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.WeekDay;
 
 import org.apache.commons.beanutils.BeanComparator;
@@ -38,7 +56,7 @@ import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.UnionGroup;
 import org.fenixedu.bennu.core.groups.UserGroup;
-import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 public class TeacherCreditsDocument extends TeacherCreditsDocument_Base {
 
@@ -73,7 +91,6 @@ public class TeacherCreditsDocument extends TeacherCreditsDocument_Base {
 
     private String getTeacherCreditsFile(Teacher teacher, ExecutionSemester executionSemester, TeacherService teacherService)
             throws ParseException {
-        ResourceBundle bundleEnumeration = ResourceBundle.getBundle("resources.EnumerationResources", I18N.getLocale());
         CreditLineDTO creditLineDTO = ReadAllTeacherCredits.readCreditLineDTO(executionSemester, teacher);
         Unit lastWorkingUnit =
                 teacher.getLastWorkingUnit(executionSemester.getBeginDateYearMonthDay(),
@@ -276,8 +293,8 @@ public class TeacherCreditsDocument extends TeacherCreditsDocument_Base {
 
             for (WeekDay weekDay : WeekDay.values()) {
                 if (!weekDay.equals(WeekDay.SUNDAY)) {
-                    htmlText.append("<th style=\"width: 16.5em;\">").append(bundleEnumeration.getString(weekDay.name()))
-                            .append("</th>");
+                    htmlText.append("<th style=\"width: 16.5em;\">")
+                            .append(BundleUtil.getString(Bundle.ENUMERATION, weekDay.name())).append("</th>");
                 }
             }
             htmlText.append("</tr><tr>");

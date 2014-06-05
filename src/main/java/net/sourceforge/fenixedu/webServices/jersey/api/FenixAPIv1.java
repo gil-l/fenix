@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.webServices.jersey.api;
 
 import java.io.IOException;
@@ -6,6 +24,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -91,6 +110,7 @@ import net.sourceforge.fenixedu.domain.util.icalendar.EventBean;
 import net.sourceforge.fenixedu.presentationTier.Action.ICalendarSyncPoint;
 import net.sourceforge.fenixedu.presentationTier.Action.externalServices.OAuthUtils;
 import net.sourceforge.fenixedu.presentationTier.backBeans.student.enrolment.DisplayEvaluationsForStudentToEnrol;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.ContentType;
 import net.sourceforge.fenixedu.util.EvaluationType;
 import net.sourceforge.fenixedu.webServices.jersey.beans.FenixCalendar;
@@ -125,8 +145,6 @@ import net.sourceforge.fenixedu.webServices.jersey.beans.publico.FenixRoomEvent;
 import net.sourceforge.fenixedu.webServices.jersey.beans.publico.FenixSchedule;
 import net.sourceforge.fenixedu.webServices.jersey.beans.publico.FenixSpace;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
@@ -148,6 +166,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Ordering;
+import com.google.common.io.ByteStreams;
 import com.google.common.net.HttpHeaders;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -198,7 +217,7 @@ public class FenixAPIv1 {
             if (person.isPhotoAvailableToCurrentUser()) {
                 final byte[] avatar = personalPhoto.getDefaultAvatar();
                 String type = ContentType.PNG.getMimeType();
-                String data = Base64.encodeBase64String(avatar);
+                String data = Base64.getEncoder().encodeToString(avatar);
                 photo = new FenixPhoto(type, data);
             }
         } catch (Exception npe) {
@@ -606,9 +625,9 @@ public class FenixAPIv1 {
     public FenixPayment personPayments() {
 
         Properties props = new Properties();
-        props.setProperty("application", "resources.ApplicationResources");
-        props.setProperty("enum", "resources.EnumerationResources");
-        props.setProperty("default", "resources.ApplicationResources");
+        props.setProperty("application", Bundle.APPLICATION);
+        props.setProperty("enum", Bundle.ENUMERATION);
+        props.setProperty("default", Bundle.APPLICATION);
         DefaultResourceBundleProvider provider = new DefaultResourceBundleProvider(props);
         Person person = getPerson();
 
@@ -869,7 +888,7 @@ public class FenixAPIv1 {
             return new JsonObject().toString();
         }
         try {
-            return Streams.asString(resourceAsStream);
+            return new String(ByteStreams.toByteArray(resourceAsStream));
         } catch (IOException e) {
             return new JsonObject().toString();
         }
@@ -1246,7 +1265,7 @@ public class FenixAPIv1 {
 
             final WrittenEvaluationEnrolment evalEnrolment = writtenEvaluation.getWrittenEvaluationEnrolmentFor(student);
             if (evalEnrolment != null) {
-                assignedRoom = (Space) evalEnrolment.getRoom();
+                assignedRoom = evalEnrolment.getRoom();
             }
 
             if (type.equals(EvaluationType.EXAM_TYPE)) {
@@ -1322,7 +1341,7 @@ public class FenixAPIv1 {
 
         Space space = getDomainObject(oid, Space.class);
         if (SpaceUtils.isRoom(space)) {
-            return getFenixRoom((Space) space, getRoomDay(day));
+            return getFenixRoom(space, getRoomDay(day));
         }
         return FenixSpace.getSpace(space);
     }

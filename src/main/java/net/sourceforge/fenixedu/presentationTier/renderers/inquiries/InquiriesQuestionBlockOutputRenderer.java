@@ -1,10 +1,25 @@
 /**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
+/**
  * 
  */
 package net.sourceforge.fenixedu.presentationTier.renderers.inquiries;
-
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
 import net.sourceforge.fenixedu.dataTransferObject.oldInquiries.CheckBoxQuestion;
 import net.sourceforge.fenixedu.dataTransferObject.oldInquiries.InquiriesBlock;
@@ -13,9 +28,10 @@ import net.sourceforge.fenixedu.dataTransferObject.oldInquiries.QuestionChoice;
 import net.sourceforge.fenixedu.dataTransferObject.oldInquiries.QuestionHeader;
 import net.sourceforge.fenixedu.dataTransferObject.oldInquiries.RadioGroupQuestion;
 import net.sourceforge.fenixedu.dataTransferObject.oldInquiries.TextBoxQuestion;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.commons.lang.StringUtils;
-import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import pt.ist.fenixWebFramework.renderers.OutputRenderer;
 import pt.ist.fenixWebFramework.renderers.components.HtmlComponent;
@@ -31,16 +47,12 @@ import pt.ist.fenixWebFramework.renderers.model.MetaObject;
 import pt.ist.fenixWebFramework.renderers.model.MetaObjectFactory;
 import pt.ist.fenixWebFramework.renderers.model.MetaSlot;
 import pt.ist.fenixWebFramework.renderers.utils.RenderKit;
-import java.util.Locale;
 
 /**
  * @author - Shezad Anavarali (shezad@ist.utl.pt)
  * 
  */
 public class InquiriesQuestionBlockOutputRenderer extends OutputRenderer {
-
-    private final ResourceBundle inquiriesResources = ResourceBundle.getBundle("resources.InquiriesResources",
-            I18N.getLocale());
 
     private String columnClasses;
 
@@ -160,11 +172,7 @@ public class InquiriesQuestionBlockOutputRenderer extends OutputRenderer {
         }
 
         private String getResource(String label) {
-            try {
-                return inquiriesResources.getString(label);
-            } catch (MissingResourceException e) {
-            }
-            return label;
+            return BundleUtil.getString(Bundle.INQUIRIES, label);
         }
 
         private void createHeaderRow(final QuestionHeader header, final HtmlTable mainTable, InquiriesBlock block) {

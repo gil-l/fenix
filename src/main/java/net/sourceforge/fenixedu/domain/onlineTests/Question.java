@@ -1,13 +1,32 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 /*
  * Created on 24/Jul/2003
  *
  */
 package net.sourceforge.fenixedu.domain.onlineTests;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import net.sourceforge.fenixedu.domain.onlineTests.utils.ParseSubQuestion;
 
 import org.fenixedu.bennu.core.domain.Bennu;
 
@@ -15,8 +34,6 @@ import org.fenixedu.bennu.core.domain.Bennu;
  * @author Susana Fernandes
  */
 public class Question extends Question_Base {
-
-    private List<SubQuestion> subQuestions;
 
     public Question() {
         super();
@@ -40,18 +57,7 @@ public class Question extends Question_Base {
     }
 
     public List<SubQuestion> getSubQuestions() {
-        return subQuestions;
-    }
-
-    public void setSubQuestions(List<SubQuestion> subQuestions) {
-        this.subQuestions = subQuestions;
-    }
-
-    public void addSubQuestion(SubQuestion subQuestion) {
-        if (subQuestions == null) {
-            subQuestions = new ArrayList<SubQuestion>();
-        }
-        subQuestions.add(subQuestion);
+        return ParseSubQuestion.getSubQuestionFor(this);
     }
 
     // public SubQuestion getSubQuestionByItem(String itemId) {

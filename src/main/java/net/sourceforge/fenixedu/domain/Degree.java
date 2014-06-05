@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain;
 
 import java.io.Serializable;
@@ -15,7 +33,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -43,12 +60,14 @@ import net.sourceforge.fenixedu.domain.thesis.Thesis;
 import net.sourceforge.fenixedu.domain.thesis.ThesisState;
 import net.sourceforge.fenixedu.domain.time.calendarStructure.AcademicInterval;
 import net.sourceforge.fenixedu.predicates.AcademicPredicates;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.MarkType;
 
 import org.apache.commons.collections.comparators.ReverseComparator;
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.Group;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.DateTime;
@@ -706,7 +725,7 @@ public class Degree extends Degree_Base implements Comparable<Degree> {
         final String degreeType = getDegreeType().getLocalizedName(locale);
         if (!StringUtils.isEmpty(degreeType)) {
             res.append(degreeType).append(" ");
-            res.append(ResourceBundle.getBundle("resources.ApplicationResources", locale).getString("label.in"));
+            res.append(BundleUtil.getString(Bundle.APPLICATION, locale, "label.in"));
             res.append(" ");
         }
 
@@ -729,8 +748,7 @@ public class Degree extends Degree_Base implements Comparable<Degree> {
         final StringBuilder res = new StringBuilder(getNameFor(executionYear).getContent(locale));
 
         for (final Space campus : Space.getAllCampus()) {
-            String toRemove;
-            toRemove = " - " + campus.getName();
+            String toRemove = " - " + campus.getName();
             if (res.toString().contains(toRemove)) {
                 res.replace(res.indexOf(toRemove), res.indexOf(toRemove) + toRemove.length(), StringUtils.EMPTY);
             }
@@ -1160,7 +1178,7 @@ public class Degree extends Degree_Base implements Comparable<Degree> {
     /**
      * Verifies if the given person was a coordinator for this degree regardless
      * of the execution year.
-     * 
+     *
      * @param person
      *            the person to check
      * @return <code>true</code> if the person was a coordinator for a certain
@@ -1399,7 +1417,7 @@ public class Degree extends Degree_Base implements Comparable<Degree> {
         if (!elections.isEmpty()) {
             lastYearDelegateElection =
                     Collections
-                            .max(elections, DelegateElection.ELECTION_COMPARATOR_BY_VOTING_START_DATE_AND_CANDIDACY_START_DATE);
+                    .max(elections, DelegateElection.ELECTION_COMPARATOR_BY_VOTING_START_DATE_AND_CANDIDACY_START_DATE);
         }
         return lastYearDelegateElection;
     }

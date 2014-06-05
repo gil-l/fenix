@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.mobility.outbound;
 
 import java.io.IOException;
@@ -26,7 +44,8 @@ import net.sourceforge.fenixedu.domain.util.email.Recipient;
 import net.sourceforge.fenixedu.injectionCode.AccessControl;
 import net.sourceforge.fenixedu.presentationTier.Action.academicAdministration.AcademicAdministrationApplication.AcademicAdminCandidaciesApp;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -285,7 +304,7 @@ public class OutboundMobilityCandidacyDA extends FenixDispatchAction {
         final OutboundMobilityCandidacyContestGroup mobilityGroup = getDomainObject(request, "mobilityGroupOid");
 
         final String filename =
-                BundleUtil.getStringFromResourceBundle("resources.AcademicAdminOffice",
+                BundleUtil.getString(Bundle.ACADEMIC,
                         "label.mobility.candidates.information.filename");
 
         response.setHeader("Content-disposition", "attachment; filename=" + filename + ".xls");
@@ -304,7 +323,7 @@ public class OutboundMobilityCandidacyDA extends FenixDispatchAction {
         final OutboundMobilityCandidacyPeriod period = getDomainObject(request, "candidacyPeriodOid");
 
         final String filename =
-                BundleUtil.getStringFromResourceBundle("resources.AcademicAdminOffice",
+                BundleUtil.getString(Bundle.ACADEMIC,
                         "label.mobility.outbound.period.export.selected.candiadates.filename");
 
         response.setHeader("Content-disposition", "attachment; filename=" + filename + ".xls");
@@ -432,7 +451,7 @@ public class OutboundMobilityCandidacyDA extends FenixDispatchAction {
         final OutboundMobilityCandidacyContestGroup mobilityGroup = getDomainObject(request, "mobilityGroupOid");
 
         final String toGroupName =
-                BundleUtil.getStringFromResourceBundle("resources.AcademicAdminOffice",
+                BundleUtil.getString(Bundle.ACADEMIC,
                         "label.send.email.to.candidates.group.to.name", mobilityGroup.getDescription(), period
                                 .getExecutionInterval().getName());
         final Group group = UnionGroup.of(getCandidateGroups(mobilityGroup, period));

@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 /*
  * Created on 19/Ago/2003
  */
@@ -7,7 +25,6 @@ package net.sourceforge.fenixedu.applicationTier.Servico.teacher.onlineTests;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import net.sourceforge.fenixedu.applicationTier.Filtro.ExecutionCourseLecturingTeacherAuthorizationFilter;
 import net.sourceforge.fenixedu.applicationTier.Servico.exceptions.FenixServiceException;
@@ -20,13 +37,13 @@ import net.sourceforge.fenixedu.domain.Shift;
 import net.sourceforge.fenixedu.domain.onlineTests.DistributedTest;
 import net.sourceforge.fenixedu.domain.onlineTests.StudentTestQuestion;
 import net.sourceforge.fenixedu.domain.student.Registration;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.struts.util.LabelValueBean;
-import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
-import java.util.Locale;
 
 /**
  * @author Susana Fernandes
@@ -81,10 +98,10 @@ public class ReadStudentsByIdArray {
 
     private List<InfoStudent> returnStudentsFromShiftsArray(DistributedTest distributedTest, String[] shifts)
             throws FenixServiceException {
-        final ResourceBundle bundle = ResourceBundle.getBundle("resources.ApplicationResources", I18N.getLocale());
+        final String value = BundleUtil.getString(Bundle.APPLICATION, "label.allShifts");
         List<InfoStudent> infoStudentList = new ArrayList<InfoStudent>();
         for (String shift2 : shifts) {
-            if (shift2.equals(bundle.getString("label.allShifts"))) {
+            if (shift2.equals(value)) {
                 continue;
             }
             Shift shift = FenixFramework.getDomainObject(shift2);
@@ -104,12 +121,12 @@ public class ReadStudentsByIdArray {
 
     private List<InfoStudent> returnStudentsFromStudentsArray(DistributedTest distributedTest, String[] students,
             String executionCourseId) throws FenixServiceException {
-        final ResourceBundle bundle = ResourceBundle.getBundle("resources.ApplicationResources", I18N.getLocale());
+        final String value = BundleUtil.getString(Bundle.APPLICATION, "label.allStudents");
         List<InfoStudent> studentsList = new ArrayList<InfoStudent>();
         ExecutionCourse executionCourse = FenixFramework.getDomainObject(executionCourseId);
 
         for (String student : students) {
-            if (student.equals(bundle.getString("label.allStudents"))) {
+            if (student.equals(value)) {
                 Collection<Attends> attendList = executionCourse.getAttends();
                 for (Attends attend : attendList) {
                     InfoStudent infoStudent = InfoStudent.newInfoFromDomain(attend.getRegistration());

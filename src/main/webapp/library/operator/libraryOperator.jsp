@@ -1,3 +1,23 @@
+<%--
+
+    Copyright © 2002 Instituto Superior Técnico
+
+    This file is part of FenixEdu Core.
+
+    FenixEdu Core is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    FenixEdu Core is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+
+--%>
 <%@page import="net.sourceforge.fenixedu.presentationTier.Action.library.LibraryAttendance"%>
 <%@page import="org.fenixedu.bennu.core.security.Authenticate"%>
 <%@page import="org.fenixedu.bennu.core.domain.Bennu"%>
@@ -32,7 +52,7 @@
 					<fr:schema bundle="LIBRARY_RESOURCES" type="net.sourceforge.fenixedu.presentationTier.Action.library.LibraryAttendance">
 						<fr:slot name="library" key="label.library" layout="menu-select-postback" required="true">
 							<fr:property name="providerClass" value="net.sourceforge.fenixedu.presentationTier.renderers.providers.library.LibraryProvider" />
-							<fr:property name="format" value="Biblioteca \${spaceBuilding.nameWithCampus}" />
+							<fr:property name="format" value="Biblioteca \${parent.parent.presentationName}" />
 							<fr:property name="destination" value="postback" />
 						</fr:slot>
 					</fr:schema>
@@ -47,7 +67,8 @@
 		<td>
 			<div style="float: right; margin-left: 10px; margin-top: 15px;">
 				<logic:present name="attendance" property="library">
-					<bean:message key="label.library.ocupation" />: ${attendance.library.currentAttendaceCount()} / ${attendance.library.spaceInformation.capacity}
+					 				
+					<bean:message key="label.library.ocupation" />: <%= net.sourceforge.fenixedu.domain.space.SpaceUtils.currentAttendaceCount(((net.sourceforge.fenixedu.presentationTier.Action.library.LibraryAttendance)request.getAttribute("attendance")).getLibrary()) %> / ${attendance.library.allocatableCapacity}
 				</logic:present>
 			</div>
 		</td>
@@ -163,7 +184,7 @@
 							<fr:slot name="person.emailForSendingEmails" layout="null-as-label" key="label.card.person.email" />
 							<fr:slot name="person.mobile" key="label.person.mobile" />
 							
-							<logic:notEmpty name="attendance" property="giafProfessionalDataSet">
+							<%-- <logic:notEmpty name="attendance" property="giafProfessionalDataSet">
 								<logic:iterate id="giafProfessionalDataSet" name="attendance" property="giafProfessionalDataSet" indexId="i">
 									<bean:define id="labelId" name="giafProfessionalDataSet" property="professionalCategory.categoryType"/>
 									<fr:slot name="<%="giafProfessionalDataSet["+ i+"]"%>" key="<%=labelId.toString() %>" bundle="ENUMERATION_RESOURCES">
@@ -174,7 +195,7 @@
 										</logic:notEmpty>
 									</fr:slot>
 								</logic:iterate>
-							</logic:notEmpty>
+							</logic:notEmpty> --%>
 							<logic:present name="attendance" property="externalTeacherUnit">
 								<fr:slot name="externalTeacherUnit.presentationName" key="label.person.externalTeacher" />
 							</logic:present>
@@ -237,8 +258,8 @@
 												<fr:schema bundle="LIBRARY_RESOURCES" type="net.sourceforge.fenixedu.presentationTier.Action.library.LibraryAttendance">
 													<fr:slot name="selectedSpace" key="label.person.place" layout="menu-select">
 														<fr:property name="providerClass" value="net.sourceforge.fenixedu.presentationTier.Action.library.LibraryAttendance$PlaceProvider" />
-														<fr:property name="sortBy" value="spaceInformation.presentationName" />
-														<fr:property name="format" value="\${spaceInformation.presentationName}" />
+														<fr:property name="sortBy" value="presentationName" />
+														<fr:property name="format" value="\${presentationName}" />
 														<fr:property name="defaultText" value="label.space.libraryResourceNone" />
 														<fr:property name="bundle" value="LIBRARY_RESOURCES" />
 														<fr:property name="key" value="true" />
@@ -259,13 +280,14 @@
 						</logic:notPresent>
 					</logic:equal>
 				</logic:present>
+				
 			</td>
-
+			
 			<td style="vertical-align: top;">
 				<div style="float: right; margin-left: 120px;">
 					<h3 class="mtop2"><bean:message key="label.attendances" bundle="LIBRARY_RESOURCES" />
 					</h3>
-
+					
 					<fr:view name="attendance" property="libraryAttendances">
 						<fr:schema bundle="LIBRARY_RESOURCES" type="net.sourceforge.fenixedu.domain.space.SpaceAttendances">
 							<fr:slot name="person.istUsername" key="label.person.istUsername" />

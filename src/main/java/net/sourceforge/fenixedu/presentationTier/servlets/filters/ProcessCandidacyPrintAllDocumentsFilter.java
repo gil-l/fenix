@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.servlets.filters;
 
 import java.io.ByteArrayInputStream;
@@ -34,7 +52,8 @@ import net.sourceforge.fenixedu.domain.candidacy.StudentCandidacy;
 import net.sourceforge.fenixedu.domain.student.Registration;
 import net.sourceforge.fenixedu.domain.student.Student;
 import net.sourceforge.fenixedu.presentationTier.candidacydocfiller.PdfFiller;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import org.apache.commons.lang.StringUtils;
 import org.htmlcleaner.HtmlCleaner;
@@ -246,7 +265,7 @@ public class ProcessCandidacyPrintAllDocumentsFilter implements Filter {
                 // nothing; print everything else
             }
 
-            map.put("sex", BundleUtil.getStringFromResourceBundle("resources/EnumerationResources", person.getGender().name()));
+            map.put("sex", BundleUtil.getString(Bundle.ENUMERATION, person.getGender().name()));
             map.put("maritalStatus", person.getMaritalStatus().getPresentationName());
             map.put("profession", person.getProfession());
             map.put("idDocType", person.getIdDocumentType().getLocalizedName());

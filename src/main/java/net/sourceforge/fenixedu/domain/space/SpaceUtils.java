@@ -1,17 +1,46 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.space;
 
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import javax.servlet.UnavailableException;
+
+import net.sourceforge.fenixedu.dataTransferObject.InfoRoom;
+import net.sourceforge.fenixedu.dataTransferObject.spaceManager.FindSpacesBean.SpacesSearchCriteriaType;
+import net.sourceforge.fenixedu.domain.ExecutionCourse;
 import net.sourceforge.fenixedu.domain.ExecutionSemester;
 import net.sourceforge.fenixedu.domain.FrequencyType;
 import net.sourceforge.fenixedu.domain.Lesson;
 import net.sourceforge.fenixedu.domain.Person;
+import net.sourceforge.fenixedu.domain.WrittenEvaluation;
 import net.sourceforge.fenixedu.domain.person.RoleType;
 import net.sourceforge.fenixedu.domain.time.calendarStructure.AcademicInterval;
 import net.sourceforge.fenixedu.util.DiaSemana;
@@ -21,21 +50,24 @@ import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.collections.comparators.ComparatorChain;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.Group;
+import org.fenixedu.commons.StringNormalizer;
 import org.fenixedu.spaces.domain.Space;
 import org.fenixedu.spaces.domain.SpaceClassification;
-import org.fenixedu.spaces.domain.UnavailableException;
 import org.fenixedu.spaces.domain.occupation.Occupation;
 import org.joda.time.Interval;
 import org.joda.time.YearMonthDay;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 
 public class SpaceUtils {
+    public static final String CAMPUS = "Campus";
+    public static final String BUILDING = "Building";
+    public static final String FLOOR = "Floor";
+    public static final String ROOM_SUBDIVISION = "Room Subdivision";
+
+    public static final String LABORATORY_FOR_EDUCATION_CODE = "2.1", LABORATORY_FOR_RESEARCHER_CODE = "2.2";
 
     public final static Comparator<Space> ROOM_COMPARATOR_BY_NAME = new ComparatorChain();
     static {
@@ -47,282 +79,135 @@ public class SpaceUtils {
             "absoluteCode");
 
     public static Space findAllocatableSpaceForEducationByName(String name) {
-        for (Space space : SpaceUtils.getActiveSpaces()) {
-            try {
-                if ((SpaceUtils.isRoom(space) || SpaceClassification.getByName("Room Subdivision").equals(
-                        space.getClassification()))
-                        && space.getName().equalsIgnoreCase(name)) {
-                    return space;
-                }
-            } catch (UnavailableException e) {
-            }
-        }
-        return null;
+        return allocatableSpacesForEducation().filter(space -> space.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
-    private static boolean isForEducation(Space space) {
+    public static Stream<Space> allocatableSpaces() {
+        return Space.getSpaces().filter(space -> isRoom(space) || isRoomSubdivision(space));
+    }
+
+    public static Stream<Space> allocatableSpacesForEducation() {
+        return allocatableSpaces().filter(space -> isForEducation(space));
+    }
+
+    public static List<InfoRoom> allocatableSpace(YearMonthDay startDate, YearMonthDay endDate, HourMinuteSecond startTimeHMS,
+            HourMinuteSecond endTimeHMS, DiaSemana dayOfWeek, Integer normalCapacity, FrequencyType frequency, boolean withLabs) {
+        return allocatableSpace(normalCapacity, withLabs)
+                .filter(space -> isFree(space, startDate, endDate, startTimeHMS, endTimeHMS, dayOfWeek, frequency, true, true))
+                .map(space -> InfoRoom.newInfoFromDomain(space)).collect(Collectors.toList());
+    }
+
+    public static List<Space> allocatableSpace(final Integer normalCapacity, final boolean withLabs, final Interval... intervals) {
+        return allocatableSpace(normalCapacity, withLabs).filter(space -> space.isFree(intervals)).collect(Collectors.toList());
+    }
+
+    public static Stream<Space> allocatableSpace(final Integer normalCapacity, final boolean withLabs) {
+        Stream<Space> stream = allocatableSpacesForEducation();
+        if (normalCapacity != null) {
+            stream = stream.filter(space -> space.getAllocatableCapacity() >= normalCapacity);
+        }
+        if (!withLabs) {
+            stream = stream.filter(space -> !isLaboratory(space));
+        }
+        return stream;
+    }
+
+    public static List<Space> buildings() {
+        return Space.getSpaces().filter(space -> isBuilding(space)).collect(Collectors.toList());
+    }
+
+    public static boolean isCampus(Space space) {
+        return SpaceClassification.getByName(CAMPUS).equals(space.getClassification());
+    }
+
+    public static boolean isBuilding(Space space) {
+        return SpaceClassification.getByName(BUILDING).equals(space.getClassification());
+    }
+
+    public static boolean isFloor(Space space) {
+        return SpaceClassification.getByName(FLOOR).equals(space.getClassification());
+    }
+
+    public static boolean isRoomSubdivision(Space space) {
+        return SpaceClassification.getByName(ROOM_SUBDIVISION).equals(space.getClassification());
+    }
+
+    public static boolean isRoom(Space space) {
+        return !(isCampus(space) || isBuilding(space) || isFloor(space) || isRoomSubdivision(space));
+    }
+
+    public static boolean isLaboratory(Space space) {
+        SpaceClassification classification = space.getClassification();
+        return classification.equals(SpaceClassification.get(LABORATORY_FOR_EDUCATION_CODE))
+                || classification.equals(SpaceClassification.get(LABORATORY_FOR_RESEARCHER_CODE));
+    }
+
+    public static boolean isForEducation(Space space) {
         return isForEducation(space, null);
     }
 
     private static boolean isForEducation(Space space, Person person) {
-        final Group lessonGroup = space.getOccupationsAccessGroup() != null ? space.getOccupationsAccessGroup().toGroup() : null;
+        final Group lessonGroup = space.getOccupationsGroup();
 
-        final boolean isForEducation = groupHasElements(lessonGroup, person);
-
-        if (isForEducation) {
+        if (lessonGroup != null && lessonGroup.getMembers().size() > 0
+                && (person == null || lessonGroup.isMember(person.getUser()))) {
             return true;
         }
 
-        final Space suroundingSpace = space.getParent();
-        try {
-            if (SpaceUtils.isRoom(suroundingSpace)
-                    || SpaceClassification.getByName("Room Subdivision").equals(suroundingSpace.getClassification())) {
-                return isForEducation(suroundingSpace, person);
-            }
-        } catch (UnavailableException e) {
+        final Space parent = space.getParent();
+        if (parent != null && parent.isActive() && (isRoom(parent) || isRoomSubdivision(parent))) {
+            return isForEducation(parent, person);
         }
 
         return false;
 
     }
 
-    private static boolean groupHasElements(final Group group) {
-        return groupHasElements(group, null);
+    public static boolean isFree(Space space, YearMonthDay startDate, YearMonthDay endDate, HourMinuteSecond startTime,
+            HourMinuteSecond endTime, DiaSemana dayOfWeek, FrequencyType frequency, Boolean dailyFrequencyMarkSaturday,
+            Boolean dailyFrequencyMarkSunday) {
+        return isFree(space, startDate, endDate, startTime, endTime, dayOfWeek, frequency, dailyFrequencyMarkSaturday,
+                dailyFrequencyMarkSunday, null);
     }
 
-    private static boolean groupHasElements(final Group group, Person person) {
-        return group != null && group.getMembers().size() > 0 && (person == null || group.isMember(person.getUser()));
-    }
+    public static boolean isFree(Space space, YearMonthDay startDate, YearMonthDay endDate, HourMinuteSecond startTime,
+            HourMinuteSecond endTime, DiaSemana dayOfWeek, FrequencyType frequency, Boolean dailyFrequencyMarkSaturday,
+            Boolean dailyFrequencyMarkSunday, Set<Class<? extends EventSpaceOccupation>> eventSpaceOccupationClassesToSkip) {
+        List<Interval> intervals = null;
 
-    public static Space findActiveAllocatableSpaceForEducationByName(String name) {
-        Space allocatableSpace = findAllocatableSpaceForEducationByName(name);
-        if (allocatableSpace != null && allocatableSpace.isActive()) {
-            return allocatableSpace;
+        if (eventSpaceOccupationClassesToSkip == null) {
+            eventSpaceOccupationClassesToSkip = Collections.emptySet();
         }
-        return null;
-    }
 
-    public static List<Space> getAllActiveAllocatableSpacesExceptLaboratoriesForEducation() {
-        return findAllocatableSpacesByPredicates(ACTIVE_FOR_EDUCATION_EXCEPT_LABS_PREDICATE);
-    }
-
-    public static List<Space> getAllActiveAllocatableSpacesForEducation() {
-        return findAllocatableSpacesByPredicates(ACTIVE_FOR_EDUCATION_PREDICATE);
-    }
-
-    public static List<Space> getAllActiveAllocatableSpacesForEducationAndPunctualOccupations() {
-        return getAllActiveAllocatableSpacesForEducationAndPunctualOccupations(null);
-    }
-
-    public static List<Space> getAllActiveAllocatableSpacesForEducationAndPunctualOccupations(Person person) {
-        List<Space> result = new ArrayList<Space>();
-        for (Space space : SpaceUtils.getActiveSpaces()) {
-            try {
-                if ((SpaceUtils.isRoom(space) || SpaceClassification.getByName("Room Subdivision").equals(
-                        space.getClassification()))
-                        && space.isActive() && isForEducation(space, person)) {
-                    result.add((Space) space);
+        for (Occupation spaceOccupation : getResourceAllocationsForCheck(space)) {
+            if (spaceOccupation instanceof EventSpaceOccupation) {
+                if (eventSpaceOccupationClassesToSkip.contains(spaceOccupation.getClass())) {
+                    continue;
                 }
-            } catch (UnavailableException e) {
-            }
-        }
-        return result;
-    }
-
-    public static interface AllocatableSpacePredicate {
-
-        public boolean eval(final Space space);
-
-    }
-
-    public static interface AllocatableSpaceTransformer<T> {
-
-        public T transform(final Space space);
-
-    }
-
-    public static final AllocatableSpaceTransformer<Space> NO_TRANSFORMER = new AllocatableSpaceTransformer<Space>() {
-        @Override
-        public Space transform(final Space space) {
-            return space;
-        }
-    };
-
-    public static <T> List<T> findAllocatableSpacesByPredicates(final AllocatableSpaceTransformer<T> transformer,
-            final AllocatableSpacePredicate... predicates) {
-        final List<T> result = new ArrayList<T>();
-        for (final Space resource : SpaceUtils.getActiveSpaces()) {
-            try {
-                if (SpaceUtils.isRoom(resource)
-                        || SpaceClassification.getByName("Room Subdivision").equals(resource.getClassification())) {
-                    final Space allocatableSpace = (Space) resource;
-                    if (matchesAllPredicates(allocatableSpace, predicates)) {
-                        result.add(transformer.transform(allocatableSpace));
-                    }
+                EventSpaceOccupation occupation = (EventSpaceOccupation) spaceOccupation;
+                if (occupation.alreadyWasOccupiedIn(startDate, endDate, startTime, endTime, dayOfWeek, frequency,
+                        dailyFrequencyMarkSaturday, dailyFrequencyMarkSunday)) {
+                    return false;
                 }
-            } catch (UnavailableException e) {
+            }
+
+            if (spaceOccupation.getClass().equals(Occupation.class)) {
+                if (intervals == null) {
+                    intervals =
+                            EventSpaceOccupation.generateEventSpaceOccupationIntervals(startDate, endDate, startTime, endTime,
+                                    frequency, dayOfWeek, dailyFrequencyMarkSaturday, dailyFrequencyMarkSunday, null, null);
+                }
+                if (spaceOccupation.overlaps(intervals)) {
+                    return false;
+                }
             }
         }
-        return result;
-    }
 
-    public static List<Space> findAllocatableSpacesByPredicates(final AllocatableSpacePredicate... predicates) {
-        return findAllocatableSpacesByPredicates(NO_TRANSFORMER, predicates);
-    }
-
-    private static boolean matchesAllPredicates(final Space space, final AllocatableSpacePredicate... predicates) {
-        for (final AllocatableSpacePredicate predicate : predicates) {
-            if (!predicate.eval(space)) {
-                return false;
-            }
-        }
         return true;
     }
 
-    public static boolean isRoom(Space space) {
-        final SpaceClassification roomSubdiv = SpaceClassification.getByName("Room Subdivision");
-        final SpaceClassification floor = SpaceClassification.getByName("Floor");
-        final SpaceClassification campus = SpaceClassification.getByName("Campus");
-        final SpaceClassification building = SpaceClassification.getByName("Building");
-        SpaceClassification classification;
-        try {
-            classification = space.getClassification();
-            return !(classification.equals(floor) || classification.equals(campus) || classification.equals(building) || classification
-                    .equals(roomSubdiv));
-        } catch (UnavailableException e) {
-            return false;
-        }
-    }
-
-    public static class ActiveForEducationPredicate implements AllocatableSpacePredicate {
-
-        @Override
-        public boolean eval(final Space space) {
-            return space.isActive() && isForEducation(space, null);
-        }
-
-    }
-
-    public static final ActiveForEducationPredicate ACTIVE_FOR_EDUCATION_PREDICATE = new ActiveForEducationPredicate();
-
-    public static class ActiveForEducationWithNormalCapacityPredicate extends ActiveForEducationPredicate {
-
-        private final Integer normalCapacity;
-
-        public ActiveForEducationWithNormalCapacityPredicate(final Integer normalCapacity) {
-            this.normalCapacity = normalCapacity;
-        }
-
-        @Override
-        public boolean eval(final Space space) {
-            return normalCapacity != null && space.getAllocatableCapacity() != null
-                    && space.getAllocatableCapacity().intValue() >= normalCapacity.intValue() && super.eval(space);
-        }
-
-    }
-
-    public static class ActiveForEducationForRoomTypePredicate extends ActiveForEducationPredicate {
-
-        private final SpaceClassification roomType;
-
-        public ActiveForEducationForRoomTypePredicate(final SpaceClassification roomType) {
-            this.roomType = roomType;
-        }
-
-        @Override
-        public boolean eval(final Space space) {
-            try {
-                return roomType != null && roomType == space.getClassification() && super.eval(space);
-            } catch (UnavailableException e) {
-                return false;
-            }
-        }
-    }
-
-    public static class ActiveForEducationExceptLabsPredicate extends ActiveForEducationPredicate {
-
-        @Override
-        public boolean eval(final Space space) {
-            return super.eval(space) && isNotALab(space);
-
-        }
-
-        public static final String LABORATORY_FOR_EDUCATION_CODE = "2.1", LABORATORY_FOR_RESEARCHER_CODE = "2.2";
-
-        private boolean isNotALab(final Space space) {
-            SpaceClassification roomClassification;
-            try {
-                roomClassification = space.getClassification();
-                return roomClassification == null
-                        || (!roomClassification.equals(SpaceClassification.get(LABORATORY_FOR_EDUCATION_CODE)) && !roomClassification
-                                .equals(SpaceClassification.get(LABORATORY_FOR_RESEARCHER_CODE)));
-            } catch (UnavailableException e) {
-                return false;
-            }
-
-        }
-    }
-
-    public static final ActiveForEducationExceptLabsPredicate ACTIVE_FOR_EDUCATION_EXCEPT_LABS_PREDICATE =
-            new ActiveForEducationExceptLabsPredicate();
-
-    public static class IsFreePredicate implements AllocatableSpacePredicate {
-
-        private final YearMonthDay startDate;
-        private final YearMonthDay endDate;
-        private final HourMinuteSecond startTime;
-        private final HourMinuteSecond endTime;
-        private final DiaSemana dayOfWeek;
-        private final FrequencyType frequency;
-        private final Boolean dailyFrequencyMarkSaturday;
-        private final Boolean dailyFrequencyMarkSunday;
-
-        public IsFreePredicate(YearMonthDay startDate, YearMonthDay endDate, HourMinuteSecond startTime,
-                HourMinuteSecond endTime, DiaSemana dayOfWeek, FrequencyType frequency, Boolean dailyFrequencyMarkSaturday,
-                Boolean dailyFrequencyMarkSunday) {
-            this.startDate = startDate;
-            this.endDate = endDate;
-            this.startTime = startTime;
-            this.endTime = endTime;
-            this.dayOfWeek = dayOfWeek;
-            this.frequency = frequency;
-            this.dailyFrequencyMarkSaturday = dailyFrequencyMarkSaturday;
-            this.dailyFrequencyMarkSunday = dailyFrequencyMarkSunday;
-        }
-
-        @Override
-        public boolean eval(final Space space) {
-            try {
-                return isFree(space, startDate, endDate, startTime, endTime, dayOfWeek, frequency, dailyFrequencyMarkSaturday,
-                        dailyFrequencyMarkSunday);
-            } catch (UnavailableException e) {
-                return false;
-            }
-        }
-
-    }
-
-    public static class IsFreeIntervalPredicate implements AllocatableSpacePredicate {
-
-        private final Interval[] intervals;
-
-        public IsFreeIntervalPredicate(final Interval[] intervals) {
-            this.intervals = intervals;
-        }
-
-        @Override
-        public boolean eval(final Space space) {
-            return space.isFree(Lists.newArrayList(intervals));
-        }
-
-    }
-
-    public static List<Space> findActiveAllocatableSpacesForEducationWithNormalCapacity(Integer normalCapacity) {
-        return findAllocatableSpacesByPredicates(new ActiveForEducationWithNormalCapacityPredicate(normalCapacity));
-    }
-
-    public static List<Space> findActiveAllocatableSpacesForEducationByRoomType(SpaceClassification roomType) {
-        return findAllocatableSpacesByPredicates(new ActiveForEducationForRoomTypePredicate(roomType));
+    public static Space getSpaceByName(String name) {
+        return Space.getSpaces().filter(space -> name.equals(space.getName())).findFirst().get();
     }
 
     public static Occupation getFirstOccurrenceOfResourceAllocationByClass(Space space, Class<? extends Occupation> clazz) {
@@ -338,27 +223,9 @@ public class SpaceUtils {
 
     public static Space getDefaultCampus() {
         if (Bennu.getInstance().getDefaultCampus() == null) {
-            return Ordering.from(SpaceUtils.COMPARATOR_BY_PRESENTATION_NAME).min(Space.getAllCampus());
+            return Ordering.from(COMPARATOR_BY_PRESENTATION_NAME).min(Space.getAllCampus());
         }
         return Bennu.getInstance().getDefaultCampus();
-    }
-
-    public static List<Space> getAllActiveBuildings() {
-        return getAllSpacesByClassification("Building", Boolean.TRUE);
-    }
-
-    private static List<Space> getAllSpacesByClassification(String classification, Boolean active) {
-        SpaceClassification clazz = SpaceClassification.getByName(classification);
-        List<Space> result = new ArrayList<Space>();
-        for (Space space : SpaceUtils.getActiveSpaces()) {
-            try {
-                if (space.getClassification().equals(clazz) && (active == null || space.isActive() == active.booleanValue())) {
-                    result.add((Space) space);
-                }
-            } catch (UnavailableException e) {
-            }
-        }
-        return result;
     }
 
     public static SortedSet<SpaceClassification> sortByRoomClassificationAndCode(
@@ -369,72 +236,37 @@ public class SpaceUtils {
 
     public static List<Space> getAllActiveSubRoomsForEducation(Space space) {
         List<Space> result = new ArrayList<Space>();
-        final Set<org.fenixedu.spaces.domain.Space> containedSpaces = space.getChildrenSet();
-        for (org.fenixedu.spaces.domain.Space subSpace : containedSpaces) {
-            Space subSpaceSpace = (Space) subSpace;
-            try {
-                if ((SpaceUtils.isRoom(subSpaceSpace) || SpaceClassification.getByName("Room Subdivision").equals(
-                        subSpaceSpace.getClassification()))
-                        && subSpaceSpace.isActive() && isForEducation((Space) space)) {
-                    result.add(subSpaceSpace);
-                }
-            } catch (UnavailableException e) {
+        final Set<Space> containedSpaces = space.getChildren();
+        for (Space subSpace : containedSpaces) {
+            if ((isRoom(subSpace) || isRoomSubdivision(subSpace)) && subSpace.isActive() && isForEducation(subSpace)) {
+                result.add(subSpace);
             }
         }
-        for (org.fenixedu.spaces.domain.Space subSpace : containedSpaces) {
-            Space subSpaceSpace = (Space) subSpace;
+        for (Space subSpace : containedSpaces) {
+            Space subSpaceSpace = subSpace;
             result.addAll(getAllActiveSubRoomsForEducation(subSpaceSpace));
         }
         return result;
     }
 
-    public static Set<Space> getAllActiveCampus() {
-        return Space.getAllCampus();
-    }
-
     public static Integer countAllAvailableSeatsForExams() {
-        int countAllSeatsForExams = 0;
-        for (Space space : SpaceUtils.getActiveSpaces()) {
-            try {
-                if (SpaceUtils.isRoom(space)
-                        && SpaceClassification.getByName("Room Subdivision").equals(space.getClassification())) {
-                    if (space.isActive()) {
-                        final Integer examCapacity = space.getMetadata("examCapacity");
-                        if (examCapacity != null) {
-                            countAllSeatsForExams += examCapacity;
-                        }
-                    }
-                }
-            } catch (UnavailableException e) {
-            }
-        }
-        return countAllSeatsForExams;
+        return allocatableSpaces().mapToInt(space -> space.<Integer> getMetadata("examCapacity").orElse(0)).sum();
     }
 
     public final static Comparator<Space> COMPARATOR_BY_PRESENTATION_NAME = new Comparator<Space>() {
         @Override
         public int compare(Space o1, Space o2) {
-
-            try {
-                if (SpaceClassification.getByName("Floor").equals(o1.getClassification())
-                        && SpaceClassification.getByName("Floor").equals(o2.getClassification())) {
-                    Integer level;
-                    try {
-                        level = o1.getMetadata("level");
-                        int compareTo1 = level.compareTo((Integer) o2.getMetadata("level"));
-                        if (compareTo1 == 0) {
-                            return o1.getExternalId().compareTo(o2.getExternalId());
-                        }
-                        return compareTo1;
-                    } catch (UnavailableException e) {
-                        return -1;
-                    }
+            if (isFloor(o1) && isFloor(o2)) {
+                Integer level = o1.<Integer> getMetadata("level").orElse(-1);
+                Integer otherLevel = o2.<Integer> getMetadata("level").orElse(-1);
+                int compareTo1 = level.compareTo(otherLevel);
+                if (compareTo1 == 0) {
+                    return o1.getExternalId().compareTo(o2.getExternalId());
                 }
-            } catch (UnavailableException e1) {
+                return compareTo1;
             }
 
-            int compareTo;
-            compareTo = o1.getName().compareTo(o2.getName());
+            int compareTo = o1.getName().compareTo(o2.getName());
             if (compareTo == 0) {
                 return o1.getExternalId().compareTo(o2.getExternalId());
             }
@@ -462,8 +294,7 @@ public class SpaceUtils {
                     return floorCheck.intValue();
                 }
 
-                int compareTo;
-                compareTo = o1.getName().compareTo(o2.getName());
+                int compareTo = o1.getName().compareTo(o2.getName());
                 if (compareTo == 0) {
                     return o1.getExternalId().compareTo(o2.getExternalId());
                 }
@@ -485,22 +316,16 @@ public class SpaceUtils {
                 return null;
 
             } else if (!space1.equals(space2)) {
-                if (SpaceClassification.getByName("Floor").equals(space1.getClassification())
-                        && SpaceClassification.getByName("Floor").equals(space2.getClassification())) {
-                    Integer level;
-                    try {
-                        level = space1.getMetadata("level");
-                        int compareTo1 = level.compareTo((Integer) space2.getMetadata("level"));
-                        if (compareTo1 == 0) {
-                            return space1.getExternalId().compareTo(space2.getExternalId());
-                        }
-                        return compareTo1;
-                    } catch (UnavailableException e) {
-                        return -1;
+                if (isFloor(space1) && isFloor(space2)) {
+                    Integer level = space1.<Integer> getMetadata("level").orElse(-1);
+                    Integer otherLevel = space2.<Integer> getMetadata("level").orElse(-1);
+                    int compareTo1 = level.compareTo(otherLevel);
+                    if (compareTo1 == 0) {
+                        return space1.getExternalId().compareTo(space2.getExternalId());
                     }
+                    return compareTo1;
                 }
-                int compareTo;
-                compareTo = space1.getName().compareTo(space2.getName());
+                int compareTo = space1.getName().compareTo(space2.getName());
                 if (compareTo == 0) {
                     return space1.getExternalId().compareTo(space2.getExternalId());
                 }
@@ -516,21 +341,21 @@ public class SpaceUtils {
                 && person.hasRole(RoleType.SPACE_MANAGER);
     }
 
-    public static Space getSpaceBuilding(Space space) throws UnavailableException {
-        if (SpaceClassification.getByName("Building").equals(space.getClassification())) {
+    public static Space getSpaceBuilding(Space space) {
+        if (isBuilding(space)) {
             return space;
         }
-        if (space.getParent() == null) {
-            return space;
+        if (space.getParent() == null || !space.getParent().isActive()) {
+            return null;
         }
         return getSpaceBuilding(space.getParent());
     }
 
-    public static Space getSpaceFloor(Space space) throws UnavailableException {
-        if (SpaceClassification.getByName("Floor").equals(space.getClassification())) {
+    public static Space getSpaceFloor(Space space) {
+        if (isFloor(space)) {
             if (space.getParent() == null) {
                 return space;
-            } else if (SpaceClassification.getByName("Floor").equals(space.getParent().getClassification())) {
+            } else if (isFloor(space.getParent())) {
                 return getSpaceFloor(space.getParent());
             } else {
                 return space;
@@ -543,7 +368,7 @@ public class SpaceUtils {
     }
 
     public static Space getSpaceFloorWithIntermediary(Space space) throws UnavailableException {
-        if (SpaceClassification.getByName("Floor").equals(space.getClassification())) {
+        if (isFloor(space)) {
             return space;
         }
         if (space.getParent() == null) {
@@ -552,8 +377,8 @@ public class SpaceUtils {
         return getSpaceFloorWithIntermediary(space.getParent());
     }
 
-    public static Space getSpaceCampus(Space space) throws UnavailableException {
-        if (SpaceClassification.getByName("Campus").equals(space.getClassification())) {
+    public static Space getSpaceCampus(Space space) {
+        if (isCampus(space)) {
             return space;
         }
         if (space.getParent() == null) {
@@ -562,25 +387,25 @@ public class SpaceUtils {
         return getSpaceCampus(space.getParent());
     }
 
-    public static Collection<Occupation> getResourceAllocationsForCheck(Space space) throws UnavailableException {
-        List<Space> roomSubdivisions = SpaceUtils.getRoomSubdivisions(space);
+    public static Collection<Occupation> getResourceAllocationsForCheck(Space space) {
+        List<Space> roomSubdivisions = getRoomSubdivisions(space);
         if (roomSubdivisions.isEmpty()) {
             return space.getOccupationSet();
         } else {
             List<Occupation> result = new ArrayList<Occupation>();
             result.addAll(space.getOccupationSet());
-            for (Space roomSubdivision : SpaceUtils.getRoomSubdivisions(space)) {
+            for (Space roomSubdivision : getRoomSubdivisions(space)) {
                 result.addAll(roomSubdivision.getOccupationSet());
             }
             return result;
         }
     }
 
-    public static List<Space> getRoomSubdivisions(Space space) throws UnavailableException {
+    public static List<Space> getRoomSubdivisions(Space space) {
         List<Space> result = new ArrayList<Space>();
-        for (org.fenixedu.spaces.domain.Space subSpaceSpace : space.getValidChildrenSet()) {
-            Space subSpace = (Space) subSpaceSpace;
-            if (SpaceClassification.getByName("Room Subdivision").equals(subSpace.getClassification())) {
+        for (Space subSpaceSpace : space.getChildren()) {
+            Space subSpace = subSpaceSpace;
+            if (isRoomSubdivision(subSpace)) {
                 result.add(subSpace);
             }
         }
@@ -617,59 +442,161 @@ public class SpaceUtils {
     }
 
     public static int currentAttendaceCount(Space space) {
-        int occupants = space.getCurrentAttendanceSet().size();
-        for (org.fenixedu.spaces.domain.Space innerSpace : space.getValidChildrenSet()) {
-            Space child = (Space) innerSpace;
-            occupants += currentAttendaceCount(child);
+        return space.getCurrentAttendanceSet().size()
+                + space.getChildren().stream().mapToInt(SpaceUtils::currentAttendaceCount).sum();
+    }
+
+    public static String[] getIdentificationWords(String name) {
+        String[] identificationWords = null;
+        if (name != null && !Strings.isNullOrEmpty(name.trim())) {
+            identificationWords = StringNormalizer.normalize(name).trim().split(" ");
         }
-        return occupants;
+        return identificationWords;
     }
 
-    public static Set<Space> getActiveChildrenSet(Space space) {
-        return FluentIterable.from(space.getValidChildrenSet())
-                .transform(new Function<org.fenixedu.spaces.domain.Space, Space>() {
-
-                    @Override
-                    public Space apply(org.fenixedu.spaces.domain.Space input) {
-                        return (Space) input;
-                    }
-
-                }).toSet();
-    }
-
-    public static boolean isFree(Space space, YearMonthDay startDate, YearMonthDay endDate, HourMinuteSecond startTime,
-            HourMinuteSecond endTime, DiaSemana dayOfWeek, FrequencyType frequency, Boolean dailyFrequencyMarkSaturday,
-            Boolean dailyFrequencyMarkSunday) throws UnavailableException {
-
-        for (Occupation spaceOccupation : getResourceAllocationsForCheck(space)) {
-            if (spaceOccupation instanceof EventSpaceOccupation) {
-                EventSpaceOccupation occupation = (EventSpaceOccupation) spaceOccupation;
-                if (occupation.alreadyWasOccupiedIn(startDate, endDate, startTime, endTime, dayOfWeek, frequency,
-                        dailyFrequencyMarkSaturday, dailyFrequencyMarkSunday)) {
-                    return false;
+    private static Set<ExecutionCourse> searchExecutionCoursesByName(SpacesSearchCriteriaType searchType, String[] labelWords) {
+        Set<ExecutionCourse> executionCoursesToTest = null;
+        if (labelWords != null
+                && (searchType.equals(SpacesSearchCriteriaType.EXECUTION_COURSE) || searchType
+                        .equals(SpacesSearchCriteriaType.WRITTEN_EVALUATION))) {
+            executionCoursesToTest = new HashSet<ExecutionCourse>();
+            for (ExecutionCourse executionCourse : ExecutionSemester.readActualExecutionSemester()
+                    .getAssociatedExecutionCoursesSet()) {
+                if (executionCourse.verifyNameEquality(labelWords)) {
+                    executionCoursesToTest.add(executionCourse);
                 }
             }
         }
-        return true;
+        return executionCoursesToTest;
     }
 
-    public static Set<Space> getActiveSpaces() {
-        return FluentIterable.from(Bennu.getInstance().getSpaceSet()).filter(new Predicate<Space>() {
+//    private static Collection<Person> searchPersonsByName(SpacesSearchCriteriaType searchType, String labelToSearch) {
+//        if (labelToSearch != null && !Strings.isNullOrEmpty(labelToSearch) && searchType.equals(SpacesSearchCriteriaType.PERSON)) {
+//            return Person.findPerson(labelToSearch);
+//        }
+//        return Collections.EMPTY_LIST;
+//    }
 
-            @Override
-            public boolean apply(Space input) {
-                return input.isActive();
-            }
-        }).toSet();
-    }
-
-    public static Space getSpaceByName(String name) {
-        for (Space space : SpaceUtils.getActiveSpaces()) {
-            if (space.getName().equals(name)) {
-                return space;
+    private static boolean verifyNameEquality(Space space, String[] nameWords) {
+        if (nameWords != null) {
+            String spacePresentationName = space.getPresentationName();
+            if (spacePresentationName != null) {
+                String[] spaceIdentificationWords = StringNormalizer.normalize(spacePresentationName).trim().split(" ");
+                int j, i;
+                for (i = 0; i < nameWords.length; i++) {
+                    if (!nameWords[i].equals("")) {
+                        for (j = 0; j < spaceIdentificationWords.length; j++) {
+                            if (spaceIdentificationWords[j].equals(nameWords[i])) {
+                                break;
+                            }
+                        }
+                        if (j == spaceIdentificationWords.length) {
+                            return false;
+                        }
+                    }
+                }
+                if (i == nameWords.length) {
+                    return true;
+                }
             }
         }
-        return null;
+        return false;
     }
 
+    public static List<Space> getSpaceFullPath(Space space) {
+        List<Space> result = new ArrayList<Space>();
+        result.add(space);
+        Space suroundingSpace = space.getParent();
+        while (suroundingSpace != null) {
+            result.add(0, suroundingSpace);
+            suroundingSpace = suroundingSpace.getParent();
+        }
+        return result;
+    }
+
+    public static Set<Space> findSpaces(String labelToSearch, Space campus, Space building, SpacesSearchCriteriaType searchType) {
+
+        Set<Space> result = new TreeSet<Space>(COMPARATOR_BY_NAME_FLOOR_BUILDING_AND_CAMPUS);
+
+        if (searchType != null
+                && (campus != null || building != null || (labelToSearch != null && !Strings.isNullOrEmpty(labelToSearch.trim())))) {
+
+            String[] labelWords = getIdentificationWords(labelToSearch);
+            Set<ExecutionCourse> executionCoursesToTest = searchExecutionCoursesByName(searchType, labelWords);
+            //Collection<Person> personsToTest = searchPersonsByName(searchType, labelToSearch);
+
+            for (Space space : Space.getSpaces().collect(Collectors.toList())) {
+
+                if (!space.equals(campus) && !space.equals(building)) {
+
+                    if (labelWords != null) {
+
+                        boolean toAdd = false;
+
+                        switch (searchType) {
+
+                        case SPACE:
+                            toAdd = verifyNameEquality(space, labelWords);
+                            break;
+
+//                        case PERSON:
+//                            for (Person person : personsToTest) {
+//                                if (person.getActivePersonSpaces().contains(resource)) {
+//                                    toAdd = true;
+//                                    break;
+//                                }
+//                            }
+//                            break;
+
+                        case EXECUTION_COURSE:
+                            for (ExecutionCourse executionCourse : executionCoursesToTest) {
+                                if (executionCourse.getAllRooms().contains(space)) {
+                                    toAdd = true;
+                                    break;
+                                }
+                            }
+                            break;
+
+                        case WRITTEN_EVALUATION:
+                            for (ExecutionCourse executionCourse : executionCoursesToTest) {
+                                SortedSet<WrittenEvaluation> writtenEvaluations = executionCourse.getWrittenEvaluations();
+                                for (WrittenEvaluation writtenEvaluation : writtenEvaluations) {
+                                    if (writtenEvaluation.getAssociatedRooms().contains(space)) {
+                                        toAdd = true;
+                                        break;
+                                    }
+                                }
+                                if (toAdd) {
+                                    break;
+                                }
+                            }
+                            break;
+
+                        default:
+                            break;
+                        }
+
+                        if (!toAdd) {
+                            continue;
+                        }
+                    }
+
+                    if (building != null) {
+                        Space spaceBuilding = getSpaceBuilding(space);
+                        if (spaceBuilding == null || !spaceBuilding.equals(building)) {
+                            continue;
+                        }
+                    } else if (campus != null) {
+                        Space spaceCampus = getSpaceCampus(space);
+                        if (spaceCampus == null || !spaceCampus.equals(campus)) {
+                            continue;
+                        }
+                    }
+
+                    result.add(space);
+                }
+            }
+        }
+        return result;
+    }
 }

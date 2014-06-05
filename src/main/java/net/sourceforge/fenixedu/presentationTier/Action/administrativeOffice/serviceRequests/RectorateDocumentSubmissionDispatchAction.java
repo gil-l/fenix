@@ -1,9 +1,26 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.administrativeOffice.serviceRequests;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -30,13 +47,14 @@ import net.sourceforge.fenixedu.domain.serviceRequests.documentRequests.Document
 import net.sourceforge.fenixedu.domain.serviceRequests.documentRequests.IDocumentRequest;
 import net.sourceforge.fenixedu.presentationTier.Action.academicAdministration.AcademicAdministrationApplication.AcademicAdminServicesApp;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.portal.EntryPoint;
 import org.fenixedu.bennu.portal.StrutsFunctionality;
-import org.fenixedu.commons.i18n.I18N;
 
 import pt.ist.fenixWebFramework.struts.annotations.Forward;
 import pt.ist.fenixWebFramework.struts.annotations.Forwards;
@@ -45,7 +63,6 @@ import pt.ist.fenixframework.Atomic;
 import pt.utl.ist.fenix.tools.spreadsheet.SheetData;
 import pt.utl.ist.fenix.tools.spreadsheet.SpreadsheetBuilder;
 import pt.utl.ist.fenix.tools.spreadsheet.WorkbookExportFormat;
-import java.util.Locale;
 
 @StrutsFunctionality(app = AcademicAdminServicesApp.class, path = "rectorate-submission", titleKey = "link.rectorateSubmission",
         accessGroup = "academic(SERVICE_REQUESTS_RECTORAL_SENDING)")
@@ -187,29 +204,27 @@ public class RectorateDocumentSubmissionDispatchAction extends FenixDispatchActi
             protected void makeLine(AcademicServiceRequest academicServiceRequest) {
                 IDocumentRequest document = (IDocumentRequest) academicServiceRequest;
 
-                ResourceBundle enumeration = ResourceBundle.getBundle("resources.EnumerationResources", I18N.getLocale());
-                ResourceBundle phdBundle = ResourceBundle.getBundle("resources.PhdResources", I18N.getLocale());
                 addCell("Código", document.getRegistryCode().getCode());
-                addCell("Tipo de Documento", enumeration.getString(document.getDocumentRequestType().name()));
+                addCell("Tipo de Documento", BundleUtil.getString(Bundle.ENUMERATION, document.getDocumentRequestType().name()));
                 switch (document.getDocumentRequestType()) {
                 case REGISTRY_DIPLOMA_REQUEST:
-                    addCell("Ciclo", enumeration.getString(((IRegistryDiplomaRequest) document).getRequestedCycle().name()));
+                    addCell("Ciclo", BundleUtil.getString(Bundle.ENUMERATION, ((IRegistryDiplomaRequest) document).getRequestedCycle().name()));
                     break;
                 case DIPLOMA_REQUEST:
                     CycleType cycle = ((IDiplomaRequest) document).getWhatShouldBeRequestedCycle();
-                    addCell("Ciclo", cycle != null ? enumeration.getString(cycle.name()) : null);
+                    addCell("Ciclo", cycle != null ? BundleUtil.getString(Bundle.ENUMERATION, cycle.name()) : null);
                     break;
                 case DIPLOMA_SUPPLEMENT_REQUEST:
-                    addCell("Ciclo", enumeration.getString(((IDiplomaSupplementRequest) document).getRequestedCycle().name()));
+                    addCell("Ciclo", BundleUtil.getString(Bundle.ENUMERATION, ((IDiplomaSupplementRequest) document).getRequestedCycle().name()));
                     break;
                 default:
                     addCell("Ciclo", null);
                 }
 
                 if (document.isRequestForRegistration()) {
-                    addCell("Tipo de Curso", enumeration.getString(((DocumentRequest) document).getDegreeType().name()));
+                    addCell("Tipo de Curso", BundleUtil.getString(Bundle.ENUMERATION, ((DocumentRequest) document).getDegreeType().name()));
                 } else if (document.isRequestForPhd()) {
-                    addCell("Tipo de Curso", phdBundle.getString("label.php.program"));
+                    addCell("Tipo de Curso", BundleUtil.getString(Bundle.PHD, "label.php.program"));
                 }
 
                 addCell("Nº de Aluno", document.getStudent().getNumber());

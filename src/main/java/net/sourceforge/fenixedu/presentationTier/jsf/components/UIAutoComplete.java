@@ -1,10 +1,27 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.jsf.components;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIInput;
@@ -13,9 +30,12 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.convert.IntegerConverter;
 import javax.servlet.http.HttpServletRequest;
 
+import net.sourceforge.fenixedu.util.Bundle;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.CharEncoding;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
 
 import pt.ist.fenixframework.DomainObject;
@@ -244,10 +264,6 @@ public class UIAutoComplete extends UIInput {
     }
 
     private String getMessageFromBundle(FacesContext context, String key) {
-        ResourceBundle resourceBundle =
-                ResourceBundle.getBundle(context.getApplication().getMessageBundle(), context.getViewRoot().getLocale());
-
-        String errorMessage = resourceBundle.getString(key);
-        return errorMessage;
+        return BundleUtil.getString(Bundle.APPLICATION, key);
     }
 }

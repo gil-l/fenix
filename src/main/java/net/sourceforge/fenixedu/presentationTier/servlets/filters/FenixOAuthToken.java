@@ -1,12 +1,30 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.servlets.filters;
 
 import net.sourceforge.fenixedu.domain.AppUserSession;
 import net.sourceforge.fenixedu.presentationTier.Action.externalServices.OAuthUtils;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.Base64;
 
 import com.google.common.base.Joiner;
 
@@ -32,7 +50,7 @@ public class FenixOAuthToken {
             throw new FenixOAuthTokenException();
         }
 
-        String accessTokenDecoded = new String(Base64.decodeBase64(oAuthToken));
+        String accessTokenDecoded = new String(Base64.getDecoder().decode(oAuthToken));
         String[] accessTokenBuilder = accessTokenDecoded.split(":");
 
         if (accessTokenBuilder.length != 2) {
@@ -57,7 +75,7 @@ public class FenixOAuthToken {
 
     public String format() {
         String token = Joiner.on(":").join(appUserSession.getExternalId(), nounce);
-        return Base64.encodeBase64String(token.getBytes());
+        return Base64.getEncoder().encodeToString(token.getBytes());
     }
 
     private static AppUserSession appUserSession(String appUserSessionId) {

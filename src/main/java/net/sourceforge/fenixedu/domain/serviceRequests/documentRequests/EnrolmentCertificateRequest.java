@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.serviceRequests.documentRequests;
 
 import java.util.Collection;
@@ -63,54 +81,27 @@ public class EnrolmentCertificateRequest extends EnrolmentCertificateRequest_Bas
     }
 
     final public Collection<Enrolment> getEntriesToReport() {
-        return filterEntries();
+        return getRegistration().getLatestCurricularCoursesEnrolments(getExecutionYear());
     }
 
-    private Collection<Enrolment> filterEntries() {
-        final Collection<Enrolment> result = new HashSet<Enrolment>();
-        if (extraCurricular == null) {
-            extraCurricular = new HashSet<Enrolment>();
-        } else {
-            extraCurricular.clear();
-        }
-        if (propaedeutic == null) {
-            propaedeutic = new HashSet<Enrolment>();
-        } else {
-            propaedeutic.clear();
-        }
-
+    final public Collection<Enrolment> getExtraCurricularEntriesToReport() {
+        final Collection<Enrolment> extraCurricular = new HashSet<Enrolment>();
         for (final Enrolment entry : getRegistration().getLatestCurricularCoursesEnrolments(getExecutionYear())) {
             if (entry.isExtraCurricular() && !entry.hasAnyEnrolmentWrappers()) {
                 extraCurricular.add(entry);
-                continue;
-            } else if (entry.isPropaedeutic()) {
-                propaedeutic.add(entry);
-                continue;
             }
-
-            result.add(entry);
         }
-
-        return result;
-    }
-
-    Collection<Enrolment> extraCurricular = null;
-
-    final public Collection<Enrolment> getExtraCurricularEntriesToReport() {
-        if (extraCurricular == null) {
-            filterEntries();
-        }
-
         return extraCurricular;
     }
 
-    Collection<Enrolment> propaedeutic = null;
 
     final public Collection<Enrolment> getPropaedeuticEntriesToReport() {
-        if (propaedeutic == null) {
-            filterEntries();
+        final Collection<Enrolment> propaedeutic = new HashSet<Enrolment>();
+        for (final Enrolment entry : getRegistration().getLatestCurricularCoursesEnrolments(getExecutionYear())) {
+            if (!(entry.isExtraCurricular() && !entry.hasAnyEnrolmentWrappers()) && entry.isPropaedeutic()) {
+                propaedeutic.add(entry);
+            }
         }
-
         return propaedeutic;
     }
 

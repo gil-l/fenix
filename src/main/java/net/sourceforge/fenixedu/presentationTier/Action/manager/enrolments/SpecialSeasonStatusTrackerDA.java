@@ -1,10 +1,27 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.manager.enrolments;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,14 +32,15 @@ import net.sourceforge.fenixedu.domain.Department;
 import net.sourceforge.fenixedu.domain.Enrolment;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction;
 import net.sourceforge.fenixedu.presentationTier.Action.manager.ManagerApplications.ManagerStudentsApp;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.portal.EntryPoint;
 import org.fenixedu.bennu.portal.StrutsFunctionality;
-import org.fenixedu.commons.i18n.I18N;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixWebFramework.struts.annotations.Forward;
@@ -30,7 +48,6 @@ import pt.ist.fenixWebFramework.struts.annotations.Forwards;
 import pt.ist.fenixWebFramework.struts.annotations.Mapping;
 import pt.utl.ist.fenix.tools.util.excel.Spreadsheet;
 import pt.utl.ist.fenix.tools.util.excel.Spreadsheet.Row;
-import java.util.Locale;
 
 @StrutsFunctionality(app = ManagerStudentsApp.class, path = "special-season-enrolments",
         titleKey = "label.course.specialSeasonEnrolments")
@@ -113,8 +130,7 @@ public class SpecialSeasonStatusTrackerDA extends FenixDispatchAction {
 
     private String getFilename(SpecialSeasonStatusTrackerBean bean) {
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append(ResourceBundle.getBundle("resources.ApplicationResources", I18N.getLocale()).getString(
-                "special.season.filename"));
+        strBuilder.append(BundleUtil.getString(Bundle.APPLICATION, "special.season.filename"));
         if (bean.getCompetenceCourse() != null) {
             strBuilder.append("_");
             strBuilder.append(bean.getCompetenceCourse().getAcronym());
@@ -125,8 +141,7 @@ public class SpecialSeasonStatusTrackerDA extends FenixDispatchAction {
         strBuilder.append("_");
         strBuilder.append(bean.getExecutionSemester().getSemester());
         strBuilder.append("_");
-        strBuilder.append(ResourceBundle.getBundle("resources.ApplicationResources", I18N.getLocale()).getString(
-                "special.season.semester"));
+        strBuilder.append(BundleUtil.getString(Bundle.APPLICATION, "special.season.semester"));
         strBuilder.append("_");
         strBuilder.append(bean.getExecutionSemester().getExecutionYear().getName());
         return strBuilder.toString();
@@ -151,26 +166,25 @@ public class SpecialSeasonStatusTrackerDA extends FenixDispatchAction {
     }
 
     private Spreadsheet createSpreadSheet() {
-        final ResourceBundle bundle = ResourceBundle.getBundle("resources.ApplicationResources", I18N.getLocale());
-        final Spreadsheet spreadsheet = new Spreadsheet(bundle.getString("list.students"));
+        final Spreadsheet spreadsheet = new Spreadsheet(BundleUtil.getString(Bundle.APPLICATION, "list.students"));
 
         spreadsheet.setHeaders(new String[] {
 
-        bundle.getString("label.istid"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.istid"),
 
-        bundle.getString("label.number"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.number"),
 
-        bundle.getString("label.name"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.name"),
 
-        bundle.getString("label.email"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.email"),
 
-        bundle.getString("label.Degree"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.Degree"),
 
-        bundle.getString("label.curricularPlan"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.curricularPlan"),
 
-        bundle.getString("label.curricular.course.name"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.curricular.course.name"),
 
-        bundle.getString("label.curricular.course.name"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.curricular.course.name"),
 
         " ", " " });
 

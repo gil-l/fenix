@@ -1,8 +1,25 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.phd;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import net.sourceforge.fenixedu.domain.CompetenceCourse;
@@ -11,13 +28,13 @@ import net.sourceforge.fenixedu.domain.Enrolment;
 import net.sourceforge.fenixedu.domain.StudentCurricularPlan;
 import net.sourceforge.fenixedu.domain.exceptions.DomainException;
 import net.sourceforge.fenixedu.injectionCode.AccessControl;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.dml.runtime.RelationAdapter;
-import java.util.Locale;
 
 public class PhdStudyPlan extends PhdStudyPlan_Base {
 
@@ -187,8 +204,7 @@ public class PhdStudyPlan extends PhdStudyPlan_Base {
 
     public String getDescription() {
         if (getExempted().booleanValue()) {
-            return ResourceBundle.getBundle("resources.PhdResources", I18N.getLocale()).getString(
-                    "label.PhdStudyPlan.description.exempted");
+            return BundleUtil.getString(Bundle.PHD, "label.PhdStudyPlan.description.exempted");
         } else {
             return getDegree().getPresentationName(getProcess().getExecutionYear());
         }

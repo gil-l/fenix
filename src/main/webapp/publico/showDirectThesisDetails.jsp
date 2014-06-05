@@ -1,3 +1,23 @@
+<%--
+
+    Copyright © 2002 Instituto Superior Técnico
+
+    This file is part of FenixEdu Core.
+
+    FenixEdu Core is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    FenixEdu Core is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+
+--%>
 <%@ page language="java" %>
 
 <%@ taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
@@ -52,28 +72,25 @@
 
 <h3 class="mtop15 mbottom05"><bean:message key="title.thesis.details.publication"/></h3>
 
-<logic:notEmpty name="thesis" property="publication">
+<logic:equal name="thesis" property="evaluated" value="true">
 
-    <bean:define id="files" name="thesis" property="publication.resultDocumentFiles"/>
+    <fr:view name="thesis" property="finalTitle"/>,
+    <fr:view name="thesis" property="student.name"/>,
+    <fr:view name="thesis" property="discussed.year"/>,
 
-    <fr:view name="thesis" property="publication.title"/>,
-    <fr:view name="thesis" property="publication.authorsNames"/>,
-    <fr:view name="thesis" property="publication.year"/>,
-    <fr:view name="thesis" property="publication.organization"/>
-    
-    <bean:define id="publicationId" name="thesis" property="publication.externalId"/>
-    (<html:link target="_blank" page="<%="/bibtexExport.do?method=exportPublicationToBibtex&publicationId="+ publicationId %>">
-        <bean:message bundle="RESEARCHER_RESOURCES" key="researcher.result.publication.exportToBibTeX" />
-    </html:link><logic:iterate id="file" name="files" length="1">,
-    
-    <bean:define id="downloadUrl" name="file" property="downloadUrl" type="java.lang.String"/>  
-    <html:link href="<%= downloadUrl %>">
-        <html:img page="/images/icon_pdf.gif" module=""/>
-        <fr:view name="file" property="size" layout="fileSize"/>
-    </html:link></logic:iterate>)
-        
-</logic:notEmpty>
+    <p>
+        <bean:define id="downloadUrl" name="thesis" property="dissertation.downloadUrl" type="java.lang.String"/>   
+        <html:link href="<%= downloadUrl %>">
+            <html:img page="/images/icon_pdf.gif" module=""/>
+            <fr:view name="thesis" property="dissertation.size" layout="fileSize"/>
+        </html:link>
+    </p>
 
-<logic:empty name="thesis" property="publication">
+	<p>
+		<bean:message bundle="RESEARCHER_RESOURCES" key="label.publication.subject.to.copyright"/>
+	</p>
+</logic:equal>
+
+<logic:equal name="thesis" property="evaluated" value="false">
     <em><bean:message key="message.thesis.publication.notAvailable"/></em>
-</logic:empty>
+</logic:equal>

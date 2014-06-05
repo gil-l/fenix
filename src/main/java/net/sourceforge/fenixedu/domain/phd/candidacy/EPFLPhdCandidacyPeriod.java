@@ -1,17 +1,33 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.phd.candidacy;
-
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 import net.sourceforge.fenixedu.domain.ExecutionYear;
 import net.sourceforge.fenixedu.domain.exceptions.DomainException;
 import net.sourceforge.fenixedu.domain.period.CandidacyPeriod;
 import net.sourceforge.fenixedu.domain.phd.PhdIndividualProgramProcess;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.phd.EPFLPhdCandidacyProcessProperties;
 import net.sourceforge.fenixedu.util.phd.PhdProperties;
 
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;
@@ -110,10 +126,7 @@ public class EPFLPhdCandidacyPeriod extends EPFLPhdCandidacyPeriod_Base {
 
     @Override
     public String getEmailMessageBodyForRefereeForm(final PhdCandidacyReferee referee) {
-        Locale locale = I18N.getLocale();
-        final ResourceBundle bundle = ResourceBundle.getBundle("resources.PhdResources", locale);
-
-        return String.format(bundle.getString("message.phd.epfl.email.body.referee"), referee.getPhdProgramCandidacyProcess()
+        return String.format(BundleUtil.getString(Bundle.PHD, "message.phd.epfl.email.body.referee"), referee.getPhdProgramCandidacyProcess()
                 .getIndividualProgramProcess().getPhdProgramFocusArea().getName().getContent(), EPFLPhdCandidacyProcessProperties
                 .getConfiguration().getPublicCandidacyRefereeFormLink(), referee.getValue(), referee
                 .getPhdProgramCandidacyProcess().getPublicPhdCandidacyPeriod().getEnd().toString("yyyy-MM-dd HH:mm"));
@@ -121,22 +134,17 @@ public class EPFLPhdCandidacyPeriod extends EPFLPhdCandidacyPeriod_Base {
 
     @Override
     public MultiLanguageString getEmailMessageSubjectForMissingCandidacyValidation(PhdIndividualProgramProcess process) {
-        final ResourceBundle bundle = getResourceBundle(Locale.ENGLISH);
         return new MultiLanguageString().with(MultiLanguageString.en,
-                bundle.getString("message.phd.epfl.email.subject.missing.candidacy.validation"));
+                BundleUtil.getString(Bundle.PHD, "message.phd.epfl.email.subject.missing.candidacy.validation"));
     }
 
     @Override
     public MultiLanguageString getEmailMessageBodyForMissingCandidacyValidation(PhdIndividualProgramProcess process) {
-        final ResourceBundle bundle = getResourceBundle(Locale.ENGLISH);
         final String body =
-                String.format(bundle.getString("message.phd.epfl.email.body.missing.candidacy.validation"),
+                String.format(BundleUtil.getString(Bundle.PHD, "message.phd.epfl.email.body.missing.candidacy.validation"),
                         PhdProperties.getPublicCandidacyAccessLink(), process.getCandidacyProcess().getCandidacyHashCode()
                                 .getValue());
         return new MultiLanguageString().with(MultiLanguageString.en, body);
     }
 
-    final protected ResourceBundle getResourceBundle(final Locale locale) {
-        return ResourceBundle.getBundle("resources.PhdResources", locale);
-    }
 }

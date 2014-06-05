@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.accounting.report.events;
 
 import java.io.ByteArrayOutputStream;
@@ -35,6 +53,7 @@ import net.sourceforge.fenixedu.domain.person.RoleType;
 import net.sourceforge.fenixedu.domain.phd.candidacy.PhdProgramCandidacyEvent;
 import net.sourceforge.fenixedu.domain.phd.debts.PhdEvent;
 import net.sourceforge.fenixedu.injectionCode.AccessControl;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.ConnectionManager;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -371,8 +390,8 @@ public class EventReportQueueJob extends EventReportQueueJob_Base {
     private EventBean writeEvent(final Event event) {
         Properties formatterProperties = new Properties();
 
-        formatterProperties.put(LabelFormatter.ENUMERATION_RESOURCES, "resources.EnumerationResources");
-        formatterProperties.put(LabelFormatter.APPLICATION_RESOURCES, "resources.ApplicationResources");
+        formatterProperties.put(LabelFormatter.ENUMERATION_RESOURCES, Bundle.ENUMERATION);
+        formatterProperties.put(LabelFormatter.APPLICATION_RESOURCES, Bundle.APPLICATION);
 
         Wrapper wrapper = buildWrapper(event);
 
@@ -514,8 +533,8 @@ public class EventReportQueueJob extends EventReportQueueJob_Base {
 
     private StringBuilder getErrorLine(Event event, Throwable e) {
         Properties formatterProperties = new Properties();
-        formatterProperties.put(LabelFormatter.ENUMERATION_RESOURCES, "resources.EnumerationResources");
-        formatterProperties.put(LabelFormatter.APPLICATION_RESOURCES, "resources.ApplicationResources");
+        formatterProperties.put(LabelFormatter.ENUMERATION_RESOURCES, Bundle.ENUMERATION);
+        formatterProperties.put(LabelFormatter.APPLICATION_RESOURCES, Bundle.APPLICATION);
 
         StringBuilder errorLine = new StringBuilder();
         try {
@@ -562,8 +581,8 @@ public class EventReportQueueJob extends EventReportQueueJob_Base {
 
             ExemptionBean bean = new ExemptionBean();
 
-            formatterProperties.put(LabelFormatter.ENUMERATION_RESOURCES, "resources.EnumerationResources");
-            formatterProperties.put(LabelFormatter.APPLICATION_RESOURCES, "resources.ApplicationResources");
+            formatterProperties.put(LabelFormatter.ENUMERATION_RESOURCES, Bundle.ENUMERATION);
+            formatterProperties.put(LabelFormatter.APPLICATION_RESOURCES, Bundle.APPLICATION);
 
             bean.eventExternalId = event.getExternalId();
             bean.exemptionTypeDescription = wrapper.getExemptionTypeDescription();

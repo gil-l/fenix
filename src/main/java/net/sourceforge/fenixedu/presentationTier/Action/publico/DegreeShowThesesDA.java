@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.publico;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +34,10 @@ import org.apache.struts.action.ActionMapping;
 import pt.ist.fenixWebFramework.struts.annotations.Forward;
 import pt.ist.fenixWebFramework.struts.annotations.Forwards;
 import pt.ist.fenixWebFramework.struts.annotations.Mapping;
+import pt.ist.fenixframework.DomainObject;
 import pt.ist.fenixframework.FenixFramework;
+
+import com.google.common.base.Strings;
 
 @Mapping(module = "publico", path = "/showDegreeTheses", scope = "session", parameter = "method")
 @Forwards(value = { @Forward(name = "showThesisDetails", path = "degree-showDegreeThesisDetails"),
@@ -26,7 +47,11 @@ public class DegreeShowThesesDA extends PublicShowThesesDA {
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
             throws Exception {
-        request.setAttribute("degree", getDegree(request));
+        Degree degree = getDegree(request);
+        if (degree == null) {
+            return new ActionForward("/notFound.jsp");
+        }
+        request.setAttribute("degree", degree);
         return super.execute(mapping, form, request, response);
     }
 
@@ -37,7 +62,12 @@ public class DegreeShowThesesDA extends PublicShowThesesDA {
             degree = site.getDegree();
         } else {
             String degreeId = FenixContextDispatchAction.getFromRequest("degreeID", request);
-            degree = FenixFramework.getDomainObject(degreeId);
+            if (!Strings.isNullOrEmpty(degreeId) && !"null".equals(degreeId)) {
+                DomainObject obj = FenixFramework.getDomainObject(degreeId);
+                if (obj instanceof Degree) {
+                    degree = (Degree) obj;
+                }
+            }
         }
         if (degree != null) {
             request.setAttribute("degreeID", degree.getExternalId());

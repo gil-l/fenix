@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package pt.utl.ist.codeGenerator.database;
 
 import static java.util.Collections.singletonList;
@@ -27,6 +45,7 @@ import net.sourceforge.fenixedu.domain.organizationalStructure.PartyType;
 import net.sourceforge.fenixedu.domain.organizationalStructure.PartyTypeEnum;
 import net.sourceforge.fenixedu.domain.organizationalStructure.PlanetUnit;
 import net.sourceforge.fenixedu.domain.person.RoleType;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.bootstrap.AdminUserBootstrapper.AdminUserSection;
@@ -50,7 +69,7 @@ import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 import com.google.common.collect.Lists;
 
 @Bootstrapper(sections = { SchoolSetupSection.class, PortalSection.class, AdminUserSection.class }, name = "bootstrapper.name",
-        bundle = "resources.ApplicationResources", after = PortalBootstrapper.class)
+        bundle = Bundle.APPLICATION, after = PortalBootstrapper.class)
 public class FenixBootstrapper {
 
     final static Locale PT = new Locale("pt");
@@ -62,7 +81,7 @@ public class FenixBootstrapper {
 
         if (Planet.getEarth().getByAlfa3(schoolSetupSection.getCountryCode()) == null) {
             return singletonList(new BootstrapError(SchoolSetupSection.class, "getCountryCode", "bootstrapper.error.contry",
-                    "resources.ApplicationResources"));
+                    Bundle.APPLICATION));
         }
 
         createRoles();
@@ -178,7 +197,7 @@ public class FenixBootstrapper {
                     new Country(countryName,
                             new MultiLanguageString(MultiLanguageString.pt, nationalityPT).append(new MultiLanguageString(
                                     MultiLanguageString.en, nationalityEN)), code, threeLetterCode);
-            if (StringUtils.equals(threeLetterCode, schoolSection.getCountryCode())) {
+            if (StringUtils.equals(threeLetterCode, schoolSection.getCountryCode().toUpperCase())) {
                 defaultCountry = country;
             }
         }
@@ -203,6 +222,8 @@ public class FenixBootstrapper {
         person.addPersonRoles(Role.getRoleByRoleType(RoleType.DEPARTMENT_ADMINISTRATIVE_OFFICE));
         person.addPersonRoles(Role.getRoleByRoleType(RoleType.SPACE_MANAGER));
         person.addPersonRoles(Role.getRoleByRoleType(RoleType.SPACE_MANAGER_SUPER_USER));
+        person.addPersonRoles(Role.getRoleByRoleType(RoleType.ACADEMIC_ADMINISTRATIVE_OFFICE));
+        person.addPersonRoles(Role.getRoleByRoleType(RoleType.BOLONHA_MANAGER));
         person.setRootDomainObject(bennu);
         person.setCountry(Country.readDefault());
         person.setCountryOfBirth(Country.readDefault());
@@ -214,10 +235,10 @@ public class FenixBootstrapper {
             partyContact.getPartyContactValidation().setState(PartyContactValidationState.VALID);
         }
         Authenticate.mock(adminUser);
-        PersistentAcademicAuthorizationGroup group =
-                new PersistentAcademicAuthorizationGroup(AcademicOperationType.MANAGE_AUTHORIZATIONS,
-                        new HashSet<AcademicProgram>(), new HashSet<AdministrativeOffice>());
-        group.addMember(person);
+        new PersistentAcademicAuthorizationGroup(AcademicOperationType.MANAGE_AUTHORIZATIONS, new HashSet<AcademicProgram>(),
+                new HashSet<AdministrativeOffice>()).addMember(person);
+        new PersistentAcademicAuthorizationGroup(AcademicOperationType.MANAGE_ACADEMIC_CALENDARS, new HashSet<AcademicProgram>(),
+                new HashSet<AdministrativeOffice>()).addMember(person);
     }
 
     private static void createPartyTypeEnums() {
@@ -251,7 +272,7 @@ public class FenixBootstrapper {
     }
 
     @Section(name = "bootstrapper.schoolSetup.name", description = "bootstrapper.schoolSetup.description",
-            bundle = "resources.ApplicationResources")
+            bundle = Bundle.APPLICATION)
     public static interface SchoolSetupSection {
 
         @Field(name = "bootstrapper.schoolSetup.universityName", hint = "bootstrapper.schoolSetup.universityName.hint", order = 1)

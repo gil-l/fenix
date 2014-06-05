@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.administrativeOffice.lists;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
@@ -44,13 +62,14 @@ import net.sourceforge.fenixedu.domain.studentCurriculum.CycleCurriculumGroup;
 import net.sourceforge.fenixedu.injectionCode.AccessControl;
 import net.sourceforge.fenixedu.presentationTier.Action.academicAdministration.AcademicAdministrationApplication.AcademicAdminListingsApp;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.portal.EntryPoint;
 import org.fenixedu.bennu.portal.StrutsFunctionality;
 
@@ -94,10 +113,12 @@ public class StudentListByDegreeDA extends FenixDispatchAction {
         SearchStudentsByDegreeParametersBean bean = getRenderedObject("searchParametersBean");
         if (bean == null) {
             Set<DegreeType> degreeTypesForOperation =
-                    AcademicAuthorizationGroup.getDegreeTypesForOperation(AccessControl.getPerson(), AcademicOperationType.STUDENT_LISTINGS);
+                    AcademicAuthorizationGroup.getDegreeTypesForOperation(AccessControl.getPerson(),
+                            AcademicOperationType.STUDENT_LISTINGS);
             bean =
                     new SearchStudentsByDegreeParametersBean(degreeTypesForOperation,
-                            AcademicAuthorizationGroup.getDegreesForOperation(AccessControl.getPerson(), AcademicOperationType.STUDENT_LISTINGS));
+                            AcademicAuthorizationGroup.getDegreesForOperation(AccessControl.getPerson(),
+                                    AcademicOperationType.STUDENT_LISTINGS));
         }
         return bean;
     }
@@ -250,7 +271,7 @@ public class StudentListByDegreeDA extends FenixDispatchAction {
             if (degree != null) {
                 filename += "_" + degree.getNameFor(executionYear).getContent().replace(' ', '_');
             } else if (degreeType != null) {
-                filename += "_" + BundleUtil.getEnumName(degreeType).replace(' ', '_');
+                filename += "_" + degreeType.getLocalizedName().replace(' ', '_');
             }
             filename += "_" + executionYear.getYear();
 
@@ -300,8 +321,7 @@ public class StudentListByDegreeDA extends FenixDispatchAction {
         }
         spreadsheet.newHeaderRow();
         if (searchBean.getRegime() != null) {
-            spreadsheet.addHeader(getResourceMessage("registration.regime") + ": "
-                    + BundleUtil.getEnumName(searchBean.getRegime()));
+            spreadsheet.addHeader(getResourceMessage("registration.regime") + ": " + searchBean.getRegime().getLocalizedName());
         }
         spreadsheet.newHeaderRow();
         if (searchBean.getNationality() != null) {
@@ -310,28 +330,28 @@ public class StudentListByDegreeDA extends FenixDispatchAction {
         spreadsheet.newHeaderRow();
         if (searchBean.getIngression() != null) {
             spreadsheet.addHeader(getResourceMessage("label.ingression.short") + ": "
-                    + BundleUtil.getEnumName(searchBean.getIngression()));
+                    + searchBean.getIngression().getLocalizedName());
         }
 
         spreadsheet.newHeaderRow();
         if (searchBean.hasAnyRegistrationAgreements()) {
             spreadsheet.addHeader(getResourceMessage("label.registrationAgreement") + ":");
             for (RegistrationAgreement agreement : searchBean.getRegistrationAgreements()) {
-                spreadsheet.addHeader(BundleUtil.getEnumName(agreement));
+                spreadsheet.addHeader(agreement.getDescription());
             }
         }
         spreadsheet.newHeaderRow();
         if (searchBean.hasAnyRegistrationStateTypes()) {
             spreadsheet.addHeader(getResourceMessage("label.registrationState") + ":");
             for (RegistrationStateType state : searchBean.getRegistrationStateTypes()) {
-                spreadsheet.addHeader(BundleUtil.getEnumName(state));
+                spreadsheet.addHeader(state.getDescription());
             }
         }
         spreadsheet.newHeaderRow();
         if (searchBean.hasAnyStudentStatuteType()) {
             spreadsheet.addHeader(getResourceMessage("label.statutes") + ":");
             for (StudentStatuteType statute : searchBean.getStudentStatuteTypes()) {
-                spreadsheet.addHeader(BundleUtil.getEnumName(statute));
+                spreadsheet.addHeader(BundleUtil.getString(Bundle.ENUMERATION, statute.name()));
             }
         }
     }
@@ -376,7 +396,7 @@ public class StudentListByDegreeDA extends FenixDispatchAction {
                 spreadsheet.addCell(registration.getEnrolmentsExecutionYears().size());
                 spreadsheet.addCell(registration.getCurricularYear(executionYear));
                 spreadsheet.addCell(registration.getEnrolments(executionYear).size());
-                spreadsheet.addCell(BundleUtil.getEnumName(registration.getRegimeType(executionYear)));
+                spreadsheet.addCell(registration.getRegimeType(executionYear).getLocalizedName());
 
                 fillSpreadSheetPreBolonhaInfo(spreadsheet, registration);
 
@@ -648,12 +668,13 @@ public class StudentListByDegreeDA extends FenixDispatchAction {
     }
 
     protected static String getResourceMessage(String key) {
-        return BundleUtil.getMessageFromModuleOrApplication("academicAdminOffice", key);
+        return BundleUtil.getString(Bundle.ACADEMIC, "academicAdminOffice", key);
     }
 
     protected Set<CycleType> getAdministratedCycleTypes() {
         Set<CycleType> cycles = new HashSet<CycleType>();
-        for (DegreeType degreeType : AcademicAuthorizationGroup.getDegreeTypesForOperation(AccessControl.getPerson(), AcademicOperationType.STUDENT_LISTINGS)) {
+        for (DegreeType degreeType : AcademicAuthorizationGroup.getDegreeTypesForOperation(AccessControl.getPerson(),
+                AcademicOperationType.STUDENT_LISTINGS)) {
             cycles.addAll(degreeType.getCycleTypes());
         }
         return cycles;

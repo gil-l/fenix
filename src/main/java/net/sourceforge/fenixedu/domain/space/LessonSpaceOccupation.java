@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.space;
 
 import static net.sourceforge.fenixedu.injectionCode.AccessControl.check;
@@ -42,11 +60,9 @@ public class LessonSpaceOccupation extends LessonSpaceOccupation_Base {
 
         if (allocatableSpace != null /* && !allocatableSpace.isFree(this) */
                 && !allocatableSpace.isFree(Lists.newArrayList(lesson.getAllLessonIntervalsWithoutInstanceDates()))) {
-            String name;
-            name = allocatableSpace.getName();
-            throw new DomainException("error.LessonSpaceOccupation.room.is.not.free", name, getPeriod().getStartYearMonthDay()
-                    .toString("dd-MM-yyy"), getPeriod().getLastOccupationPeriodOfNestedPeriods().getEndYearMonthDay()
-                    .toString("dd-MM-yyy"));
+            throw new DomainException("error.LessonSpaceOccupation.room.is.not.free", allocatableSpace.getName(), getPeriod()
+                    .getStartYearMonthDay().toString("dd-MM-yyy"), getPeriod().getLastOccupationPeriodOfNestedPeriods()
+                    .getEndYearMonthDay().toString("dd-MM-yyy"));
         }
 
         setResource(allocatableSpace);
@@ -63,16 +79,15 @@ public class LessonSpaceOccupation extends LessonSpaceOccupation_Base {
                 getLesson().getAllLessonIntervalsWithoutInstanceDates();
         if (allocatableSpace != null /* && !allocatableSpace.isFree(this) */
                 && !allocatableSpace.isFree(Lists.newArrayList(allLessonIntervalsWithoutInstanceDates))) {
-            String name;
-            name = allocatableSpace.getName();
-            throw new DomainException("error.LessonSpaceOccupation.room.is.not.free", name, getPeriod().getStartYearMonthDay()
-                    .toString("dd-MM-yyy"), getPeriod().getLastOccupationPeriodOfNestedPeriods().getEndYearMonthDay()
-                    .toString("dd-MM-yyy"));
+            throw new DomainException("error.LessonSpaceOccupation.room.is.not.free", allocatableSpace.getName(), getPeriod()
+                    .getStartYearMonthDay().toString("dd-MM-yyy"), getPeriod().getLastOccupationPeriodOfNestedPeriods()
+                    .getEndYearMonthDay().toString("dd-MM-yyy"));
         }
 
         setResource(allocatableSpace);
     }
 
+    @Override
     public void delete() {
         check(this, SpacePredicates.checkPermissionsToDeleteLessonSpaceOccupations);
         super.setLesson(null);
@@ -129,7 +144,7 @@ public class LessonSpaceOccupation extends LessonSpaceOccupation_Base {
 
     @Override
     public Group getAccessGroup() {
-        return getSpace().getOccupationsAccessGroupWithChainOfResponsability();
+        return getSpace().getOccupationsGroupWithChainOfResponsability();
     }
 
     @Override

@@ -1,16 +1,29 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.accessControl;
+
+import java.util.Objects;
 
 import net.sourceforge.fenixedu.domain.organizationalStructure.FunctionType;
 import net.sourceforge.fenixedu.domain.organizationalStructure.PersonFunction;
 
 import org.fenixedu.bennu.core.groups.Group;
-
-import pt.ist.fenixframework.Atomic;
-import pt.ist.fenixframework.Atomic.TxMode;
-
-import com.google.common.base.Objects;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
 
 public class PersistentDelegateStudentsGroup extends PersistentDelegateStudentsGroup_Base {
     private PersistentDelegateStudentsGroup(PersonFunction delegateFunction, FunctionType type) {
@@ -31,23 +44,9 @@ public class PersistentDelegateStudentsGroup extends PersistentDelegateStudentsG
     }
 
     public static PersistentDelegateStudentsGroup getInstance(PersonFunction delegateFunction, FunctionType type) {
-        PersistentDelegateStudentsGroup instance = select(delegateFunction, type);
-        return instance != null ? instance : create(delegateFunction, type);
-    }
-
-    @Atomic(mode = TxMode.WRITE)
-    private static PersistentDelegateStudentsGroup create(PersonFunction delegateFunction, FunctionType type) {
-        PersistentDelegateStudentsGroup instance = select(delegateFunction, type);
-        return instance != null ? instance : new PersistentDelegateStudentsGroup(delegateFunction, type);
-    }
-
-    private static PersistentDelegateStudentsGroup select(PersonFunction delegateFunction, final FunctionType type) {
-        return FluentIterable.from(delegateFunction.getDelegateStudentsGroupSet())
-                .firstMatch(new Predicate<PersistentDelegateStudentsGroup>() {
-                    @Override
-                    public boolean apply(PersistentDelegateStudentsGroup group) {
-                        return Objects.equal(group.getType(), type);
-                    }
-                }).orNull();
+        return singleton(
+                () -> delegateFunction.getDelegateStudentsGroupSet().stream()
+                .filter(group -> Objects.equals(group.getType(), type)).findAny(),
+                () -> new PersistentDelegateStudentsGroup(delegateFunction, type));
     }
 }

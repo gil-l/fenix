@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.manager.payments;
 
 import java.io.File;
@@ -9,7 +27,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,6 +41,7 @@ import net.sourceforge.fenixedu.domain.accounting.SibsPaymentFileProcessReport;
 import net.sourceforge.fenixedu.injectionCode.AccessControl;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction;
 import net.sourceforge.fenixedu.presentationTier.Action.manager.ManagerApplications.ManagerPaymentsApp;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.sibs.incomming.SibsIncommingPaymentFile;
 import net.sourceforge.fenixedu.util.sibs.incomming.SibsIncommingPaymentFileDetailLine;
 
@@ -31,6 +49,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.portal.EntryPoint;
 import org.fenixedu.bennu.portal.StrutsFunctionality;
 import org.fenixedu.commons.StringNormalizer;
@@ -177,13 +196,7 @@ public class SIBSPaymentsDA extends FenixDispatchAction {
 
     private static String getMessage(Exception ex) {
         String message = (ex.getMessage() == null) ? ex.getClass().getSimpleName() : ex.getMessage();
-
-        ResourceBundle bundle = ResourceBundle.getBundle("resources/ManagerResources");
-        if (bundle.containsKey(message)) {
-            return bundle.getString(message);
-        }
-
-        return message;
+        return BundleUtil.getString(Bundle.MANAGER, message);
     }
 
     private void recursiveZipProcess(File unzipDir, HttpServletRequest request) {

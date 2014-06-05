@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 /*
  * Created on May 25, 2003
  *  
@@ -7,7 +25,6 @@ package net.sourceforge.fenixedu.presentationTier.TagLib.sop.examsMapNew;
 
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import javax.servlet.jsp.PageContext;
 
@@ -43,11 +60,10 @@ public class ExamsMapForRoomRenderer implements IExamsMapRenderer {
     @Override
     public StringBuilder render(Locale locale, PageContext pageContext) {
         StringBuilder strBuffer = new StringBuilder("");
-        ResourceBundle bundle = ResourceBundle.getBundle("resources.PublicDegreeInformation", locale);
         strBuffer.append("<table class='examMapContainer' cellspacing='0' cellpadding='3' width='95%'>");
         strBuffer.append("<tr>");
         strBuffer.append("<td>");
-        renderExamsMapForRoom(strBuffer, pageContext, bundle);
+        renderExamsMapForRoom(strBuffer, pageContext);
         strBuffer.append("</td>");
         strBuffer.append("</tr>");
         strBuffer.append("</table>");
@@ -60,7 +76,7 @@ public class ExamsMapForRoomRenderer implements IExamsMapRenderer {
         return strBuffer;
     }
 
-    private void renderExamsMapForRoom(StringBuilder strBuffer, PageContext pageContext, ResourceBundle bundle) {
+    private void renderExamsMapForRoom(StringBuilder strBuffer, PageContext pageContext) {
         strBuffer.append("<table class='examMap' cellspacing='0' cellpadding='3' width='95%'>");
 
         strBuffer.append("<tr>");
@@ -69,7 +85,7 @@ public class ExamsMapForRoomRenderer implements IExamsMapRenderer {
 
         for (int week = 0; week < numberOfWeks; week++) {
             strBuffer.append("<tr>");
-            renderLabelsForRowOfDays(strBuffer, week, pageContext, bundle);
+            renderLabelsForRowOfDays(strBuffer, week, pageContext);
             strBuffer.append("</tr>\r\n");
             strBuffer.append("<tr>");
             renderExamsForRowOfDays(strBuffer, week, pageContext);
@@ -102,7 +118,7 @@ public class ExamsMapForRoomRenderer implements IExamsMapRenderer {
         }
     }
 
-    private void renderLabelsForRowOfDays(StringBuilder strBuffer, int week, PageContext pageContext, ResourceBundle bundle) {
+    private void renderLabelsForRowOfDays(StringBuilder strBuffer, int week, PageContext pageContext) {
         for (int slot = 0; slot < daysOfWeek.length; slot++) {
             ExamsMapSlot examsMapSlot = (ExamsMapSlot) examsMap.getDays().get(week * daysOfWeek.length + slot);
 

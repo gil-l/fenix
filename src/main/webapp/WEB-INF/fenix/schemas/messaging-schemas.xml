@@ -1,3 +1,23 @@
+<!--
+
+    Copyright © 2002 Instituto Superior Técnico
+
+    This file is part of FenixEdu Core.
+
+    FenixEdu Core is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    FenixEdu Core is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
 <schema name="executionCourseForum.view.nameOnly" type="net.sourceforge.fenixedu.domain.messaging.ExecutionCourseForum">
 	<slot name="name"/>
 </schema>
@@ -335,5 +355,32 @@
 	<slot name="sentMailsCount" key="net.sourceforge.fenixedu.domain.util.email.Message.sentMailsCount"/>
 	<!-- <slot name="possibleErrorsCount" key="net.sourceforge.fenixedu.domain.util.email.Message.failedMailsCount"/> -->
 	<slot name="failedMailsCount" key="net.sourceforge.fenixedu.domain.util.email.Message.failedMailsCount"/>
+</schema>
+
+<schema name="PublicFindSpaces" type="net.sourceforge.fenixedu.dataTransferObject.spaceManager.FindSpacesBean" bundle="DEFAULT">
+	<slot name="searchType" key="label.find.space.search.type" layout="radio">
+		<property name="bundle" value="DEFAULT" />
+		<property name="classes" value="liinline" />
+	</slot>
+	<slot name="labelToSearch" key="label.find.spaces.label">
+		<property name="size" value="30"/>
+	</slot>							        
+</schema>
+
+<schema name="PublicFindSpacesWithExtraOptions" extends="PublicFindSpaces" type="net.sourceforge.fenixedu.dataTransferObject.spaceManager.FindSpacesBean" bundle="DEFAULT">
+	<slot name="searchType" key="label.find.space.search.type" layout="radio">
+		<property name="bundle" value="DEFAULT" />
+		<property name="classes" value="list2 liinline" />
+	</slot>			
+	<slot name="campus" key="label.find.spaces.campus" layout="menu-select-postback">	
+		<property name="size" value="30"/>
+		<property name="providerClass" value="net.sourceforge.fenixedu.presentationTier.renderers.providers.spaceManager.CampusProvider"/>		
+		<property name="format"	value="${name}" />
+		<property name="destination" value="postBack"/>	
+	</slot>
+	<slot name="building" key="label.find.spaces.building" layout="menu-select">	
+		<property name="providerClass" value="net.sourceforge.fenixedu.presentationTier.renderers.providers.spaceManager.BuildingProvider"/>		
+		<property name="format"	value="${name}" />	
+	</slot>								       
 </schema>
 

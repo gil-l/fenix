@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.resourceAllocationManager.exams;
 
 import java.util.ArrayList;
@@ -9,8 +27,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sourceforge.fenixedu.applicationTier.Servico.resourceAllocationManager.exams.ReadAvailableRoomsForExam;
 import net.sourceforge.fenixedu.dataTransferObject.InfoRoom;
+import net.sourceforge.fenixedu.domain.space.SpaceUtils;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction;
 import net.sourceforge.fenixedu.presentationTier.Action.resourceAllocationManager.RAMApplication.RAMEvaluationsApp;
 import net.sourceforge.fenixedu.presentationTier.Action.resourceAllocationManager.utils.PresentationConstants;
@@ -41,7 +59,7 @@ import pt.ist.fenixframework.FenixFramework;
 @StrutsFunctionality(app = RAMEvaluationsApp.class, path = "room-search", titleKey = "link.exams.searchAvailableRooms")
 @Mapping(module = "resourceAllocationManager", path = "/roomSearch", formBean = "roomSearchForm")
 @Forwards({ @Forward(name = "showRooms", path = "/resourceAllocationManager/exams/showRooms.jsp"),
-        @Forward(name = "roomSearch", path = "/resourceAllocationManager/exams/roomSearch.jsp") })
+    @Forward(name = "roomSearch", path = "/resourceAllocationManager/exams/roomSearch.jsp") })
 public class RoomSearchDA extends FenixDispatchAction {
 
     @EntryPoint
@@ -107,9 +125,9 @@ public class RoomSearchDA extends FenixDispatchAction {
 
         List<InfoRoom> availableInfoRoom = null;
         availableInfoRoom =
-                ReadAvailableRoomsForExam.run(YearMonthDay.fromCalendarFields(searchDate),
+                SpaceUtils.allocatableSpace(YearMonthDay.fromCalendarFields(searchDate),
                         YearMonthDay.fromCalendarFields(searchDate), HourMinuteSecond.fromCalendarFields(searchStartTime),
-                        HourMinuteSecond.fromCalendarFields(searchEndTime), dayOfWeek, null, null, Boolean.FALSE);
+                        HourMinuteSecond.fromCalendarFields(searchEndTime), dayOfWeek, null, null, false);
         String sdate = roomSearchForm.get("day") + "/" + roomSearchForm.get("month") + "/" + roomSearchForm.get("year");
         String startTime = roomSearchForm.get("beginningHour") + ":" + roomSearchForm.get("beginningMinute");
         String endTime = roomSearchForm.get("endHour") + ":" + roomSearchForm.get("endMinute");

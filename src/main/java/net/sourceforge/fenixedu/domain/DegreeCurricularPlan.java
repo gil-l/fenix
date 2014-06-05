@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain;
 
 import static net.sourceforge.fenixedu.injectionCode.AccessControl.check;
@@ -11,7 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -54,6 +71,7 @@ import net.sourceforge.fenixedu.domain.time.calendarStructure.AcademicYearCE;
 import net.sourceforge.fenixedu.injectionCode.AccessControl;
 import net.sourceforge.fenixedu.predicates.AcademicPredicates;
 import net.sourceforge.fenixedu.predicates.DegreeCurricularPlanPredicates;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.MarkType;
 import net.sourceforge.fenixedu.util.PeriodState;
 import net.sourceforge.fenixedu.util.SituationName;
@@ -65,6 +83,7 @@ import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.NobodyGroup;
 import org.fenixedu.bennu.core.groups.UserGroup;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.DateTime;
@@ -1640,7 +1659,7 @@ public class DegreeCurricularPlan extends DegreeCurricularPlan_Base {
                 return getLastOrderedCycleCourseGroup().getGraduateTitle(executionYear, locale);
             } else {
                 final StringBuilder res = new StringBuilder(getDegreeType().getGraduateTitle(locale));
-                res.append(" ").append(ResourceBundle.getBundle("resources/ApplicationResources", locale).getString("label.in"));
+                res.append(" ").append(BundleUtil.getString(Bundle.APPLICATION, locale, "label.in"));
                 res.append(" ").append(getDegree().getFilteredName(executionYear, locale));
 
                 return res.toString();
@@ -1711,19 +1730,6 @@ public class DegreeCurricularPlan extends DegreeCurricularPlan_Base {
 
     public List<CurricularCourse> getDissertationCurricularCourses() {
         return getDissertationCurricularCourses(ExecutionYear.readCurrentExecutionYear());
-    }
-
-    // this slot is a hack to allow renderers to call the setter. Don't
-    // delete
-    // it.
-    private DegreeCurricularPlan sourceDegreeCurricularPlan = null;
-
-    public DegreeCurricularPlan getSourceDegreeCurricularPlan() {
-        return sourceDegreeCurricularPlan;
-    }
-
-    public void setSourceDegreeCurricularPlan(DegreeCurricularPlan sourceDegreeCurricularPlan) {
-        this.sourceDegreeCurricularPlan = sourceDegreeCurricularPlan;
     }
 
     public DegreeCurricularPlanEquivalencePlan createEquivalencePlan(final DegreeCurricularPlan sourceDegreeCurricularPlan) {

@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.TagLib.sop.v3;
 
 import java.util.ArrayList;
@@ -34,7 +52,7 @@ public class TimeTable {
 
     /**
      * Constructor TimeTable.
-     * 
+     *
      * @param numberOfHours
      * @param numberOfDays
      */
@@ -58,7 +76,7 @@ public class TimeTable {
 
     /**
      * Method getDiaSemanaLabel.
-     * 
+     *
      * @param day
      */
     private String getDiaSemanaLabel(int day, Locale locale, PageContext pageContext) {
@@ -91,7 +109,7 @@ public class TimeTable {
 
     /**
      * This method will break infoLesson in minute slots.
-     * 
+     *
      * @param infoLesson
      */
     public void addLesson(InfoShowOccupation infoShowOccupation) {
@@ -115,7 +133,7 @@ public class TimeTable {
 
     /**
      * Method getInfoLessonWrapper.
-     * 
+     *
      * @param infoLesson
      */
     private InfoLessonWrapper getInfoLessonWrapper(InfoShowOccupation infoShowOccupation) {
@@ -129,7 +147,7 @@ public class TimeTable {
 
     /**
      * Method getTimeTableSlot.
-     * 
+     *
      * @param dayIndex
      * @param hourIndex
      * @return TimeTableSlot
@@ -181,7 +199,7 @@ public class TimeTable {
 
     /**
      * Method getMinutes.
-     * 
+     *
      * @param calendar
      * @return int
      */
@@ -195,7 +213,7 @@ public class TimeTable {
 
     /**
      * Returns the timeTableGrid.
-     * 
+     *
      * @return TimeTableSlot[][]
      */
     public TimeTableSlot[][] getTimeTableGrid() {
@@ -204,7 +222,7 @@ public class TimeTable {
 
     /**
      * Returns the numberOfDays.
-     * 
+     *
      * @return Integer
      */
     public Integer getNumberOfDays() {
@@ -213,7 +231,7 @@ public class TimeTable {
 
     /**
      * Returns the numberOfHours.
-     * 
+     *
      * @return Integer
      */
     public Integer getNumberOfHours() {
@@ -222,7 +240,7 @@ public class TimeTable {
 
     /**
      * Method getDayColumn.
-     * 
+     *
      * @param dayIndex
      * @return DayColumn
      */
@@ -232,7 +250,7 @@ public class TimeTable {
 
     /**
      * Returns the minimumHourInMinutes.
-     * 
+     *
      * @return int
      */
     public int getMinimumHourInMinutes() {
@@ -241,7 +259,7 @@ public class TimeTable {
 
     /**
      * Returns the slotSize.
-     * 
+     *
      * @return Integer
      */
     public Integer getSlotSize() {

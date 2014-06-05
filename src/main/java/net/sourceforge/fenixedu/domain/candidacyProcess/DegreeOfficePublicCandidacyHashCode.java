@@ -1,9 +1,26 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.candidacyProcess;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.UUID;
 
 import net.sourceforge.fenixedu.domain.Degree;
@@ -14,12 +31,13 @@ import net.sourceforge.fenixedu.domain.candidacyProcess.mobility.MobilityEmailTe
 import net.sourceforge.fenixedu.domain.candidacyProcess.mobility.MobilityEmailTemplateType;
 import net.sourceforge.fenixedu.domain.organizationalStructure.Unit;
 import net.sourceforge.fenixedu.domain.period.MobilityApplicationPeriod;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.i18n.I18N;
 
 import pt.utl.ist.fenix.tools.util.DateFormatUtil;
-import java.util.Locale;
 
 public class DegreeOfficePublicCandidacyHashCode extends DegreeOfficePublicCandidacyHashCode_Base {
 
@@ -86,12 +104,11 @@ public class DegreeOfficePublicCandidacyHashCode extends DegreeOfficePublicCandi
 
     private void sendEmailForApplicationSubmissionCandidacyForm(
             Class<? extends IndividualCandidacyProcess> individualCandidadyProcessClass) {
-        ResourceBundle bundle = ResourceBundle.getBundle("resources.CandidateResources", I18N.getLocale());
         String subject =
-                bundle.getString(individualCandidadyProcessClass.getSimpleName() + SEND_LINK_TO_ACCESS_SUBMISSION_FORM_SUBJECT);
+                BundleUtil.getString(Bundle.CANDIDATE, individualCandidadyProcessClass.getSimpleName() + SEND_LINK_TO_ACCESS_SUBMISSION_FORM_SUBJECT);
         String body =
-                bundle.getString(individualCandidadyProcessClass.getSimpleName() + SEND_LINK_TO_ACCESS_SUBMISSION_FORM_BODY);
-        String link = bundle.getString(individualCandidadyProcessClass.getSimpleName() + APPLICATION_SUBMISSION_LINK);
+                BundleUtil.getString(Bundle.CANDIDATE, individualCandidadyProcessClass.getSimpleName() + SEND_LINK_TO_ACCESS_SUBMISSION_FORM_BODY);
+        String link = BundleUtil.getString(Bundle.CANDIDATE, individualCandidadyProcessClass.getSimpleName() + APPLICATION_SUBMISSION_LINK);
         link = String.format(link, this.getValue(), I18N.getLocale());
         body = String.format(body, link);
         this.sendEmail(subject, body);
@@ -116,13 +133,12 @@ public class DegreeOfficePublicCandidacyHashCode extends DegreeOfficePublicCandi
             return;
         }
 
-        ResourceBundle bundle = ResourceBundle.getBundle("resources.CandidateResources", I18N.getLocale());
         String subject =
-                MessageFormat.format(bundle.getString(this.getIndividualCandidacyProcess().getClass().getSimpleName()
+                MessageFormat.format(BundleUtil.getString(Bundle.CANDIDATE, this.getIndividualCandidacyProcess().getClass().getSimpleName()
                         + INFORM_APPLICATION_SUCCESS_SUBJECT), Unit.getInstitutionAcronym(), Unit.getInstitutionName()
                         .getContent());
         String body =
-                MessageFormat.format(bundle.getString(this.getIndividualCandidacyProcess().getClass().getSimpleName()
+                MessageFormat.format(BundleUtil.getString(Bundle.CANDIDATE, this.getIndividualCandidacyProcess().getClass().getSimpleName()
                         + INFORM_APPLICATION_SUCCESS_BODY), Unit.getInstitutionAcronym(), Unit.getInstitutionName().getContent());
         String link = getDefaultPublicLink();
 
@@ -142,11 +158,10 @@ public class DegreeOfficePublicCandidacyHashCode extends DegreeOfficePublicCandi
     private static final String RECOVERY_APPLICATION_BODY = ".message.email.body.recovery.access";
 
     public void sendEmailFoAccessLinkRecovery() {
-        ResourceBundle bundle = ResourceBundle.getBundle("resources.CandidateResources", I18N.getLocale());
         String subject =
-                bundle.getString(this.getIndividualCandidacyProcess().getClass().getSimpleName() + RECOVERY_APPLICATION_SUBJECT);
+                BundleUtil.getString(Bundle.CANDIDATE, this.getIndividualCandidacyProcess().getClass().getSimpleName() + RECOVERY_APPLICATION_SUBJECT);
         String body =
-                bundle.getString(this.getIndividualCandidacyProcess().getClass().getSimpleName() + RECOVERY_APPLICATION_BODY);
+                BundleUtil.getString(Bundle.CANDIDATE, this.getIndividualCandidacyProcess().getClass().getSimpleName() + RECOVERY_APPLICATION_BODY);
         String link = getDefaultPublicLink();
 
         body = String.format(body, new String[] { link, this.getIndividualCandidacyProcess().getProcessCode() });
@@ -155,9 +170,8 @@ public class DegreeOfficePublicCandidacyHashCode extends DegreeOfficePublicCandi
     }
 
     public String getDefaultPublicLink() {
-        ResourceBundle bundle = ResourceBundle.getBundle("resources.CandidateResources", I18N.getLocale());
         return String.format(
-                bundle.getString(this.getIndividualCandidacyProcess().getClass().getSimpleName() + APPLICATION_ACCESS_LINK),
+                BundleUtil.getString(Bundle.CANDIDATE, this.getIndividualCandidacyProcess().getClass().getSimpleName() + APPLICATION_ACCESS_LINK),
                 this.getValue(), I18N.getLocale().getLanguage());
     }
 

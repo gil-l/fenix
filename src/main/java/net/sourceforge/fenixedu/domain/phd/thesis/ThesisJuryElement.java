@@ -1,21 +1,38 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.phd.thesis;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.ResourceBundle;
 
 import net.sourceforge.fenixedu.domain.Person;
 import net.sourceforge.fenixedu.domain.exceptions.DomainException;
 import net.sourceforge.fenixedu.domain.phd.PhdParticipant;
 import net.sourceforge.fenixedu.domain.phd.PhdProgramProcessDocument;
 import net.sourceforge.fenixedu.domain.phd.PhdThesisReportFeedbackDocument;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;
-import java.util.Locale;
 
 public class ThesisJuryElement extends ThesisJuryElement_Base {
 
@@ -131,13 +148,12 @@ public class ThesisJuryElement extends ThesisJuryElement_Base {
 
     public String getNameWithTitleAndRoleOnProcess() {
         StringBuilder stringBuilder = new StringBuilder(getNameWithTitle());
-        ResourceBundle resourceBundle = ResourceBundle.getBundle("resources.PhdResources", I18N.getLocale());
         if (getProcess().getIndividualProgramProcess().isGuider(getParticipant())) {
-            stringBuilder.append(" (").append(resourceBundle.getString("label.phd.guiding")).append(")");
+            stringBuilder.append(" (").append(BundleUtil.getString(Bundle.PHD, "label.phd.guiding")).append(")");
         }
 
         if (getProcess().getIndividualProgramProcess().isAssistantGuider(getParticipant())) {
-            stringBuilder.append(" (").append(resourceBundle.getString("label.phd.assistant.guiding")).append(")");
+            stringBuilder.append(" (").append(BundleUtil.getString(Bundle.PHD, "label.phd.assistant.guiding")).append(")");
         }
 
         return stringBuilder.toString();

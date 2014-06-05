@@ -1,6 +1,25 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.teacher;
 
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.joda.time.DateTime;
@@ -16,8 +35,8 @@ public class TeacherServiceComment extends TeacherServiceComment_Base {
         setTeacherService(teacherService);
         setCreationDate(new DateTime());
         setCreatedBy(Authenticate.getUser().getPerson());
-        new TeacherServiceLog(getTeacherService(), BundleUtil.getStringFromResourceBundle(
-                "resources.TeacherCreditsSheetResources", "label.teacher.teacherServiceComment.create", content,
+        new TeacherServiceLog(getTeacherService(), BundleUtil.getString(
+                Bundle.TEACHER_CREDITS, "label.teacher.teacherServiceComment.create", content,
                 getCreationDate().toString("yyyy-MM-dd HH:mm")));
     }
 
@@ -25,8 +44,8 @@ public class TeacherServiceComment extends TeacherServiceComment_Base {
     public void setContent(String content) {
         super.setContent(content);
         setLastModifiedDate(new DateTime());
-        new TeacherServiceLog(getTeacherService(), BundleUtil.getStringFromResourceBundle(
-                "resources.TeacherCreditsSheetResources", "label.teacher.teacherServiceComment.edit", content, getCreationDate()
+        new TeacherServiceLog(getTeacherService(), BundleUtil.getString(
+                Bundle.TEACHER_CREDITS, "label.teacher.teacherServiceComment.edit", content, getCreationDate()
                         .toString("yyyy-MM-dd HH:mm"), getLastModifiedDate().toString("yyyy-MM-dd HH:mm")));
     }
 
@@ -37,8 +56,8 @@ public class TeacherServiceComment extends TeacherServiceComment_Base {
     @Atomic
     @Override
     public void delete() {
-        new TeacherServiceLog(getTeacherService(), BundleUtil.getStringFromResourceBundle(
-                "resources.TeacherCreditsSheetResources", "label.teacher.teacherServiceComment.delete", getContent(),
+        new TeacherServiceLog(getTeacherService(), BundleUtil.getString(
+                Bundle.TEACHER_CREDITS, "label.teacher.teacherServiceComment.delete", getContent(),
                 getCreationDate().toString(), getLastModifiedDate().toString("yyyy-MM-dd HH:mm")));
         setCreatedBy(null);
         super.delete();

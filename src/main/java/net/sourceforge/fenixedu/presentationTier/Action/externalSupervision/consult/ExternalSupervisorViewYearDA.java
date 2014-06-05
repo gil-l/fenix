@@ -1,8 +1,25 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.externalSupervision.consult;
 
 import java.io.IOException;
 import java.math.RoundingMode;
-import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,15 +31,16 @@ import net.sourceforge.fenixedu.domain.student.Registration;
 import net.sourceforge.fenixedu.domain.student.RegistrationProtocol;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction;
 import net.sourceforge.fenixedu.presentationTier.Action.externalSupervision.ExternalSupervisionApplication.ExternalSupervisionConsultApp;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.portal.EntryPoint;
 import org.fenixedu.bennu.portal.StrutsFunctionality;
-import org.fenixedu.commons.i18n.I18N;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixWebFramework.struts.annotations.Forward;
@@ -31,7 +49,6 @@ import pt.ist.fenixWebFramework.struts.annotations.Mapping;
 import pt.ist.fenixframework.FenixFramework;
 import pt.utl.ist.fenix.tools.util.excel.Spreadsheet;
 import pt.utl.ist.fenix.tools.util.excel.Spreadsheet.Row;
-import java.util.Locale;
 
 @StrutsFunctionality(app = ExternalSupervisionConsultApp.class, path = "year", titleKey = "label.selectDegree.executionYear")
 @Mapping(path = "/viewYear", module = "externalSupervision")
@@ -108,8 +125,7 @@ public class ExternalSupervisorViewYearDA extends FenixDispatchAction {
 
     private String getFilename(ExternalSupervisorViewsBean bean) {
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append(ResourceBundle.getBundle("resources.ApplicationResources", I18N.getLocale()).getString(
-                "label.students"));
+        strBuilder.append(BundleUtil.getString(Bundle.APPLICATION, "label.students"));
         strBuilder.append("_");
         strBuilder.append(bean.getProtocol().getRegistrationAgreement().getName());
         strBuilder.append("_");
@@ -159,40 +175,39 @@ public class ExternalSupervisorViewYearDA extends FenixDispatchAction {
     }
 
     private Spreadsheet createSpreadSheet() {
-        final ResourceBundle bundle = ResourceBundle.getBundle("resources.ApplicationResources", I18N.getLocale());
-        final Spreadsheet spreadsheet = new Spreadsheet(bundle.getString("list.students"));
+        final Spreadsheet spreadsheet = new Spreadsheet(BundleUtil.getString(Bundle.APPLICATION, "list.students"));
 
         spreadsheet.setHeaders(new String[] {
 
-        bundle.getString("label.istid"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.istid"),
 
-        bundle.getString("label.number"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.number"),
 
-        bundle.getString("label.name"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.name"),
 
-        bundle.getString("label.email"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.email"),
 
-        bundle.getString("label.identificationDocumentType"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.identificationDocumentType"),
 
-        bundle.getString("label.identificationDocumentNumber"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.identificationDocumentNumber"),
 
-        bundle.getString("label.Degree"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.Degree"),
 
-        bundle.getString("label.curricularPlan"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.curricularPlan"),
 
-        bundle.getString("label.net.sourceforge.fenixedu.domain.student.Registration.startDate"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.net.sourceforge.fenixedu.domain.student.Registration.startDate"),
 
-        bundle.getString("label.net.sourceforge.fenixedu.domain.student.Registration.conclusionDate"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.net.sourceforge.fenixedu.domain.student.Registration.conclusionDate"),
 
-        bundle.getString("label.student.curricular.plan.state"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.student.curricular.plan.state"),
 
-        bundle.getString("label.number.approved.curricular.courses"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.number.approved.curricular.courses"),
 
-        bundle.getString("label.ects"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.ects"),
 
-        bundle.getString("label.average"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.average"),
 
-        bundle.getString("label.student.curricular.year"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.student.curricular.year"),
 
         " ", " " });
 

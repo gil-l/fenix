@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.docs.academicAdministrativeOffice;
 
 import java.text.MessageFormat;
@@ -9,7 +27,9 @@ import net.sourceforge.fenixedu.domain.organizationalStructure.Unit;
 import net.sourceforge.fenixedu.domain.serviceRequests.documentRequests.DocumentRequest;
 import net.sourceforge.fenixedu.domain.serviceRequests.documentRequests.IDocumentRequest;
 import net.sourceforge.fenixedu.domain.student.Registration;
+import net.sourceforge.fenixedu.util.Bundle;
 
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 
 public class RegistrationDeclaration extends AdministrativeOfficeDocument {
@@ -39,7 +59,7 @@ public class RegistrationDeclaration extends AdministrativeOfficeDocument {
 
     @Override
     protected void setDocumentTitle() {
-        addParameter("documentTitle", getResourceBundle().getString("label.academicDocument.title.declaration"));
+        addParameter("documentTitle", BundleUtil.getString(Bundle.ACADEMIC, "label.academicDocument.title.declaration"));
     }
 
     @Override
@@ -52,9 +72,9 @@ public class RegistrationDeclaration extends AdministrativeOfficeDocument {
 
         String studentRegistered;
         if (registration.getStudent().getPerson().isMale()) {
-            studentRegistered = getResourceBundle().getString("label.academicDocument.declaration.maleRegistered");
+            studentRegistered = BundleUtil.getString(Bundle.ACADEMIC, "label.academicDocument.declaration.maleRegistered");
         } else {
-            studentRegistered = getResourceBundle().getString("label.academicDocument.declaration.femaleRegistered");
+            studentRegistered = BundleUtil.getString(Bundle.ACADEMIC, "label.academicDocument.declaration.femaleRegistered");
         }
 
         fillFirstParagraph(coordinator, adminOfficeUnit, coordinatorTitle);
@@ -73,7 +93,7 @@ public class RegistrationDeclaration extends AdministrativeOfficeDocument {
         String institutionName = getInstitutionName();
         String universityName = getUniversityName(new DateTime());
 
-        String stringTemplate = getResourceBundle().getString("label.academicDocument.declaration.firstParagraph");
+        String stringTemplate = BundleUtil.getString(Bundle.ACADEMIC, "label.academicDocument.declaration.firstParagraph");
 
         addParameter(
                 "firstParagraph",
@@ -86,11 +106,11 @@ public class RegistrationDeclaration extends AdministrativeOfficeDocument {
     protected void fillSecondParagraph(Registration registration) {
         String student;
         if (registration.getStudent().getPerson().isMale()) {
-            student = getResourceBundle().getString("label.academicDocument.declaration.theMaleStudent");
+            student = BundleUtil.getString(Bundle.ACADEMIC, "label.academicDocument.declaration.theMaleStudent");
         } else {
-            student = getResourceBundle().getString("label.academicDocument.declaration.theFemaleStudent");
+            student = BundleUtil.getString(Bundle.ACADEMIC, "label.academicDocument.declaration.theFemaleStudent");
         }
-        String stringTemplate = getResourceBundle().getString("label.academicDocument.declaration.secondParagraph");
+        String stringTemplate = BundleUtil.getString(Bundle.ACADEMIC, "label.academicDocument.declaration.secondParagraph");
         addParameter("secondParagraph",
                 "      " + MessageFormat.format(stringTemplate, student, registration.getNumber().toString()));
     }
@@ -98,9 +118,9 @@ public class RegistrationDeclaration extends AdministrativeOfficeDocument {
     protected void fillSeventhParagraph(Registration registration, String studentRegistered) {
 
         String situation =
-                getResourceBundle().getString(getExecutionYear().containsDate(new DateTime()) ? "label.is" : "label.was");
+                BundleUtil.getString(Bundle.ACADEMIC, getExecutionYear().containsDate(new DateTime()) ? "label.is" : "label.was");
 
-        String stringTemplate = getResourceBundle().getString("label.academicDocument.declaration.seventhParagraph");
+        String stringTemplate = BundleUtil.getString(Bundle.ACADEMIC, "label.academicDocument.declaration.seventhParagraph");
         addParameter("seventhParagraph", MessageFormat.format(stringTemplate, situation,
                 studentRegistered.toUpperCase(getLocale()), getExecutionYear().getYear(), getDegreeDescription()));
     }

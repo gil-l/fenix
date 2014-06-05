@@ -1,4 +1,22 @@
 /**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
+/**
  * 
  */
 package net.sourceforge.fenixedu.presentationTier.backBeans.scientificCouncil.curricularPlans;
@@ -6,7 +24,6 @@ package net.sourceforge.fenixedu.presentationTier.backBeans.scientificCouncil.cu
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
@@ -18,12 +35,14 @@ import net.sourceforge.fenixedu.domain.Department;
 import net.sourceforge.fenixedu.domain.Employee;
 import net.sourceforge.fenixedu.domain.Person;
 import net.sourceforge.fenixedu.presentationTier.backBeans.base.FenixBackingBean;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.collections.comparators.ComparatorChain;
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.Group;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import pt.ist.fenixframework.FenixFramework;
 
@@ -32,8 +51,6 @@ import pt.ist.fenixframework.FenixFramework;
  * 
  */
 public class CurricularPlansMembersManagementBackingBean extends FenixBackingBean {
-    private final ResourceBundle scouncilBundle = getResourceBundle("resources/ScientificCouncilResources");
-
     private String[] selectedPersonsIDsToAdd;
     private String[] selectedPersonsIDsToRemove;
 
@@ -77,7 +94,7 @@ public class CurricularPlansMembersManagementBackingBean extends FenixBackingBea
 
     public List<SelectItem> getDepartments() {
         List<SelectItem> result = new ArrayList<SelectItem>();
-        result.add(new SelectItem(0, scouncilBundle.getString("choose")));
+        result.add(new SelectItem(0, BundleUtil.getString(Bundle.SCIENTIFIC, "choose")));
         for (Department department : rootDomainObject.getDepartmentsSet()) {
             result.add(new SelectItem(department.getExternalId(), department.getRealName()));
         }

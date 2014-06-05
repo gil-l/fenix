@@ -1,10 +1,27 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.student;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import net.sourceforge.fenixedu.domain.Attends;
@@ -54,23 +71,19 @@ import net.sourceforge.fenixedu.domain.studentCurriculum.OptionalDismissal;
 import net.sourceforge.fenixedu.domain.studentCurriculum.Substitution;
 import net.sourceforge.fenixedu.domain.studentCurriculum.TemporarySubstitution;
 import net.sourceforge.fenixedu.injectionCode.AccessControl;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.InvocationResult;
 import net.sourceforge.fenixedu.util.Money;
 
-import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.YearMonthDay;
-
-import java.util.Locale;
 
 public class SeparationCyclesManagement {
 
     private static final List<DegreeType> ACCEPTED_DEGREE_TYPES = Arrays.asList(DegreeType.BOLONHA_DEGREE,
             DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE);
-
-    private final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("resources.ApplicationResources",
-            I18N.getLocale());
 
     public SeparationCyclesManagement() {
     }
@@ -667,7 +680,7 @@ public class SeparationCyclesManagement {
     }
 
     private String getNoPaymentsReason(final GratuityEvent second) {
-        final String message = RESOURCE_BUNDLE.getString("label.SeparationCyclesManagement.noPayments.reason");
+        final String message = BundleUtil.getString(Bundle.APPLICATION, "label.SeparationCyclesManagement.noPayments.reason");
         return MessageFormat.format(message, second.getStudentCurricularPlan().getName());
     }
 

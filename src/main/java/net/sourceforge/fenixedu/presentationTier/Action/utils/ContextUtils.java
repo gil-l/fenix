@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 /*
  * Created on 2003/07/28
  *
@@ -7,7 +25,6 @@ package net.sourceforge.fenixedu.presentationTier.Action.utils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,15 +55,15 @@ import net.sourceforge.fenixedu.domain.ExecutionYear;
 import net.sourceforge.fenixedu.domain.time.calendarStructure.AcademicInterval;
 import net.sourceforge.fenixedu.domain.time.calendarStructure.AcademicPeriod;
 import net.sourceforge.fenixedu.presentationTier.Action.resourceAllocationManager.utils.PresentationConstants;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.struts.util.LabelValueBean;
-import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixframework.FenixFramework;
-import java.util.Locale;
 
 /**
  * @author Luis Cruz & Sara Ribeiro
@@ -240,8 +257,6 @@ public class ContextUtils {
 
     @Deprecated
     public static void prepareChangeExecutionDegreeAndCurricularYear(HttpServletRequest request) {
-        ResourceBundle bundle = ResourceBundle.getBundle("resources.EnumerationResources", I18N.getLocale());
-        ResourceBundle applicationResources = ResourceBundle.getBundle("resources.ApplicationResources", I18N.getLocale());
 
         InfoExecutionPeriod infoExecutionPeriod =
                 (InfoExecutionPeriod) request.getAttribute(PresentationConstants.EXECUTION_PERIOD);
@@ -261,10 +276,10 @@ public class ContextUtils {
 
             final DegreeCurricularPlan degreeCurricularPlan = executionDegree.getDegreeCurricularPlan();
             final Degree degree = degreeCurricularPlan.getDegree();
-            final String degreeTypeString = bundle.getString(degree.getDegreeType().toString());
+            final String degreeTypeString = BundleUtil.getString(Bundle.ENUMERATION, degree.getDegreeType().toString());
             final StringBuilder name = new StringBuilder();
             name.append(degreeTypeString);
-            name.append(" ").append(applicationResources.getString("label.in")).append(" ");
+            name.append(" ").append(BundleUtil.getString(Bundle.APPLICATION, "label.in")).append(" ");
             name.append(degree.getNameFor(executionDegree.getExecutionYear()).getContent());
             if (duplicateDegreeInList(degree, executionYear)) {
                 name.append(" - ");

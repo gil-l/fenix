@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.cms;
 
 import java.io.IOException;
@@ -11,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 import net.sourceforge.fenixedu.domain.Item;
 import net.sourceforge.fenixedu.domain.Section;
 import net.sourceforge.fenixedu.domain.Site;
-import net.sourceforge.fenixedu.presentationTier.servlets.startup.FenixInitializer.FenixCustomExceptionHandler;
 
 import org.fenixedu.bennu.portal.domain.MenuFunctionality;
 import org.fenixedu.bennu.portal.servlet.SemanticURLHandler;
@@ -29,41 +46,35 @@ public class OldCmsSemanticURLHandler implements SemanticURLHandler {
     @Override
     public void handleRequest(MenuFunctionality functionality, HttpServletRequest request, HttpServletResponse response,
             FilterChain chain) throws IOException, ServletException {
-        try {
-            String path =
-                    request.getRequestURI().substring(request.getContextPath().length() + functionality.getFullPath().length());
-            path = path.startsWith("/") ? path.substring(1) : path;
-            String[] parts = Strings.isNullOrEmpty(path) ? new String[] {} : path.split("/");
-            SiteTemplateController controller = functionality.getSiteTemplate().getController();
-            Site site = controller.selectSiteForPath(parts);
-            int startIndex = controller.getTrailingPath(site, parts);
+        String path = request.getRequestURI().substring(request.getContextPath().length() + functionality.getFullPath().length());
+        path = path.startsWith("/") ? path.substring(1) : path;
+        String[] parts = Strings.isNullOrEmpty(path) ? new String[] {} : path.split("/");
+        SiteTemplateController controller = functionality.getSiteTemplate().getController();
+        Site site = controller.selectSiteForPath(parts);
+        int startIndex = controller.getTrailingPath(site, parts);
 
-            CmsContent content = site == null ? null : findContent(site, null, site.getOrderedSections(), parts, startIndex);
+        CmsContent content = site == null ? null : findContent(site, null, site.getOrderedSections(), parts, startIndex);
 
-            if (content instanceof TemplatedSectionInstance) {
-                content = ((TemplatedSectionInstance) content).getSectionTemplate();
-            }
-
-            String dispatch = NOT_FOUND_PATH;
-
-            if (content instanceof TemplatedSection) {
-                TemplatedSection section = (TemplatedSection) content;
-                dispatch = section.getCustomPath();
-            } else if (content instanceof Section) {
-                dispatch = SECTION_PATH;
-            } else if (content instanceof Item) {
-                dispatch = ITEM_PATH;
-            }
-
-            request.setAttribute("actual$site", site);
-            request.setAttribute("site", site);
-            request.setAttribute("actual$content", content);
-
-            request.getRequestDispatcher(dispatch).forward(RequestWrapperFilter.getFenixHttpServletRequestWrapper(request),
-                    response);
-        } catch (Throwable t) {
-            new FenixCustomExceptionHandler().handle(request, response, t);
+        if (content instanceof TemplatedSectionInstance) {
+            content = ((TemplatedSectionInstance) content).getSectionTemplate();
         }
+
+        String dispatch = NOT_FOUND_PATH;
+
+        if (content instanceof TemplatedSection) {
+            TemplatedSection section = (TemplatedSection) content;
+            dispatch = section.getCustomPath();
+        } else if (content instanceof Section) {
+            dispatch = SECTION_PATH;
+        } else if (content instanceof Item) {
+            dispatch = ITEM_PATH;
+        }
+
+        request.setAttribute("actual$site", site);
+        request.setAttribute("site", site);
+        request.setAttribute("actual$content", content);
+
+        request.getRequestDispatcher(dispatch).forward(RequestWrapperFilter.getFenixHttpServletRequestWrapper(request), response);
     }
 
     private CmsContent findContent(Site site, CmsContent initial, List<? extends CmsContent> sections, String[] parts,

@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.phd;
 
 import java.util.ArrayList;
@@ -7,7 +25,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -109,9 +126,11 @@ import net.sourceforge.fenixedu.domain.student.Student;
 import net.sourceforge.fenixedu.domain.student.registrationStates.RegistrationState.RegistrationStateCreator;
 import net.sourceforge.fenixedu.domain.student.registrationStates.RegistrationStateType;
 import net.sourceforge.fenixedu.injectionCode.AccessControl;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -366,7 +385,7 @@ public class PhdIndividualProgramProcess extends PhdIndividualProgramProcess_Bas
 
     @Override
     public String getDisplayName() {
-        return ResourceBundle.getBundle("resources/PhdResources").getString(getClass().getSimpleName());
+        return BundleUtil.getString(Bundle.PHD, getClass().getSimpleName());
     }
 
     public String getCollaborationTypeName() {
@@ -777,7 +796,7 @@ public class PhdIndividualProgramProcess extends PhdIndividualProgramProcess_Bas
             getCandidacyProcess().cancelDebt(person);
         }
 
-        if (hasRegistrationFee() && !getRegistrationFee().hasAnyPayments()) {
+        if (hasRegistrationFee() && !getRegistrationFee().hasAnyPayments() && getRegistrationFee().isOpen()) {
             getRegistrationFee().cancel(person);
         }
     }
@@ -1302,8 +1321,7 @@ public class PhdIndividualProgramProcess extends PhdIndividualProgramProcess_Bas
     }
 
     public String getGraduateTitle(Locale locale) {
-        ResourceBundle bundle = ResourceBundle.getBundle("resources.PhdResources", locale);
-        StringBuilder stringBuilder = new StringBuilder(bundle.getString("label.phd.graduated.title.in")).append(" ");
+        StringBuilder stringBuilder = new StringBuilder(BundleUtil.getString(Bundle.PHD, locale, "label.phd.graduated.title.in")).append(" ");
         stringBuilder.append(getPhdProgram().getName().getContent(locale));
 
         return stringBuilder.toString();

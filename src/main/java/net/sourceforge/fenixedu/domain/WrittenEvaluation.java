@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain;
 
 import java.text.ParseException;
@@ -24,6 +42,7 @@ import net.sourceforge.fenixedu.domain.student.Student;
 import net.sourceforge.fenixedu.domain.util.icalendar.EvaluationEventBean;
 import net.sourceforge.fenixedu.domain.vigilancy.Vigilancy;
 import net.sourceforge.fenixedu.domain.vigilancy.VigilantGroup;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.DiaSemana;
 import net.sourceforge.fenixedu.util.EvaluationType;
 import net.sourceforge.fenixedu.util.HourMinuteSecond;
@@ -33,7 +52,6 @@ import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.core.util.CoreConfiguration;
 import org.fenixedu.spaces.domain.Space;
-import org.fenixedu.spaces.domain.UnavailableException;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.YearMonthDay;
@@ -104,11 +122,7 @@ abstract public class WrittenEvaluation extends WrittenEvaluation_Base {
     public Space getCampus() {
         List<Space> rooms = getAssociatedRooms();
         if (rooms.size() > 0) {
-            try {
-                return SpaceUtils.getSpaceCampus(rooms.iterator().next());
-            } catch (UnavailableException e) {
-                return null;
-            }
+            return SpaceUtils.getSpaceCampus(rooms.iterator().next());
         } else {
             return null;
         }
@@ -481,7 +495,7 @@ abstract public class WrittenEvaluation extends WrittenEvaluation_Base {
         this.setEnrollmentBeginTimeDate(enrolmentBeginTime);
         this.setEnrollmentEndTimeDate(enrolmentEndTime);
         for (ExecutionCourse ec : getAssociatedExecutionCourses()) {
-            EvaluationManagementLog.createLog(ec, "resources.MessagingResources",
+            EvaluationManagementLog.createLog(ec, Bundle.MESSAGING,
                     "log.executionCourse.evaluation.generic.edited.enrolment", getPresentationName(), ec.getName(),
                     ec.getDegreePresentationString());
         }
@@ -553,12 +567,7 @@ abstract public class WrittenEvaluation extends WrittenEvaluation_Base {
         this.checkRoomsCapacityForStudents(selectedRooms, studentsToDistribute.size());
 
         for (final Space room : selectedRooms) {
-            Integer examCapacity;
-            try {
-                examCapacity = room.getMetadata("examCapacity");
-            } catch (UnavailableException e) {
-                examCapacity = 0;
-            }
+            Integer examCapacity = room.<Integer> getMetadata("examCapacity").orElse(0);
             for (int numberOfStudentsInserted = 0; numberOfStudentsInserted < examCapacity && !studentsToDistribute.isEmpty(); numberOfStudentsInserted++) {
                 final Registration registration = getRandomStudentFromList(studentsToDistribute);
                 final WrittenEvaluationEnrolment writtenEvaluationEnrolment = this.getWrittenEvaluationEnrolmentFor(registration);
@@ -574,7 +583,7 @@ abstract public class WrittenEvaluation extends WrittenEvaluation_Base {
         }
 
         for (ExecutionCourse ec : getAssociatedExecutionCourses()) {
-            EvaluationManagementLog.createLog(ec, "resources.MessagingResources",
+            EvaluationManagementLog.createLog(ec, Bundle.MESSAGING,
                     "log.executionCourse.evaluation.generic.edited.rooms.distributed", getPresentationName(), ec.getName(),
                     ec.getDegreePresentationString());
         }
@@ -611,15 +620,8 @@ abstract public class WrittenEvaluation extends WrittenEvaluation_Base {
     }
 
     private void checkRoomsCapacityForStudents(final List<Space> selectedRooms, int studentsToDistributeSize) {
-        int totalCapacity = 0;
-        for (final Space room : selectedRooms) {
-            Integer examCapacity;
-            try {
-                examCapacity = room.getMetadata("examCapacity");
-                totalCapacity += (Integer) examCapacity;
-            } catch (UnavailableException e) {
-            }
-        }
+        int totalCapacity = selectedRooms.stream().mapToInt(room -> room.<Integer> getMetadata("examCapacity").orElse(0)).sum();
+
         if (studentsToDistributeSize > totalCapacity) {
             throw new DomainException("error.not.enough.room.space");
         }
@@ -681,14 +683,8 @@ abstract public class WrittenEvaluation extends WrittenEvaluation_Base {
     }
 
     public Integer getCountNumberReservedSeats() {
-        int i = 0;
-        for (final WrittenEvaluationSpaceOccupation roomOccupation : getWrittenEvaluationSpaceOccupations()) {
-            try {
-                i += (Integer) (roomOccupation.getRoom()).getMetadata("examCapacity");
-            } catch (UnavailableException e) {
-            }
-        }
-        return i;
+        return getWrittenEvaluationSpaceOccupationsSet().stream()
+                .mapToInt(occupation -> occupation.getRoom().<Integer> getMetadata("examCapacity").orElse(0)).sum();
     }
 
     public Integer getCountVacancies() {
@@ -771,9 +767,7 @@ abstract public class WrittenEvaluation extends WrittenEvaluation_Base {
     public String getAssociatedRoomsAsString() {
         String rooms = "";
         for (Space room : getAssociatedRooms()) {
-            String name;
-            name = room.getName();
-            rooms += name + "\n";
+            rooms += room.getName() + "\n";
         }
         return rooms;
     }

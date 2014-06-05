@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.backBeans.student.enrolment;
 
 import java.util.ArrayList;
@@ -5,7 +23,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
@@ -24,16 +41,17 @@ import net.sourceforge.fenixedu.domain.exceptions.DomainException;
 import net.sourceforge.fenixedu.domain.student.Registration;
 import net.sourceforge.fenixedu.injectionCode.IllegalDataAccessException;
 import net.sourceforge.fenixedu.presentationTier.backBeans.base.FenixBackingBean;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.collections.comparators.ComparatorChain;
 import org.apache.commons.collections.comparators.ReverseComparator;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import pt.ist.fenixframework.FenixFramework;
 
 public class DisplayEvaluationsForStudentToEnrol extends FenixBackingBean {
 
-    private final ResourceBundle messages = getResourceBundle("resources/StudentResources");
     private static final ComparatorChain comparatorChain = new ComparatorChain();
     static {
         comparatorChain.addComparator(new ReverseComparator(new BeanComparator("isInEnrolmentPeriod")));
@@ -77,11 +95,11 @@ public class DisplayEvaluationsForStudentToEnrol extends FenixBackingBean {
     public List<SelectItem> getEvaluationTypes() {
         if (this.evaluationTypes == null) {
             this.evaluationTypes = new ArrayList(4);
-            final String allEvaluations = messages.getString("link.all");
+            final String allEvaluations = BundleUtil.getString(Bundle.STUDENT, "link.all");
             evaluationTypes.add(new SelectItem(ALL, allEvaluations));
-            final String exams = messages.getString("link.exams.enrolment");
+            final String exams = BundleUtil.getString(Bundle.STUDENT, "link.exams.enrolment");
             evaluationTypes.add(new SelectItem(EXAMS, exams));
-            final String writtenTests = messages.getString("link.writtenTests.enrolment");
+            final String writtenTests = BundleUtil.getString(Bundle.STUDENT, "link.writtenTests.enrolment");
             evaluationTypes.add(new SelectItem(WRITTENTESTS, writtenTests));
         }
         return this.evaluationTypes;

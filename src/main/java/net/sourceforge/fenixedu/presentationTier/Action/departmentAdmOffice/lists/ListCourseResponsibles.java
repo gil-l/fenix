@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.departmentAdmOffice.lists;
 
 import java.util.ArrayList;
@@ -23,11 +41,12 @@ import net.sourceforge.fenixedu.domain.Teacher;
 import net.sourceforge.fenixedu.injectionCode.AccessControl;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction;
 import net.sourceforge.fenixedu.presentationTier.Action.departmentAdmOffice.DepartmentAdmOfficeApp.DepartmentAdmOfficeListingsApp;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.portal.EntryPoint;
 import org.fenixedu.bennu.portal.StrutsFunctionality;
 
@@ -44,8 +63,6 @@ import pt.utl.ist.fenix.tools.util.excel.Spreadsheet.Row;
 @Mapping(path = "/listCourseResponsibles", module = "departmentAdmOffice")
 @Forwards(@Forward(name = "chooseCurricularCourse", path = "/departmentAdmOffice/lists/listCourseResponsibles.jsp"))
 public class ListCourseResponsibles extends FenixDispatchAction {
-
-    protected static final String RESOURCE_MODULE = "academicAdminOffice";
 
     @EntryPoint
     public ActionForward prepareByCurricularCourse(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
@@ -162,7 +179,7 @@ public class ListCourseResponsibles extends FenixDispatchAction {
     }
 
     static private String getResourceMessage(String key) {
-        return BundleUtil.getMessageFromModuleOrApplication(RESOURCE_MODULE, key);
+        return BundleUtil.getString(Bundle.ACADEMIC, key);
     }
 
     private void addStatisticsInformation(final Spreadsheet spreadsheet,

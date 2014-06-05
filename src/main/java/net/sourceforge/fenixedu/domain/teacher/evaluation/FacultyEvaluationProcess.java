@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.teacher.evaluation;
 
 import java.util.Comparator;
@@ -10,7 +28,8 @@ import net.sourceforge.fenixedu.domain.Employee;
 import net.sourceforge.fenixedu.domain.Person;
 import net.sourceforge.fenixedu.domain.Teacher;
 import net.sourceforge.fenixedu.domain.exceptions.DomainException;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
@@ -145,9 +164,9 @@ public class FacultyEvaluationProcess extends FacultyEvaluationProcess_Base impl
     }
 
     private void appendMessage(final StringBuilder stringBuilder, final int lineNumber, final String key, final String[] args) {
-        final String description = BundleUtil.getStringFromResourceBundle("resources.ApplicationResources", key, args);
+        final String description = BundleUtil.getString(Bundle.APPLICATION, key, args);
         final String message =
-                BundleUtil.getStringFromResourceBundle("resources.ApplicationResources", "error.invalid.file.contents.line",
+                BundleUtil.getString(Bundle.APPLICATION, "error.invalid.file.contents.line",
                         Integer.toString(lineNumber), description);
         stringBuilder.append("\n\t");
         stringBuilder.append(message);
@@ -240,8 +259,7 @@ public class FacultyEvaluationProcess extends FacultyEvaluationProcess_Base impl
                     }
                 } else {
                     final String message =
-                            BundleUtil.getStringFromResourceBundle("resources/ResearcherResources",
-                                    "error.evaluee.has.no.process", evaluee);
+                            BundleUtil.getString(Bundle.RESEARCHER, "error.evaluee.has.no.process", evaluee);
                     stringBuilder.append(message);
                     stringBuilder.append('\n');
                 }

@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.administrativeOffice.lists;
 
 import java.io.IOException;
@@ -31,11 +49,12 @@ import net.sourceforge.fenixedu.domain.serviceRequests.documentRequests.Document
 import net.sourceforge.fenixedu.injectionCode.AccessControl;
 import net.sourceforge.fenixedu.presentationTier.Action.academicAdministration.AcademicAdministrationApplication.AcademicAdminServicesApp;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.portal.EntryPoint;
 import org.fenixedu.bennu.portal.StrutsFunctionality;
 import org.joda.time.YearMonthDay;
@@ -211,7 +230,7 @@ public class RequestListByDegreeDA extends FenixDispatchAction {
             if (degree != null) {
                 filename += "_" + degree.getNameFor(executionYear).getContent().replace(' ', '_');
             } else if (degreeType != null) {
-                filename += "_" + BundleUtil.getEnumName(degreeType).replace(' ', '_');
+                filename += "_" + degreeType.getLocalizedName().replace(' ', '_');
             }
             filename += "_" + executionYear.getYear();
 
@@ -247,16 +266,16 @@ public class RequestListByDegreeDA extends FenixDispatchAction {
         AcademicServiceRequestSituationType situationType = requestSearchBean.getAcademicServiceRequestSituationType();
         spreadsheet.newHeaderRow();
         if (requestType != null) {
-            spreadsheet.addHeader(getResourceMessage("label.type") + ": " + BundleUtil.getEnumName(requestType));
+            spreadsheet.addHeader(getResourceMessage("label.type") + ": " + requestType.getLocalizedName());
         }
         if (documentType != null) {
             spreadsheet
                     .addHeader(getResourceMessage("label.documentRequestsManagement.searchDocumentRequests.documentRequestType")
-                            + ": " + BundleUtil.getEnumName(documentType));
+                            + ": " + documentType.getQualifiedName());
         }
         spreadsheet.newHeaderRow();
         if (situationType != null) {
-            spreadsheet.addHeader(getResourceMessage("label.state") + ": " + BundleUtil.getEnumName(situationType));
+            spreadsheet.addHeader(getResourceMessage("label.state") + ": " + situationType.getLocalizedName());
         }
         spreadsheet.newHeaderRow();
         if (requestSearchBean.isUrgentRequest()) {
@@ -304,6 +323,6 @@ public class RequestListByDegreeDA extends FenixDispatchAction {
     }
 
     static private String getResourceMessage(String key) {
-        return BundleUtil.getMessageFromModuleOrApplication("academicAdminOffice", key);
+        return BundleUtil.getString(Bundle.ACADEMIC, key);
     }
 }

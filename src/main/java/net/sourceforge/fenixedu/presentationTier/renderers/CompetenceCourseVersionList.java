@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.renderers;
 
 import java.util.ArrayList;
@@ -13,7 +31,10 @@ import net.sourceforge.fenixedu.domain.degreeStructure.CurricularStage;
 import net.sourceforge.fenixedu.domain.organizationalStructure.CompetenceCourseGroupUnit;
 import net.sourceforge.fenixedu.domain.organizationalStructure.DepartmentUnit;
 import net.sourceforge.fenixedu.domain.organizationalStructure.ScientificAreaUnit;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+
+import org.fenixedu.bennu.core.i18n.BundleUtil;
+
 import pt.ist.fenixWebFramework.renderers.CollectionRenderer.TableLink;
 import pt.ist.fenixWebFramework.renderers.OutputRenderer;
 import pt.ist.fenixWebFramework.renderers.components.Face;
@@ -625,7 +646,7 @@ public class CompetenceCourseVersionList extends OutputRenderer {
         private HtmlComponent getFutureDepartmentMessage(CompetenceCourse course) {
             setFutureDepartmentMessageShown(true);
             HtmlText text =
-                    new HtmlText(BundleUtil.getMessageFromModuleOrApplication("BolonhaManager", "future.department") + ": "
+                    new HtmlText(BundleUtil.getString(Bundle.BOLONHA, "future.department") + ": "
                             + course.getDepartmentUnit(ExecutionSemester.readLastExecutionSemester()).getAcronym());
             text.setClasses(getMessageClass());
             return text;
@@ -634,7 +655,7 @@ public class CompetenceCourseVersionList extends OutputRenderer {
         private HtmlComponent getFutureGroupMessage(CompetenceCourse course) {
             setFutureGroupMessageShown(true);
             HtmlText text =
-                    new HtmlText(BundleUtil.getMessageFromModuleOrApplication("BolonhaManager", "future.group") + ": "
+                    new HtmlText(BundleUtil.getString(Bundle.BOLONHA, "future.group") + ": "
                             + course.getCompetenceCourseGroupUnit(ExecutionSemester.readLastExecutionSemester()).getName());
             text.setClasses(getMessageClass());
             return text;
@@ -642,7 +663,7 @@ public class CompetenceCourseVersionList extends OutputRenderer {
 
         private HtmlComponent getFutureTransferMessage(CompetenceCourse course) {
             setFutureTransferMessageShown(true);
-            HtmlText text = new HtmlText(BundleUtil.getMessageFromModuleOrApplication("BolonhaManager", "future.transfer"));
+            HtmlText text = new HtmlText(BundleUtil.getString(Bundle.BOLONHA, "future.transfer"));
             text.setClasses(getMessageClass());
             return text;
         }
@@ -664,7 +685,7 @@ public class CompetenceCourseVersionList extends OutputRenderer {
         private HtmlComponent getOldDepartmentMessage(CompetenceCourse course) {
             setOldDepartmentMessageShown(true);
             HtmlText text =
-                    new HtmlText(BundleUtil.getMessageFromModuleOrApplication("BolonhaManager", "current.department") + ": "
+                    new HtmlText(BundleUtil.getString(Bundle.BOLONHA, "current.department") + ": "
                             + course.getDepartmentUnit().getAcronym());
             text.setClasses(getMessageClass());
             return text;
@@ -674,7 +695,7 @@ public class CompetenceCourseVersionList extends OutputRenderer {
             HtmlBlockContainer container = new HtmlBlockContainer();
             if (isFutureDepartmentMessageShown() || isFutureGroupMessageShown() || isFutureTransferMessageShown()
                     || isOldDepartmentMessageShown()) {
-                HtmlText caption = new HtmlText(BundleUtil.getMessageFromModuleOrApplication("BolonhaManager", "caption"));
+                HtmlText caption = new HtmlText(BundleUtil.getString(Bundle.BOLONHA, "caption"));
                 caption.setClasses(CAPTION_CLASSES);
                 caption.setFace(Face.STRONG);
                 container.addChild(caption);
@@ -683,11 +704,11 @@ public class CompetenceCourseVersionList extends OutputRenderer {
                     HtmlListItem item = list.createItem();
                     HtmlInlineContainer messageLine = new HtmlInlineContainer();
                     HtmlText message =
-                            new HtmlText(BundleUtil.getMessageFromModuleOrApplication("BolonhaManager", "current.department")
+                            new HtmlText(BundleUtil.getString(Bundle.BOLONHA, "current.department")
                                     + ":");
                     message.setFace(Face.EMPHASIS);
                     messageLine.addChild(message);
-                    messageLine.addChild(new HtmlText(BundleUtil.getMessageFromModuleOrApplication("BolonhaManager",
+                    messageLine.addChild(new HtmlText(BundleUtil.getString(Bundle.BOLONHA,
                             "current.department.caption")));
                     item.addChild(messageLine);
                 }
@@ -695,11 +716,11 @@ public class CompetenceCourseVersionList extends OutputRenderer {
                     HtmlListItem item = list.createItem();
                     HtmlInlineContainer messageLine = new HtmlInlineContainer();
                     HtmlText message =
-                            new HtmlText(BundleUtil.getMessageFromModuleOrApplication("BolonhaManager", "future.department")
+                            new HtmlText(BundleUtil.getString(Bundle.BOLONHA, "future.department")
                                     + ":");
                     message.setFace(Face.EMPHASIS);
                     messageLine.addChild(message);
-                    messageLine.addChild(new HtmlText(BundleUtil.getMessageFromModuleOrApplication("BolonhaManager",
+                    messageLine.addChild(new HtmlText(BundleUtil.getString(Bundle.BOLONHA,
                             "future.department.caption")));
                     item.addChild(messageLine);
                 }
@@ -707,10 +728,10 @@ public class CompetenceCourseVersionList extends OutputRenderer {
                     HtmlListItem item = list.createItem();
                     HtmlInlineContainer messageLine = new HtmlInlineContainer();
                     HtmlText message =
-                            new HtmlText(BundleUtil.getMessageFromModuleOrApplication("BolonhaManager", "future.group") + ":");
+                            new HtmlText(BundleUtil.getString(Bundle.BOLONHA, "future.group") + ":");
                     message.setFace(Face.EMPHASIS);
                     messageLine.addChild(message);
-                    messageLine.addChild(new HtmlText(BundleUtil.getMessageFromModuleOrApplication("BolonhaManager",
+                    messageLine.addChild(new HtmlText(BundleUtil.getString(Bundle.BOLONHA,
                             "future.group.caption")));
                     item.addChild(messageLine);
                 }
@@ -718,10 +739,10 @@ public class CompetenceCourseVersionList extends OutputRenderer {
                     HtmlListItem item = list.createItem();
                     HtmlInlineContainer messageLine = new HtmlInlineContainer();
                     HtmlText message =
-                            new HtmlText(BundleUtil.getMessageFromModuleOrApplication("BolonhaManager", "future.transfer") + ":");
+                            new HtmlText(BundleUtil.getString(Bundle.BOLONHA, "future.transfer") + ":");
                     message.setFace(Face.EMPHASIS);
                     messageLine.addChild(message);
-                    messageLine.addChild(new HtmlText(BundleUtil.getMessageFromModuleOrApplication("BolonhaManager",
+                    messageLine.addChild(new HtmlText(BundleUtil.getString(Bundle.BOLONHA,
                             "future.transfer.caption")));
                     item.addChild(messageLine);
                 }

@@ -1,27 +1,43 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.phd.reports;
 
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import net.sourceforge.fenixedu.domain.phd.PhdIndividualProgramCollaborationType;
 import net.sourceforge.fenixedu.domain.phd.PhdIndividualProgramProcess;
 import net.sourceforge.fenixedu.domain.phd.SearchPhdIndividualProgramProcessBean;
 import net.sourceforge.fenixedu.domain.phd.ThesisSubjectOrder;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.joda.time.YearMonthDay;
 
 public class EPFLCandidatesReport extends PhdReport {
 
-    private final ResourceBundle bundle;
-
     public EPFLCandidatesReport(HSSFWorkbook workbook) {
         super(workbook);
-        this.bundle = ResourceBundle.getBundle("resources.PhdResources");
     }
 
     public HSSFSheet build(final SearchPhdIndividualProgramProcessBean bean) {
@@ -116,7 +132,7 @@ public class EPFLCandidatesReport extends PhdReport {
     }
 
     private String getHeaderInBundle(String field) {
-        return this.bundle.getString("label.net.sourceforge.fenixedu.domain.phd.reports.PhdIndividualProgramProcessesReport."
+        return BundleUtil.getString(Bundle.PHD, "label.net.sourceforge.fenixedu.domain.phd.reports.PhdIndividualProgramProcessesReport."
                 + field);
     }
 

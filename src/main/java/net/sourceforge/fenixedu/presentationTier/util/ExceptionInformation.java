@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.util;
 
 import java.io.PrintWriter;
@@ -370,7 +388,6 @@ public class ExceptionInformation {
         User userView = Authenticate.getUser();
         if (userView != null) {
             user = userView.getUsername();
-            exceptionInfo.append(userView.getUsername()).append("\n");
             requestBean = SupportRequestBean.generateExceptionBean(userView.getPerson());
             MenuFunctionality selectedFunctionality = BennuPortalDispatcher.getSelectedFunctionality(request);
             if (selectedFunctionality != null) {
@@ -401,6 +418,7 @@ public class ExceptionInformation {
         exceptionInfo.append("[RequestURI] ").append(request.getRequestURI()).append("\n");
         exceptionInfo.append("[RequestURL] ").append(request.getRequestURL()).append("\n");
         exceptionInfo.append("[QueryString] ").append(request.getQueryString()).append("\n");
+        exceptionInfo.append("[Method] ").append(request.getMethod()).append('\n');
 
         if (request.getAttribute(PresentationConstants.ORIGINAL_MAPPING_KEY) != null) {
             ActionMapping mapping = (ActionMapping) request.getAttribute(PresentationConstants.ORIGINAL_MAPPING_KEY);

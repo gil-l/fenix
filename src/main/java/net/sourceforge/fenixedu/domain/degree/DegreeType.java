@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 /*
  * DegreeType.java
  *
@@ -13,7 +31,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -25,11 +42,11 @@ import net.sourceforge.fenixedu.domain.degreeStructure.CycleType;
 import net.sourceforge.fenixedu.domain.exceptions.DomainException;
 import net.sourceforge.fenixedu.domain.student.Registration;
 import net.sourceforge.fenixedu.domain.time.calendarStructure.AcademicPeriod;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.commons.lang.StringUtils;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.i18n.I18N;
-
-import java.util.Locale;
 
 /**
  * 
@@ -59,7 +76,7 @@ public enum DegreeType {
 
         @Override
         protected String localizedName(Locale locale) {
-            return ResourceBundle.getBundle("resources.EnumerationResources", locale).getString(qualifiedName());
+            return BundleUtil.getString(Bundle.ENUMERATION, locale, qualifiedName());
         }
 
         @Override
@@ -71,8 +88,8 @@ public enum DegreeType {
         protected String filteredName(Locale locale) {
             final StringBuilder result = new StringBuilder(localizedName(locale));
 
-            final ResourceBundle bundle = ResourceBundle.getBundle("resources.ApplicationResources", locale);
-            final String remove = " (" + Integer.toString(getYears()) + " " + bundle.getString("years") + ")";
+            final String remove =
+                    " (" + Integer.toString(getYears()) + " " + BundleUtil.getString(Bundle.APPLICATION, "years") + ")";
 
             if (result.toString().contains(remove)) {
                 result.replace(result.indexOf(remove), result.indexOf(remove) + remove.length(), StringUtils.EMPTY);
@@ -120,7 +137,7 @@ public enum DegreeType {
 
         @Override
         protected String localizedName(Locale locale) {
-            return ResourceBundle.getBundle("resources.EnumerationResources", locale).getString(qualifiedName());
+            return BundleUtil.getString(Bundle.ENUMERATION, locale, qualifiedName());
         }
 
         @Override
@@ -172,7 +189,7 @@ public enum DegreeType {
 
         @Override
         protected String localizedName(Locale locale) {
-            return ResourceBundle.getBundle("resources.EnumerationResources", locale).getString(qualifiedName());
+            return BundleUtil.getString(Bundle.ENUMERATION, locale, qualifiedName());
         }
 
         @Override
@@ -241,7 +258,7 @@ public enum DegreeType {
 
         @Override
         protected String localizedName(Locale locale) {
-            return ResourceBundle.getBundle("resources.EnumerationResources", locale).getString(qualifiedName());
+            return BundleUtil.getString(Bundle.ENUMERATION, locale, qualifiedName());
         }
 
         @Override
@@ -305,7 +322,7 @@ public enum DegreeType {
 
         @Override
         protected String localizedName(Locale locale) {
-            return ResourceBundle.getBundle("resources.EnumerationResources", locale).getString(qualifiedName());
+            return BundleUtil.getString(Bundle.ENUMERATION, locale, qualifiedName());
         }
 
         @Override
@@ -394,7 +411,7 @@ public enum DegreeType {
 
         @Override
         protected String localizedName(Locale locale) {
-            return ResourceBundle.getBundle("resources.EnumerationResources", locale).getString(qualifiedName());
+            return BundleUtil.getString(Bundle.ENUMERATION, locale, qualifiedName());
         }
 
         @Override
@@ -453,7 +470,7 @@ public enum DegreeType {
 
         @Override
         protected String localizedName(Locale locale) {
-            return ResourceBundle.getBundle("resources.EnumerationResources", locale).getString(qualifiedName());
+            return BundleUtil.getString(Bundle.ENUMERATION, locale, qualifiedName());
         }
 
         @Override
@@ -512,7 +529,7 @@ public enum DegreeType {
 
         @Override
         protected String localizedName(Locale locale) {
-            return ResourceBundle.getBundle("resources.EnumerationResources", locale).getString(qualifiedName());
+            return BundleUtil.getString(Bundle.ENUMERATION, locale, qualifiedName());
         }
 
         @Override
@@ -835,15 +852,14 @@ public enum DegreeType {
     public String getPrefix(final Locale locale) {
         final StringBuilder result = new StringBuilder();
 
-        final ResourceBundle bundle = ResourceBundle.getBundle("resources.AcademicAdminOffice", locale);
         switch (this) {
         case BOLONHA_ADVANCED_SPECIALIZATION_DIPLOMA:
             return result.toString();
         case BOLONHA_ADVANCED_FORMATION_DIPLOMA:
-            result.append(bundle.getString("degree.DegreeType.prefix.one")).append(" ");
+            result.append(BundleUtil.getString(Bundle.ACADEMIC, "degree.DegreeType.prefix.one")).append(" ");
             return result.toString();
         default:
-            final String string = bundle.getString("degree.DegreeType.prefix.two");
+            final String string = BundleUtil.getString(Bundle.ACADEMIC, "degree.DegreeType.prefix.two");
             result.append(string).append(string.isEmpty() ? StringUtils.EMPTY : " ");
             return result.toString();
         }
@@ -864,10 +880,8 @@ public enum DegreeType {
 
     final public String getGraduateTitle(final CycleType cycleType, final Locale locale) {
         if (getQualifiesForGraduateTitle()) {
-            final ResourceBundle bundle = ResourceBundle.getBundle("resources.EnumerationResources", locale);
-
             if (cycleType == null) {
-                return bundle.getString(qualifiedName() + GRADUATE_TITLE_SUFFIX);
+                return BundleUtil.getString(Bundle.ENUMERATION, qualifiedName() + GRADUATE_TITLE_SUFFIX);
             }
 
             if (cycleTypes().isEmpty()) {
@@ -878,7 +892,7 @@ public enum DegreeType {
                 throw new DomainException("DegreeType.doesnt.have.such.cycle.type");
             }
 
-            return bundle.getString(qualifiedName() + (isComposite() ? "." + cycleType.name() : StringUtils.EMPTY)
+            return BundleUtil.getString(Bundle.ENUMERATION, qualifiedName() + (isComposite() ? "." + cycleType.name() : StringUtils.EMPTY)
                     + GRADUATE_TITLE_SUFFIX);
         }
 

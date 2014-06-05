@@ -1,12 +1,31 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain;
 
 import java.util.Comparator;
 import java.util.List;
 
 import net.sourceforge.fenixedu.domain.exceptions.DomainException;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
@@ -31,7 +50,7 @@ public class LessonPlanning extends LessonPlanning_Base {
         setLessonType(lessonType);
         setExecutionCourse(executionCourse);
 
-        CurricularManagementLog.createLog(executionCourse, "resources.MessagingResources",
+        CurricularManagementLog.createLog(executionCourse, Bundle.MESSAGING,
                 "log.executionCourse.curricular.planning.added", title.getContent(), lessonType.getFullNameTipoAula(),
                 executionCourse.getNome(), executionCourse.getDegreePresentationString());
     }
@@ -42,7 +61,7 @@ public class LessonPlanning extends LessonPlanning_Base {
     }
 
     public void deleteWithoutReOrder() {
-        CurricularManagementLog.createLog(getExecutionCourse(), "resources.MessagingResources",
+        CurricularManagementLog.createLog(getExecutionCourse(), Bundle.MESSAGING,
                 "log.executionCourse.curricular.planning.removed", getTitle().getContent(),
                 getLessonType().getFullNameTipoAula(), getExecutionCourse().getNome(), getExecutionCourse()
                         .getDegreePresentationString());
@@ -126,16 +145,16 @@ public class LessonPlanning extends LessonPlanning_Base {
 
     public String getLessonPlanningLabel() {
         StringBuilder builder = new StringBuilder();
-        builder.append(BundleUtil.getStringFromResourceBundle("resources.ApplicationResources", "label.lesson")).append(" ");
+        builder.append(BundleUtil.getString(Bundle.APPLICATION, "label.lesson")).append(" ");
         builder.append(getOrderOfPlanning()).append(" (");
-        builder.append(BundleUtil.getStringFromResourceBundle("resources.EnumerationResources", getLessonType().getName()))
+        builder.append(BundleUtil.getString(Bundle.ENUMERATION, getLessonType().getName()))
                 .append(") - ");
         builder.append(getTitle().getContent());
         return builder.toString();
     }
 
     public void logEditEditLessonPlanning() {
-        CurricularManagementLog.createLog(getExecutionCourse(), "resources.MessagingResources",
+        CurricularManagementLog.createLog(getExecutionCourse(), Bundle.MESSAGING,
                 "log.executionCourse.curricular.planning.edited", getTitle().getContent(), getLessonType().getFullNameTipoAula(),
                 getExecutionCourse().getNome(), getExecutionCourse().getDegreePresentationString());
     }

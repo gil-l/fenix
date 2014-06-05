@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.backBeans.coordinator;
 
 import java.io.IOException;
@@ -6,11 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
 
 import javax.faces.context.FacesContext;
-
-import org.fenixedu.commons.i18n.I18N;
 
 import net.sourceforge.fenixedu.applicationTier.Servico.exceptions.FenixServiceException;
 import net.sourceforge.fenixedu.domain.DegreeCurricularPlan;
@@ -23,10 +38,13 @@ import net.sourceforge.fenixedu.domain.student.Registration;
 import net.sourceforge.fenixedu.domain.student.registrationStates.RegistrationStateType;
 import net.sourceforge.fenixedu.domain.studentCurricularPlan.StudentCurricularPlanState;
 import net.sourceforge.fenixedu.presentationTier.backBeans.base.FenixBackingBean;
+import net.sourceforge.fenixedu.util.Bundle;
+
+import org.fenixedu.bennu.core.i18n.BundleUtil;
+
 import pt.ist.fenixframework.FenixFramework;
 import pt.utl.ist.fenix.tools.util.excel.Spreadsheet;
 import pt.utl.ist.fenix.tools.util.excel.Spreadsheet.Row;
-import java.util.Locale;
 
 public class CoordinatorStudentsBackingBean extends FenixBackingBean {
 
@@ -299,7 +317,7 @@ public class CoordinatorStudentsBackingBean extends FenixBackingBean {
     }
 
     public String getApplicationResourcesString(String name) {
-        return ResourceBundle.getBundle("resources/ApplicationResources", I18N.getLocale()).getString(name);
+        return BundleUtil.getString(Bundle.APPLICATION, name);
     }
 
     public String getSerializedFilteredStudents() {
@@ -397,8 +415,7 @@ public class CoordinatorStudentsBackingBean extends FenixBackingBean {
     }
 
     private String getFilename() {
-        return ResourceBundle.getBundle("resources.ApplicationResources", I18N.getLocale()).getString(
-                "label.students.lowercase");
+        return BundleUtil.getString(Bundle.APPLICATION, "label.students.lowercase");
     }
 
     private String getAverageInformation(final StudentCurricularPlan studentCurricularPlan) {
@@ -417,26 +434,25 @@ public class CoordinatorStudentsBackingBean extends FenixBackingBean {
     }
 
     private Spreadsheet createSpreadSheet() {
-        final ResourceBundle bundle = ResourceBundle.getBundle("resources.ApplicationResources", I18N.getLocale());
-        final Spreadsheet spreadsheet = new Spreadsheet(bundle.getString("list.students"));
+        final Spreadsheet spreadsheet = new Spreadsheet(BundleUtil.getString(Bundle.APPLICATION, "list.students"));
 
         spreadsheet.setHeaders(new String[] {
 
-        bundle.getString("label.number"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.number"),
 
-        bundle.getString("label.name"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.name"),
 
-        bundle.getString("label.email"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.email"),
 
-        bundle.getString("label.student.curricular.plan.state"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.student.curricular.plan.state"),
 
-        bundle.getString("label.number.approved.curricular.courses"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.number.approved.curricular.courses"),
 
-        bundle.getString("label.ects"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.ects"),
 
-        bundle.getString("label.aritmeticAverage"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.aritmeticAverage"),
 
-        bundle.getString("label.student.curricular.year"),
+        BundleUtil.getString(Bundle.APPLICATION, "label.student.curricular.year"),
 
         " ", " " });
 

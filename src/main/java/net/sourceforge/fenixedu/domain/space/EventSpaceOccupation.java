@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.space;
 
 import java.util.ArrayList;
@@ -20,8 +38,6 @@ import org.apache.commons.collections.comparators.ComparatorChain;
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.spaces.domain.Space;
-import org.fenixedu.spaces.domain.SpaceClassification;
-import org.fenixedu.spaces.domain.UnavailableException;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.TimeOfDay;
@@ -60,19 +76,15 @@ public abstract class EventSpaceOccupation extends EventSpaceOccupation_Base {
     }
 
     public void setResource(Space resource) {
-        try {
-            if (!(SpaceUtils.isRoom(resource) || SpaceClassification.getByName("Room Subdivision").equals(
-                    resource.getClassification()))) {
-                throw new DomainException("error.EventSpaceOccupation.invalid.resource");
-            }
-            super.addSpace(resource);
-        } catch (UnavailableException e) {
+        if (!(SpaceUtils.isRoom(resource) || SpaceUtils.isRoomSubdivision(resource))) {
             throw new DomainException("error.EventSpaceOccupation.invalid.resource");
         }
+        getSpaceSet().clear();
+        super.addSpace(resource);
     }
 
     public Space getRoom() {
-        return getSpaceSet().isEmpty() ? null : getSpaceSet().iterator().next();
+        return getSpace();
     }
 
     public Calendar getStartTime() {
@@ -164,6 +176,7 @@ public abstract class EventSpaceOccupation extends EventSpaceOccupation_Base {
         return false;
     }
 
+    @Override
     public boolean overlaps(final Interval[] intervals) {
         for (final Interval interval : intervals) {
             if (overlaps(interval)) {
@@ -204,7 +217,7 @@ public abstract class EventSpaceOccupation extends EventSpaceOccupation_Base {
                 getDailyFrequencyMarkSunday(), startDateToSearch, endDateToSearch);
     }
 
-    protected List<Interval> generateEventSpaceOccupationIntervals(YearMonthDay begin, final YearMonthDay end,
+    public static List<Interval> generateEventSpaceOccupationIntervals(YearMonthDay begin, final YearMonthDay end,
             final HourMinuteSecond beginTime, final HourMinuteSecond endTime, final FrequencyType frequency,
             final DiaSemana diaSemana, final Boolean dailyFrequencyMarkSaturday, final Boolean dailyFrequencyMarkSunday,
             final YearMonthDay startDateToSearch, final YearMonthDay endDateToSearch) {
@@ -280,7 +293,7 @@ public abstract class EventSpaceOccupation extends EventSpaceOccupation_Base {
         return instantResult;
     }
 
-    private YearMonthDay getBeginDateInSpecificWeekDay(DiaSemana diaSemana, YearMonthDay begin) {
+    private static YearMonthDay getBeginDateInSpecificWeekDay(DiaSemana diaSemana, YearMonthDay begin) {
         if (diaSemana != null) {
             YearMonthDay newBegin =
                     begin.toDateTimeAtMidnight().withDayOfWeek(diaSemana.getDiaSemanaInDayOfWeekJodaFormat()).toYearMonthDay();
@@ -323,6 +336,11 @@ public abstract class EventSpaceOccupation extends EventSpaceOccupation_Base {
         return builder.toString();
     }
 
+    @Override
+    public String getSubject() {
+        return getPresentationString();
+    }
+
     public String getPresentationString() {
         return StringUtils.EMPTY;
     }
@@ -348,6 +366,7 @@ public abstract class EventSpaceOccupation extends EventSpaceOccupation_Base {
     public abstract boolean isOccupiedByExecutionCourse(final ExecutionCourse executionCourse, final DateTime start,
             final DateTime end);
 
+    @Override
     public void delete() {
         setBennu(null);
         getSpaceSet().clear();

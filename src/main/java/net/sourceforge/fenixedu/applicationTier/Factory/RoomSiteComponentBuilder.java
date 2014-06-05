@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 /*
  * Created on 5/Mai/2003
  *
@@ -37,8 +55,8 @@ import org.joda.time.YearMonthDay;
 
 /**
  * @author Jo�o Mota
- * 
- * 
+ *
+ *
  */
 public class RoomSiteComponentBuilder {
 
@@ -89,6 +107,9 @@ public class RoomSiteComponentBuilder {
         final YearMonthDay weekStartYearMonthDay = YearMonthDay.fromCalendarFields(startDay);
         final YearMonthDay weekEndYearMonthDay = YearMonthDay.fromCalendarFields(endDay).minusDays(1);
 
+        final Interval search =
+                new Interval(weekStartYearMonthDay.toDateTimeAtMidnight(), weekEndYearMonthDay.toDateTimeAtMidnight());
+
         for (final Occupation roomOccupation : room.getOccupationSet()) {
 
             if (roomOccupation instanceof WrittenEvaluationSpaceOccupation) {
@@ -105,7 +126,9 @@ public class RoomSiteComponentBuilder {
                 getLessonInstanceOccupations(infoShowOccupations, weekStartYearMonthDay, weekEndYearMonthDay, lessonInstances);
             } else {
                 for (Interval interval : roomOccupation.getIntervals()) {
-                    infoShowOccupations.add(new InfoOccupation(roomOccupation, interval));
+                    if (search.overlaps(interval)) {
+                        infoShowOccupations.add(new InfoOccupation(roomOccupation, interval));
+                    }
                 }
             }
         }

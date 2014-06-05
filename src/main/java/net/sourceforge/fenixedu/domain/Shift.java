@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain;
 
 import static net.sourceforge.fenixedu.injectionCode.AccessControl.check;
@@ -26,13 +44,14 @@ import net.sourceforge.fenixedu.domain.util.email.Message;
 import net.sourceforge.fenixedu.domain.util.email.Recipient;
 import net.sourceforge.fenixedu.injectionCode.AccessControl;
 import net.sourceforge.fenixedu.predicates.ResourceAllocationRolePredicates;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.DiaSemana;
 import net.sourceforge.fenixedu.util.WeekDay;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.UserGroup;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.Duration;
 
 import pt.ist.fenixframework.Atomic;
@@ -365,7 +384,7 @@ public class Shift extends Shift_Base {
     public boolean reserveForStudent(final Registration registration) {
         final boolean result = getLotacao().intValue() > getStudentsSet().size();
         if (result || isResourceAllocationManager()) {
-            GroupsAndShiftsManagementLog.createLog(getExecutionCourse(), "resources.MessagingResources",
+            GroupsAndShiftsManagementLog.createLog(getExecutionCourse(), Bundle.MESSAGING,
                     "log.executionCourse.groupAndShifts.shifts.attends.added", registration.getNumber().toString(), getNome(),
                     getExecutionCourse().getNome(), getExecutionCourse().getDegreePresentationString());
             addStudents(registration);
@@ -402,7 +421,7 @@ public class Shift extends Shift_Base {
         int index = 0;
         SortedSet<ShiftType> sortedTypes = getSortedTypes();
         for (ShiftType shiftType : sortedTypes) {
-            builder.append(BundleUtil.getStringFromResourceBundle("resources.EnumerationResources", shiftType.getName()));
+            builder.append(BundleUtil.getString(Bundle.ENUMERATION, shiftType.getName()));
             index++;
             if (index < sortedTypes.size()) {
                 builder.append(", ");
@@ -491,18 +510,9 @@ public class Shift extends Shift_Base {
     }
 
     public int getCapacityBasedOnSmallestRoom() {
-        int capacity = 0;
-
-        for (final Lesson lesson : getAssociatedLessonsSet()) {
-            if (lesson.hasSala()) {
-                if (capacity == 0) {
-                    capacity = (lesson.getSala()).getAllocatableCapacity();
-                } else {
-                    capacity = Math.min(capacity, (lesson.getSala()).getAllocatableCapacity());
-                }
-            }
-        }
-
+        int capacity =
+                getAssociatedLessonsSet().stream().filter(Lesson::hasSala)
+                        .mapToInt(lesson -> lesson.getSala().getAllocatableCapacity()).min().orElse(0);
         return capacity + (capacity / 10);
     }
 
@@ -527,7 +537,7 @@ public class Shift extends Shift_Base {
     @Atomic
     public void removeAttendFromShift(Registration registration, ExecutionCourse executionCourse) {
 
-        GroupsAndShiftsManagementLog.createLog(getExecutionCourse(), "resources.MessagingResources",
+        GroupsAndShiftsManagementLog.createLog(getExecutionCourse(), Bundle.MESSAGING,
                 "log.executionCourse.groupAndShifts.shifts.attends.removed", registration.getNumber().toString(), getNome(),
                 getExecutionCourse().getNome(), getExecutionCourse().getDegreePresentationString());
         registration.removeShifts(this);
@@ -536,9 +546,9 @@ public class Shift extends Shift_Base {
         Collection<Recipient> recipients =
                 Collections.singletonList(new Recipient(UserGroup.of(registration.getPerson().getUser())));
         final String subject =
-                BundleUtil.getStringFromResourceBundle("resources.ApplicationResources", "label.shift.remove.subject");
+                BundleUtil.getString(Bundle.APPLICATION, "label.shift.remove.subject");
         final String body =
-                BundleUtil.getStringFromResourceBundle("resources.ApplicationResources", "label.shift.remove.body", getNome());
+                BundleUtil.getString(Bundle.APPLICATION, "label.shift.remove.body", getNome());
 
         new Message(sender, sender.getConcreteReplyTos(), recipients, subject, body, "");
     }

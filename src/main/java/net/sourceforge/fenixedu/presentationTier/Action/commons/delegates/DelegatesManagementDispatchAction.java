@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.commons.delegates;
 
 import java.io.IOException;
@@ -30,13 +48,14 @@ import net.sourceforge.fenixedu.domain.organizationalStructure.FunctionType;
 import net.sourceforge.fenixedu.domain.organizationalStructure.PersonFunction;
 import net.sourceforge.fenixedu.domain.student.Student;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.portal.EntryPoint;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
@@ -44,8 +63,6 @@ import pt.ist.fenixframework.FenixFramework;
 import pt.utl.ist.fenix.tools.util.excel.StyledExcelSpreadsheet;
 
 public abstract class DelegatesManagementDispatchAction extends FenixDispatchAction {
-
-    protected static final String RESOURCE_MODULE = "pedagogicalCouncil";
 
     @Override
     protected Object getFromRequest(HttpServletRequest request, String id) {
@@ -226,11 +243,11 @@ public abstract class DelegatesManagementDispatchAction extends FenixDispatchAct
     }
 
     protected static String getResourceMessage(String key) {
-        return BundleUtil.getMessageFromModuleOrApplication(RESOURCE_MODULE, key);
+        return BundleUtil.getString(Bundle.PEDAGOGICAL, key);
     }
 
     protected static String getEnumName(Enum<?> enumeration) {
-        return BundleUtil.getEnumName(enumeration);
+        return BundleUtil.getString(Bundle.ENUMERATION, enumeration.name());
     }
 
     public ActionForward prepareFinishRole(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,

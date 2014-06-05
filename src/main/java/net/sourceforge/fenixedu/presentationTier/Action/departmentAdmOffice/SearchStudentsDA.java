@@ -1,8 +1,24 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.departmentAdmOffice;
 
 import java.io.OutputStream;
-import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,10 +35,12 @@ import net.sourceforge.fenixedu.domain.student.SearchStudentsWithEnrolmentsByDep
 import net.sourceforge.fenixedu.domain.student.Student;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction;
 import net.sourceforge.fenixedu.presentationTier.Action.departmentAdmOffice.DepartmentAdmOfficeApp.DepartmentAdmOfficeStudentsApp;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.portal.EntryPoint;
 import org.fenixedu.bennu.portal.StrutsFunctionality;
 
@@ -83,16 +101,14 @@ public class SearchStudentsDA extends FenixDispatchAction {
     }
 
     private Spreadsheet getSpreadsheet(final ExecutionYear executionYear) {
-        final ResourceBundle enumResourceBundle =
-                ResourceBundle.getBundle("resources.ApplicationResources", new Locale("pt", "PT"));
         final Spreadsheet spreadsheet =
-                new Spreadsheet(enumResourceBundle.getString("label.student.for.academic.year") + " "
+                new Spreadsheet(BundleUtil.getString(Bundle.APPLICATION, "label.student.for.academic.year") + " "
                         + executionYear.getYear().replace('/', ' '));
-        spreadsheet.setHeader(enumResourceBundle.getString("label.degree.code"));
-        spreadsheet.setHeader(enumResourceBundle.getString("label.student.number"));
-        spreadsheet.setHeader(enumResourceBundle.getString("label.person.name"));
-        spreadsheet.setHeader(enumResourceBundle.getString("label.person.email"));
-        spreadsheet.setHeader(enumResourceBundle.getString("label.student.curricular.year"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.APPLICATION, "label.degree.code"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.APPLICATION, "label.student.number"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.APPLICATION, "label.person.name"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.APPLICATION, "label.person.email"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.APPLICATION, "label.student.curricular.year"));
         return spreadsheet;
     }
 

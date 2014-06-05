@@ -1,7 +1,24 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.backBeans.base;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
@@ -79,14 +96,6 @@ public class FenixBackingBean {
         return ((HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest()).getContextPath();
     }
 
-    public ResourceBundle getResourceBundle(String bundleName) {
-        return ResourceBundle.getBundle(bundleName, FacesContext.getCurrentInstance().getViewRoot().getLocale());
-    }
-
-    public ResourceBundle getResourceBundle(String bundleName, Locale locale) {
-        return ResourceBundle.getBundle(bundleName, locale);
-    }
-
     public UIViewState getViewState() {
         if (this.viewState == null) {
             this.viewState = new UIViewState();
@@ -152,16 +161,6 @@ public class FenixBackingBean {
         return parameterValue;
     }
 
-    protected String getFormatedMessage(final String bundleName, final String key, final String... args) {
-        final ResourceBundle bundle = getResourceBundle(bundleName);
-        String message = bundle.getString(key);
-        return formatMessage(message, args);
-    }
-
-    protected String getFormatedMessage(final ResourceBundle bundle, final String key, final String... args) {
-        return formatMessage(bundle.getString(key), args);
-    }
-
     private String formatMessage(String message, final String... args) {
         if (message != null && args != null) {
             for (int i = 0; args.length > i; i++) {
@@ -170,21 +169,6 @@ public class FenixBackingBean {
             }
         }
         return message;
-    }
-
-    protected void addErrorMessages(final ResourceBundle bundle, final String key, final String... args) {
-        String message = bundle.getString(key);
-        if (message != null) {
-            int indexOfManyArgs = message.indexOf("{...}");
-            if (args != null && indexOfManyArgs != -1) {
-                addErrorMessage(message.substring(0, indexOfManyArgs));
-                for (final String arg : args) {
-                    addErrorMessage(arg);
-                }
-            } else {
-                addErrorMessage(formatMessage(message, args));
-            }
-        }
     }
 
     protected Double getAndHoldDoubleParameter(final String parameterName) {

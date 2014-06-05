@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package pt.utl.ist.codeGenerator.database;
 
 import java.util.HashMap;
@@ -11,7 +29,6 @@ import net.sourceforge.fenixedu.util.DiaSemana;
 import net.sourceforge.fenixedu.util.HourMinuteSecond;
 
 import org.fenixedu.spaces.domain.Space;
-import org.fenixedu.spaces.domain.UnavailableException;
 import org.joda.time.DateTime;
 
 public class WrittenTestsRoomManager extends HashSet<Space> {
@@ -31,23 +48,19 @@ public class WrittenTestsRoomManager extends HashSet<Space> {
         DateTime dateTime;
         Space oldRoom;
 
-        try {
-            do {
-                dateTime = evaluationRoomManager.getNextDateTime();
-                oldRoom = evaluationRoomManager.getNextOldRoom();
+        do {
+            dateTime = evaluationRoomManager.getNextDateTime();
+            oldRoom = evaluationRoomManager.getNextOldRoom();
 
-            } while (SpaceUtils.isFree(oldRoom, dateTime.toYearMonthDay(), dateTime.plusMinutes(120).toYearMonthDay(),
-                    new HourMinuteSecond(dateTime.getHourOfDay(), dateTime.getMinuteOfHour(), dateTime.getSecondOfMinute()),
-                    dateTime.plusMinutes(120).getHourOfDay() == 0 ? new HourMinuteSecond(
-                            dateTime.plusMinutes(119).getHourOfDay(), dateTime.plusMinutes(119).getMinuteOfHour(), dateTime
-                                    .plusMinutes(119).getSecondOfMinute()) : new HourMinuteSecond(dateTime.plusMinutes(120)
-                            .getHourOfDay(), dateTime.plusMinutes(120).getMinuteOfHour(), dateTime.plusMinutes(120)
-                            .getSecondOfMinute()), new DiaSemana(dateTime.getDayOfWeek() + 1), FrequencyType.DAILY, Boolean.TRUE,
-                    Boolean.TRUE));
-            return dateTime;
-        } catch (UnavailableException e) {
-        }
-        return null;
+        } while (SpaceUtils
+                .isFree(oldRoom, dateTime.toYearMonthDay(), dateTime.plusMinutes(120).toYearMonthDay(), new HourMinuteSecond(
+                        dateTime.getHourOfDay(), dateTime.getMinuteOfHour(), dateTime.getSecondOfMinute()),
+                        dateTime.plusMinutes(120).getHourOfDay() == 0 ? new HourMinuteSecond(dateTime.plusMinutes(119)
+                                .getHourOfDay(), dateTime.plusMinutes(119).getMinuteOfHour(), dateTime.plusMinutes(119)
+                                .getSecondOfMinute()) : new HourMinuteSecond(dateTime.plusMinutes(120).getHourOfDay(), dateTime
+                                .plusMinutes(120).getMinuteOfHour(), dateTime.plusMinutes(120).getSecondOfMinute()),
+                        new DiaSemana(dateTime.getDayOfWeek() + 1), FrequencyType.DAILY, Boolean.TRUE, Boolean.TRUE));
+        return dateTime;
     }
 
     public Space getNextOldRoom(final ExecutionSemester executionPeriod) {

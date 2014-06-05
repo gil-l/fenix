@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 /*
  * Created on 23/Ago/2003
  *
@@ -18,6 +36,7 @@ import net.sourceforge.fenixedu.domain.ExecutionCourse;
 import net.sourceforge.fenixedu.domain.Grouping;
 import net.sourceforge.fenixedu.domain.GroupsAndShiftsManagementLog;
 import net.sourceforge.fenixedu.domain.StudentGroup;
+import net.sourceforge.fenixedu.util.Bundle;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 
@@ -63,7 +82,7 @@ public class DeleteStudentGroupMembers {
         if (sbStudentNumbers.length() != 0) {
             List<ExecutionCourse> ecs = grouping.getExecutionCourses();
             for (ExecutionCourse ec : ecs) {
-                GroupsAndShiftsManagementLog.createLog(ec, "resources.MessagingResources",
+                GroupsAndShiftsManagementLog.createLog(ec, Bundle.MESSAGING,
                         "log.executionCourse.groupAndShifts.grouping.group.element.removed", Integer.toString(studentUsernames
                                 .size()), sbStudentNumbers.toString(), studentGroup.getGroupNumber().toString(), grouping
                                 .getName(), ec.getNome(), ec.getDegreePresentationString());

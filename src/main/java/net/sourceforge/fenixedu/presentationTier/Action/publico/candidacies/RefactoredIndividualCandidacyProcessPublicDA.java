@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.publico.candidacies;
 
 import java.io.IOException;
@@ -5,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,12 +53,15 @@ import net.sourceforge.fenixedu.domain.caseHandling.Process;
 import net.sourceforge.fenixedu.domain.exceptions.DomainException;
 import net.sourceforge.fenixedu.domain.person.IDDocumentType;
 import net.sourceforge.fenixedu.presentationTier.Action.candidacy.IndividualCandidacyProcessDA;
+import net.sourceforge.fenixedu.presentationTier.Action.publico.KaptchaAction;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.i18n.I18N;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -51,8 +71,6 @@ import pt.utl.ist.fenix.tools.util.Pair;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import com.octo.captcha.module.struts.CaptchaServicePlugin;
-import com.octo.captcha.service.CaptchaServiceException;
 
 public abstract class RefactoredIndividualCandidacyProcessPublicDA extends IndividualCandidacyProcessDA {
 
@@ -71,7 +89,7 @@ public abstract class RefactoredIndividualCandidacyProcessPublicDA extends Indiv
     }
 
     protected String getStringFromDefaultBundle(String key) {
-        return ResourceBundle.getBundle("resources.CandidateResources", I18N.getLocale()).getString(key);
+        return BundleUtil.getString(Bundle.CANDIDATE, key);
     }
 
     @Override
@@ -160,11 +178,9 @@ public abstract class RefactoredIndividualCandidacyProcessPublicDA extends Indiv
                             .getUnusedOrCreateNewHashCodeAndSendEmailForApplicationSubmissionToCandidate(getProcessType(),
                                     getCurrentOpenParentProcess(), email);
 
-            ResourceBundle bundle = ResourceBundle.getBundle("resources.CandidateResources", I18N.getLocale());
             String link =
-                    String.format(
-                            bundle.getString(getProcessType().getSimpleName() + ".const.public.application.submission.link"),
-                            hash.getValue(), I18N.getLocale().getLanguage());
+                    String.format(BundleUtil.getString(Bundle.CANDIDATE, getProcessType().getSimpleName()
+                            + ".const.public.application.submission.link"), hash.getValue(), I18N.getLocale().getLanguage());
 
             request.setAttribute("link", link);
 
@@ -209,21 +225,13 @@ public abstract class RefactoredIndividualCandidacyProcessPublicDA extends Indiv
             HttpServletResponse response);
 
     protected boolean validateCaptcha(ActionMapping mapping, HttpServletRequest request) {
-        final String captchaId = request.getSession().getId();
         final String captchaResponse = request.getParameter("j_captcha_response");
 
-        try {
-            if (!CaptchaServicePlugin.getInstance().getService().validateResponseForID(captchaId, captchaResponse)) {
-                addActionMessage("captcha.error", request, "captcha.wrong.word");
-                return false;
-            }
-            return true;
-        } catch (CaptchaServiceException e) { // may be thrown if the id is not
-            // valid
-            logger.error(e.getMessage(), e);
+        if (!KaptchaAction.validateResponse(request.getSession(), captchaResponse)) {
             addActionMessage("captcha.error", request, "captcha.wrong.word");
             return false;
         }
+        return true;
     }
 
     private boolean isInEnglishLocale() {

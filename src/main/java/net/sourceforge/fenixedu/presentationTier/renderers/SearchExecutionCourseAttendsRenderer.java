@@ -1,14 +1,32 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.renderers;
-
-import java.util.ResourceBundle;
-
-import org.fenixedu.commons.i18n.I18N;
 
 import net.sourceforge.fenixedu.dataTransferObject.teacher.executionCourse.SearchExecutionCourseAttendsBean;
 import net.sourceforge.fenixedu.dataTransferObject.teacher.executionCourse.SearchExecutionCourseAttendsBean.StudentAttendsStateType;
 import net.sourceforge.fenixedu.domain.DegreeCurricularPlan;
 import net.sourceforge.fenixedu.domain.Shift;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.WorkingStudentSelectionType;
+
+import org.fenixedu.bennu.core.i18n.BundleUtil;
+
 import pt.ist.fenixWebFramework.rendererExtensions.converters.DomainObjectKeyArrayConverter;
 import pt.ist.fenixWebFramework.renderers.InputRenderer;
 import pt.ist.fenixWebFramework.renderers.components.HtmlBlockContainer;
@@ -27,14 +45,8 @@ import pt.ist.fenixWebFramework.renderers.layouts.Layout;
 import pt.ist.fenixWebFramework.renderers.model.MetaObject;
 import pt.ist.fenixWebFramework.renderers.model.MetaObjectFactory;
 import pt.ist.fenixWebFramework.renderers.schemas.Schema;
-import java.util.Locale;
 
 public class SearchExecutionCourseAttendsRenderer extends InputRenderer {
-
-    private final ResourceBundle enumerationResources = ResourceBundle.getBundle("resources.EnumerationResources",
-            I18N.getLocale());
-    private final ResourceBundle applicationResources = ResourceBundle.getBundle("resources.ApplicationResources",
-            I18N.getLocale());
 
     private String searchTableClasses;
 
@@ -88,26 +100,26 @@ public class SearchExecutionCourseAttendsRenderer extends InputRenderer {
             HtmlTableRow row2 = htmlTable.createRow();
             HtmlTableCell photoCell = row2.createCell();
             photoCell.setColspan(headerRow.getCells().size());
-            HtmlCheckBox checkBox = new HtmlCheckBox(applicationResources.getString("label.viewPhoto"), bean.getViewPhoto());
+            HtmlCheckBox checkBox = new HtmlCheckBox(BundleUtil.getString(Bundle.APPLICATION, "label.viewPhoto"), bean.getViewPhoto());
             checkBox.bind(getInputContext().getMetaObject(), "viewPhoto");
             photoCell.setBody(checkBox);
 
             HtmlTableRow row3 = htmlTable.createRow();
             HtmlTableCell submitCell = row3.createCell();
             submitCell.setColspan(headerRow.getCells().size());
-            submitCell.setBody(new HtmlSubmitButton(applicationResources.getString("button.selectShift")));
+            submitCell.setBody(new HtmlSubmitButton(BundleUtil.getString(Bundle.APPLICATION, "button.selectShift")));
 
             return htmlTable;
         }
 
         private void createWorkingStudentSearch(HtmlTableRow row, HtmlTableRow headerRow) {
-            headerRow.createCell(applicationResources.getString("label.workingStudents"));
+            headerRow.createCell(BundleUtil.getString(Bundle.APPLICATION, "label.workingStudents"));
 
             HtmlCheckBoxList workingStudentCheckBoxList = new HtmlCheckBoxList();
             for (WorkingStudentSelectionType workingStudentSelectionType : WorkingStudentSelectionType.values()) {
                 HtmlCheckBox option =
                         workingStudentCheckBoxList.addOption(
-                                new HtmlLabel(enumerationResources.getString(workingStudentSelectionType.getQualifiedName())),
+                                new HtmlLabel(BundleUtil.getString(Bundle.ENUMERATION, workingStudentSelectionType.getQualifiedName())),
                                 workingStudentSelectionType.name());
                 option.setChecked(bean.getWorkingStudentTypes().contains(workingStudentSelectionType));
             }
@@ -120,7 +132,7 @@ public class SearchExecutionCourseAttendsRenderer extends InputRenderer {
         }
 
         private void createShiftSearch(HtmlTableRow row, HtmlTableRow headerRow) {
-            headerRow.createCell(applicationResources.getString("label.selectShift"));
+            headerRow.createCell(BundleUtil.getString(Bundle.APPLICATION, "label.selectShift"));
 
             HtmlCheckBoxList shiftCheckBoxList = new HtmlCheckBoxList();
             for (Shift shift : bean.getExecutionCourse().getAssociatedShifts()) {
@@ -139,7 +151,7 @@ public class SearchExecutionCourseAttendsRenderer extends InputRenderer {
         }
 
         private void createDCPSearch(HtmlTableRow row, HtmlTableRow headerRow) {
-            headerRow.createCell(applicationResources.getString("label.attends.courses"));
+            headerRow.createCell(BundleUtil.getString(Bundle.APPLICATION, "label.attends.courses"));
 
             HtmlCheckBoxList dcpCheckBoxList = new HtmlCheckBoxList();
             for (DegreeCurricularPlan degreeCurricularPlan : bean.getExecutionCourse().getAttendsDegreeCurricularPlans()) {
@@ -158,13 +170,13 @@ public class SearchExecutionCourseAttendsRenderer extends InputRenderer {
         }
 
         private void createAttendsStateTypeSearch(HtmlTableRow row, HtmlTableRow headerRow) {
-            headerRow.createCell(applicationResources.getString("label.selectStudents"));
+            headerRow.createCell(BundleUtil.getString(Bundle.APPLICATION, "label.selectStudents"));
 
             HtmlCheckBoxList attendsStateCheckBoxList = new HtmlCheckBoxList();
             for (StudentAttendsStateType attendsStateType : StudentAttendsStateType.values()) {
                 HtmlCheckBox option =
                         attendsStateCheckBoxList.addOption(
-                                new HtmlLabel(enumerationResources.getString(attendsStateType.getQualifiedName())),
+                                new HtmlLabel(BundleUtil.getString(Bundle.ENUMERATION, attendsStateType.getQualifiedName())),
                                 attendsStateType.name());
                 option.setChecked(bean.getAttendsStates().contains(attendsStateType));
             }

@@ -1,10 +1,27 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.administrativeOffice.student.candidacy.registrations;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import net.sourceforge.fenixedu.domain.Degree;
@@ -13,14 +30,14 @@ import net.sourceforge.fenixedu.domain.Person;
 import net.sourceforge.fenixedu.domain.candidacy.StudentCandidacy;
 import net.sourceforge.fenixedu.domain.contacts.EmailAddress;
 import net.sourceforge.fenixedu.domain.organizationalStructure.Unit;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.commons.lang.StringUtils;
-import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.LocalDate;
 
 import pt.utl.ist.fenix.tools.util.excel.Spreadsheet;
 import pt.utl.ist.fenix.tools.util.excel.Spreadsheet.Row;
-import java.util.Locale;
 
 public class RegisteredDegreeCandidaciesWithApplyForResidence {
 
@@ -95,8 +112,7 @@ public class RegisteredDegreeCandidaciesWithApplyForResidence {
         row.setCell(getPersonalEmailAddress(person));
         row.setCell(getPhone(person));
         row.setCell(getMobilePhone(person));
-        ResourceBundle bundle = ResourceBundle.getBundle("resources.AcademicAdminOffice", I18N.getLocale());
-        row.setCell(bundle.getString(candidacy.getApplyForResidence() ? "label.yes" : "label.no"));
+        row.setCell(BundleUtil.getString(Bundle.ACADEMIC, candidacy.getApplyForResidence() ? "label.yes" : "label.no"));
         row.setCell(candidacy.getNotesAboutResidenceAppliance().replaceAll("\n", " ").replaceAll("\r", " "));
     }
 

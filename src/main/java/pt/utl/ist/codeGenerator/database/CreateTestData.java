@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package pt.utl.ist.codeGenerator.database;
 
 import java.math.BigDecimal;
@@ -108,7 +126,6 @@ import net.sourceforge.fenixedu.domain.organizationalStructure.ScientificAreaUni
 import net.sourceforge.fenixedu.domain.organizationalStructure.Unit;
 import net.sourceforge.fenixedu.domain.organizationalStructure.UniversityUnit;
 import net.sourceforge.fenixedu.domain.person.RoleType;
-import net.sourceforge.fenixedu.domain.space.SpaceUtils;
 import net.sourceforge.fenixedu.domain.student.Registration;
 import net.sourceforge.fenixedu.domain.student.Student;
 import net.sourceforge.fenixedu.domain.teacher.TeacherService;
@@ -851,8 +868,6 @@ public class CreateTestData {
 
                             curricularCourse.addAssociatedExecutionCourses(executionCourse);
 
-                            executionCourse.createSite();
-
                             createAnnouncementsAndPlanning(executionCourse);
                             createEvaluationMethod(executionCourse);
                             createBibliographicReferences(executionCourse);
@@ -1269,7 +1284,7 @@ public class CreateTestData {
         executionCourse.addAssociatedCurricularCourses(curricularCourse);
         executionCourse.setAvailableForInquiries(Boolean.TRUE);
 
-        final ExecutionCourseSite executionCourseSite = executionCourse.createSite();
+        final ExecutionCourseSite executionCourseSite = executionCourse.getSite();
         executionCourseSite.setInitialStatement("Bla bla bla bla bla bla bla.");
         executionCourseSite.setAlternativeSite("http://www.google.com/");
         executionCourseSite.setIntroduction("Blur blur bla blur ble blur bla.");

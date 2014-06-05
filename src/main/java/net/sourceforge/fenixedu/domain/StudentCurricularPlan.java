@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain;
 
 import static net.sourceforge.fenixedu.injectionCode.AccessControl.check;
@@ -12,7 +30,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -84,6 +101,7 @@ import net.sourceforge.fenixedu.domain.studentCurriculum.curriculumLine.Curricul
 import net.sourceforge.fenixedu.domain.studentCurriculum.curriculumLine.MoveCurriculumLinesBean;
 import net.sourceforge.fenixedu.injectionCode.AccessControl;
 import net.sourceforge.fenixedu.predicates.StudentCurricularPlanPredicates;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.EnrolmentEvaluationState;
 import net.sourceforge.fenixedu.util.State;
 
@@ -92,6 +110,7 @@ import org.apache.commons.collections.Transformer;
 import org.apache.commons.collections.comparators.ReverseComparator;
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.DateTime;
@@ -1102,8 +1121,6 @@ public class StudentCurricularPlan extends StudentCurricularPlan_Base {
         return getGivenCredits() != null && getGivenCredits().doubleValue() != Double.valueOf(0).doubleValue();
     }
 
-    protected Integer creditsInSecundaryArea;
-
     public Integer getCreditsInSecundaryArea() {
         // only StudentCurricularPlanLEEC and StudentCurricularPlanLEIC should
         // return a value
@@ -1114,8 +1131,6 @@ public class StudentCurricularPlan extends StudentCurricularPlan_Base {
         // only StudentCurricularPlanLEEC and StudentCurricularPlanLEIC should
         // set a value
     }
-
-    protected Integer creditsInSpecializationArea;
 
     public Integer getCreditsInSpecializationArea() {
         // only StudentCurricularPlanLEEC and StudentCurricularPlanLEIC should
@@ -1405,9 +1420,7 @@ public class StudentCurricularPlan extends StudentCurricularPlan_Base {
     final public Integer getCurricularCourseAcumulatedEnrollments(CurricularCourse curricularCourse,
             ExecutionSemester executionSemester) {
 
-        String key = curricularCourse.getCurricularCourseUniqueKeyForEnrollment();
-
-        Integer curricularCourseAcumulatedEnrolments = getAcumulatedEnrollmentsMap(executionSemester).get(key);
+        Integer curricularCourseAcumulatedEnrolments = calculateStudentAcumulatedEnrollments(curricularCourse, executionSemester);
 
         if (curricularCourseAcumulatedEnrolments == null) {
             curricularCourseAcumulatedEnrolments = Integer.valueOf(0);
@@ -1436,16 +1449,7 @@ public class StudentCurricularPlan extends StudentCurricularPlan_Base {
                 result.add(enrolment);
             }
         }
-
-        initEctsCredits(executionSemester, result);
         return result;
-    }
-
-    private void initEctsCredits(ExecutionSemester executionSemester, List<Enrolment> enrolments) {
-        for (final Enrolment enrolment : enrolments) {
-            enrolment
-                    .setAccumulatedEctsCredits(this.getAccumulatedEctsCredits(executionSemester, enrolment.getCurricularCourse()));
-        }
     }
 
     final public boolean hasEnrolledStateInPreviousExecutionPerdiod(CurricularCourse curricularCourse,
@@ -1495,8 +1499,7 @@ public class StudentCurricularPlan extends StudentCurricularPlan_Base {
     private double getAccumulatedEctsCreditsForOldCurricularCourses(final CurricularCourse curricularCourse,
             ExecutionSemester executionSemester) {
         Double factor;
-        Integer curricularCourseAcumulatedEnrolments =
-                getAcumulatedEnrollmentsMap(executionSemester).get(curricularCourse.getCurricularCourseUniqueKeyForEnrollment());
+        Integer curricularCourseAcumulatedEnrolments = calculateStudentAcumulatedEnrollments(curricularCourse, executionSemester);
         if (curricularCourseAcumulatedEnrolments == null || curricularCourseAcumulatedEnrolments.intValue() == 0) {
             factor = 1.0;
         } else {
@@ -1507,36 +1510,26 @@ public class StudentCurricularPlan extends StudentCurricularPlan_Base {
 
     private boolean isAccumulated(final ExecutionSemester executionSemester, final CurricularCourse curricularCourse) {
         if (curricularCourse.isBolonhaDegree()) {
-            return getPreviouslyEnroledCurricularCourses(executionSemester).contains(curricularCourse);
+            return hasEnrolmentInCurricularCourseBefore(curricularCourse, executionSemester);
         } else {
             Integer curricularCourseAcumulatedEnrolments =
-                    getAcumulatedEnrollmentsMap(executionSemester).get(
-                            curricularCourse.getCurricularCourseUniqueKeyForEnrollment());
+                    calculateStudentAcumulatedEnrollments(curricularCourse, executionSemester);
             return curricularCourseAcumulatedEnrolments != null && curricularCourseAcumulatedEnrolments.intValue() != 0;
         }
     }
 
-    private Map<ExecutionSemester, Collection<CurricularCourse>> previouslyEnroledCurricularCoursesByExecutionPeriod;
-
-    private Collection<CurricularCourse> getPreviouslyEnroledCurricularCourses(final ExecutionSemester executionSemester) {
-        if (previouslyEnroledCurricularCoursesByExecutionPeriod == null) {
-            previouslyEnroledCurricularCoursesByExecutionPeriod = new HashMap<ExecutionSemester, Collection<CurricularCourse>>();
+    private boolean hasEnrolmentInCurricularCourseBefore(final CurricularCourse curricularCourse,
+            final ExecutionSemester executionSemester) {
+        if (hasRoot()) {
+            return getRoot().hasEnrolmentInCurricularCourseBefore(curricularCourse, executionSemester);
         }
-
-        Collection<CurricularCourse> previouslyEnroledCurricularCourses =
-                previouslyEnroledCurricularCoursesByExecutionPeriod.get(executionSemester);
-        if (previouslyEnroledCurricularCourses == null && this.isBolonhaDegree()) {
-            previouslyEnroledCurricularCourses = new HashSet<CurricularCourse>();
-            previouslyEnroledCurricularCoursesByExecutionPeriod.put(executionSemester, previouslyEnroledCurricularCourses);
-
-            for (final Enrolment enrolment : getEnrolmentsSet()) {
-                if (!enrolment.isAnnulled() && enrolment.getExecutionPeriod().isBefore(executionSemester)) {
-                    previouslyEnroledCurricularCourses.add(enrolment.getCurricularCourse());
-                }
+        for (final Enrolment enrolment : getEnrolmentsSet()) {
+            if (!enrolment.isAnnulled() && enrolment.getExecutionPeriod().isBefore(executionSemester)
+                    && enrolment.getCurricularCourse() == curricularCourse) {
+                return true;
             }
         }
-
-        return previouslyEnroledCurricularCourses;
+        return false;
     }
 
     // -------------------------------------------------------------
@@ -1579,26 +1572,25 @@ public class StudentCurricularPlan extends StudentCurricularPlan_Base {
     // BEGIN: Only for enrollment purposes (PROTECTED)
     // -------------------------------------------------------------
 
-    private Map<ExecutionSemester, Map<String, Integer>> acumulatedEnrollments;
-
-    private void calculateStudentAcumulatedEnrollments(ExecutionSemester executionSemester) {
+    private Integer calculateStudentAcumulatedEnrollments(final CurricularCourse curricularCourse,
+            final ExecutionSemester executionSemester) {
         if (!this.isBolonhaDegree()) {
-            if (this.acumulatedEnrollments == null) {
-                this.acumulatedEnrollments = new HashMap<ExecutionSemester, Map<String, Integer>>();
-            }
-
-            if (this.acumulatedEnrollments.get(executionSemester) == null) {
-                List<String> curricularCourses = new ArrayList<String>();
-                for (Enrolment enrolment : this.getEnrolmentsSet()) {
-                    if (!enrolment.isAnnulled() && enrolment.getExecutionPeriod().isBefore(executionSemester)) {
-                        curricularCourses.add(enrolment.getCurricularCourse().getCurricularCourseUniqueKeyForEnrollment());
+            int result = 0;
+            if (hasRoot()) {
+                result += getRoot().calculateStudentAcumulatedEnrollments(curricularCourse, executionSemester);
+            } else {
+                for (final Enrolment enrolment : super.getEnrolmentsSet()) {
+                    if (!enrolment.isAnnulled()
+                            && enrolment.getExecutionPeriod().isBefore(executionSemester)
+                            && enrolment.getCurricularCourse().getCurricularCourseUniqueKeyForEnrollment()
+                                    .equalsIgnoreCase(curricularCourse.getCurricularCourseUniqueKeyForEnrollment())) {
+                        result++;
                     }
                 }
-
-                Map<String, Integer> map = CollectionUtils.getCardinalityMap(curricularCourses);
-                this.acumulatedEnrollments.put(executionSemester, map);
             }
+            return Integer.valueOf(result);
         }
+        return null;
     }
 
     private Set getCurricularCoursesInCurricularCourseEquivalences(final CurricularCourse curricularCourse) {
@@ -1655,20 +1647,6 @@ public class StudentCurricularPlan extends StudentCurricularPlan_Base {
         CompetenceCourse comp1 = course1.getCompetenceCourse();
         CompetenceCourse comp2 = course2.getCompetenceCourse();
         return (comp1 != null) && (comp1 == comp2);
-    }
-
-    private Map<String, Integer> getAcumulatedEnrollmentsMap(ExecutionSemester executionSemester) {
-        if (!this.isBolonhaDegree()) {
-            if (this.acumulatedEnrollments == null) {
-                calculateStudentAcumulatedEnrollments(executionSemester);
-            } else {
-                if (this.acumulatedEnrollments.get(executionSemester) == null) {
-                    calculateStudentAcumulatedEnrollments(executionSemester);
-                }
-            }
-            return this.acumulatedEnrollments.get(executionSemester);
-        }
-        return null;
     }
 
     private List<CurricularCourse> getStudentNotNeedToEnrollCurricularCourses() {
@@ -2957,8 +2935,6 @@ public class StudentCurricularPlan extends StudentCurricularPlan_Base {
         }
     }
 
-    private static final ResourceBundle ACADEMIC_RESOURCES = ResourceBundle.getBundle("resources.AcademicAdminOffice");
-
     private List<MarkSheetEnrolmentEvaluationBean> setIndividualEvaluationsForCurriculumValidation(
             List<MarkSheetEnrolmentEvaluationBean> enrolmentEvaluationsBeanList) {
 
@@ -2986,7 +2962,7 @@ public class StudentCurricularPlan extends StudentCurricularPlan_Base {
                             enrolmentEvaluationBean.getBookReference(), enrolmentEvaluationBean.getPage(),
                             enrolmentEvaluationBean.getGradeScale());
             enrolmentEvaluation.confirmSubmission(AccessControl.getPerson(),
-                    ACADEMIC_RESOURCES.getString("message.curriculum.validation.observation"));
+                    BundleUtil.getString(Bundle.ACADEMIC, "message.curriculum.validation.observation"));
 
             enrolmentEvaluationBean.setEnrolmentEvaluationSet(Boolean.TRUE);
         }

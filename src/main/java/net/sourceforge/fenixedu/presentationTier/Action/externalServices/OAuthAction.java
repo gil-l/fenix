@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.externalServices;
 
 import static net.sourceforge.fenixedu.presentationTier.Action.externalServices.OAuthUtils.getOAuthProblemResponse;
@@ -8,6 +26,7 @@ import static org.apache.commons.httpclient.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
 
 import java.io.IOException;
+import java.util.Base64;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +40,7 @@ import net.sourceforge.fenixedu.domain.Person;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction;
 import net.sourceforge.fenixedu.presentationTier.servlets.filters.FenixOAuthToken;
 import net.sourceforge.fenixedu.presentationTier.servlets.filters.FenixOAuthToken.FenixOAuthTokenException;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
 import nl.bitwalker.useragentutils.UserAgent;
 
 import org.apache.amber.oauth2.as.issuer.MD5Generator;
@@ -33,13 +52,13 @@ import org.apache.amber.oauth2.common.error.OAuthError;
 import org.apache.amber.oauth2.common.exception.OAuthProblemException;
 import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.amber.oauth2.common.message.OAuthResponse;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.util.CookieReaderUtils;
 import org.fenixedu.bennu.core.util.CoreConfiguration;
 import org.slf4j.Logger;
@@ -69,7 +88,7 @@ public class OAuthAction extends FenixDispatchAction {
             String browserName = userAgent.getBrowser().getName();
             String osName = userAgent.getOperatingSystem().getName();
             deviceId =
-                    BundleUtil.getStringFromResourceBundle("resources.ApplicationResources", "oauthapps.label.device.type",
+                    BundleUtil.getString(Bundle.APPLICATION, "oauthapps.label.device.type",
                             browserName, osName);
         }
         return deviceId;
@@ -94,7 +113,7 @@ public class OAuthAction extends FenixDispatchAction {
                 //redirect person to this action with client id in session
 
                 final String cookieValue = clientId + "|" + redirectUrl;
-                response.addCookie(new Cookie(OAUTH_SESSION_KEY, Base64.encodeBase64String(cookieValue.getBytes())));
+                response.addCookie(new Cookie(OAUTH_SESSION_KEY, Base64.getEncoder().encodeToString(cookieValue.getBytes())));
                 if (CoreConfiguration.casConfig().isCasEnabled()) {
                     response.sendRedirect(CoreConfiguration.casConfig().getCasLoginUrl(
                             CoreConfiguration.getConfiguration().applicationUrl() + "/oauth/userdialog"));
@@ -128,7 +147,7 @@ public class OAuthAction extends FenixDispatchAction {
 
     public ActionForward redirectToRedirectUrl(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response,
             Person person, final Cookie cookie) {
-        String cookieValue = new String(Base64.decodeBase64(cookie.getValue()));
+        String cookieValue = new String(Base64.getDecoder().decode(cookie.getValue()));
         final int indexOf = cookieValue.indexOf("|");
         String clientApplicationId = cookieValue.substring(0, indexOf);
         String redirectUrl = cookieValue.substring(indexOf + 1, cookieValue.length());

@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.resourceAllocationManager.writtenEvaluations;
 
 import java.text.ParseException;
@@ -16,7 +34,8 @@ import net.sourceforge.fenixedu.domain.WrittenEvaluation;
 import net.sourceforge.fenixedu.domain.space.SpaceUtils;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction;
 import net.sourceforge.fenixedu.presentationTier.Action.resourceAllocationManager.RAMApplication.RAMEvaluationsApp;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import net.sourceforge.fenixedu.util.HourMinuteSecond;
 
 import org.apache.struts.action.ActionForm;
@@ -127,9 +146,9 @@ public class SearchWrittenEvaluationsByDate extends FenixDispatchAction {
                 }
             }
         }
-        request.setAttribute("availableRoomIndicationMsg", BundleUtil.getStringFromResourceBundle(
-                "resources.ResourceAllocationManagerResources", "info.total.students.vs.available.seats",
-                totalOfStudents.toString(), SpaceUtils.countAllAvailableSeatsForExams().toString()));
+        request.setAttribute("availableRoomIndicationMsg", BundleUtil.getString(Bundle.RESOURCE_ALLOCATION,
+                "info.total.students.vs.available.seats", totalOfStudents.toString(), SpaceUtils.countAllAvailableSeatsForExams()
+                        .toString()));
         request.setAttribute("writtenEvaluations", writtenEvaluations);
         return mapping.findForward("show");
     }

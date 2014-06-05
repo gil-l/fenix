@@ -1,18 +1,31 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.accessControl;
 
 import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
 import org.fenixedu.bennu.core.groups.Group;
 
-import pt.ist.fenixframework.Atomic;
-
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-
 /**
  * A {@link PersistentGroup} which hold a stateless {@link GroupStrategy}.
- * 
+ *
  * For each different type of strategy, there must be at most one single instance of this class.
- * 
+ *
  * @author João Carvalho (joao.pedro.carvalho@tecnico.ulisboa.pt)
  *
  */
@@ -29,23 +42,8 @@ public final class StrategyBasedGroup extends StrategyBasedGroup_Base {
     }
 
     static PersistentGroup getInstance(final GroupStrategy strategy) {
-        Optional<StrategyBasedGroup> optional = select(strategy);
-        return optional.isPresent() ? optional.get() : create(strategy);
+        return singleton(
+                () -> filter(StrategyBasedGroup.class).filter(group -> group.getStrategy().equals(strategy)).findAny(),
+                () -> new StrategyBasedGroup(strategy));
     }
-
-    @Atomic
-    private static StrategyBasedGroup create(GroupStrategy strategy) {
-        Optional<StrategyBasedGroup> optional = select(strategy);
-        return optional.isPresent() ? optional.get() : new StrategyBasedGroup(strategy);
-    }
-
-    private static Optional<StrategyBasedGroup> select(final GroupStrategy strategy) {
-        return filter(StrategyBasedGroup.class).filter(new Predicate<StrategyBasedGroup>() {
-            @Override
-            public boolean apply(StrategyBasedGroup input) {
-                return input.getStrategy().equals(strategy);
-            }
-        }).first();
-    }
-
 }

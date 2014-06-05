@@ -1,10 +1,27 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.backBeans.manager.degree;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import javax.faces.component.UISelectItems;
 import javax.faces.event.ValueChangeEvent;
@@ -20,8 +37,10 @@ import net.sourceforge.fenixedu.domain.exceptions.DomainException;
 import net.sourceforge.fenixedu.injectionCode.IllegalDataAccessException;
 import net.sourceforge.fenixedu.presentationTier.Action.exceptions.FenixActionException;
 import net.sourceforge.fenixedu.presentationTier.backBeans.base.FenixBackingBean;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.Data;
 
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.spaces.domain.Space;
 
 import pt.ist.fenixframework.FenixFramework;
@@ -32,10 +51,6 @@ import pt.ist.fenixframework.FenixFramework;
  * 
  */
 public class CreateExecutionDegreesForExecutionYearBean extends FenixBackingBean {
-    private final ResourceBundle enumerationBundle = getResourceBundle("resources/EnumerationResources");
-
-    private final ResourceBundle domainExceptionBundle = getResourceBundle("resources/DomainExceptionResources");
-
     private String chosenDegreeType;
 
     private String[] choosenDegreeCurricularPlansIDs;
@@ -118,9 +133,10 @@ public class CreateExecutionDegreesForExecutionYearBean extends FenixBackingBean
 
     public List<SelectItem> getDegreeTypes() {
         final List<SelectItem> result = new ArrayList<SelectItem>();
-        result.add(new SelectItem("dropDown.Default", enumerationBundle.getString("dropDown.Default")));
+        result.add(new SelectItem("dropDown.Default", BundleUtil.getString(Bundle.ENUMERATION, "dropDown.Default")));
         for (final DegreeType bolonhaDegreeType : DegreeType.values()) {
-            result.add(new SelectItem(bolonhaDegreeType.name(), enumerationBundle.getString(bolonhaDegreeType.name())));
+            result.add(new SelectItem(bolonhaDegreeType.name(),
+                    BundleUtil.getString(Bundle.ENUMERATION, bolonhaDegreeType.name())));
         }
 
         return result;
@@ -151,8 +167,8 @@ public class CreateExecutionDegreesForExecutionYearBean extends FenixBackingBean
                                 DegreeCurricularPlan.DEGREE_CURRICULAR_PLAN_COMPARATOR_BY_DEGREE_TYPE_AND_EXECUTION_DEGREE_AND_DEGREE_CODE);
 
                 for (final DegreeCurricularPlan degreeCurricularPlan : toShow) {
-                    result.add(new SelectItem(degreeCurricularPlan.getExternalId(), enumerationBundle.getString(degreeType
-                            .getName())
+                    result.add(new SelectItem(degreeCurricularPlan.getExternalId(), BundleUtil.getString(Bundle.ENUMERATION,
+                            degreeType.getName())
                             + " "
                             + degreeCurricularPlan.getDegree().getName()
                             + " - "
@@ -189,8 +205,12 @@ public class CreateExecutionDegreesForExecutionYearBean extends FenixBackingBean
 
             final List<SelectItem> result = new ArrayList<SelectItem>();
             for (final DegreeCurricularPlan degreeCurricularPlan : toShow) {
-                result.add(new SelectItem(degreeCurricularPlan.getExternalId(), enumerationBundle.getString(bolonhaDegreeType
-                        .getName()) + " " + degreeCurricularPlan.getDegree().getName() + " - " + degreeCurricularPlan.getName()));
+                result.add(new SelectItem(degreeCurricularPlan.getExternalId(), BundleUtil.getString(Bundle.ENUMERATION,
+                        bolonhaDegreeType.getName())
+                        + " "
+                        + degreeCurricularPlan.getDegree().getName()
+                        + " - "
+                        + degreeCurricularPlan.getName()));
             }
 
             this.bolonhaDegreeCurricularPlansSelectItems = new UISelectItems();
@@ -322,7 +342,7 @@ public class CreateExecutionDegreesForExecutionYearBean extends FenixBackingBean
         } catch (IllegalDataAccessException e) {
             throw new FenixActionException(e);
         } catch (DomainException e) {
-            addErrorMessage(getFormatedMessage(domainExceptionBundle, e.getKey(), e.getArgs()));
+            addErrorMessage(BundleUtil.getString(Bundle.DOMAIN_EXCEPTION, e.getKey(), e.getArgs()));
             setChoosenDegreeCurricularPlansIDs(null);
             return "";
         }

@@ -1,11 +1,27 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.alumni;
 
 import java.io.ByteArrayOutputStream;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -25,28 +41,26 @@ import net.sourceforge.fenixedu.domain.person.RoleType;
 import net.sourceforge.fenixedu.domain.student.Registration;
 import net.sourceforge.fenixedu.domain.student.Student;
 import net.sourceforge.fenixedu.domain.studentCurriculum.CycleCurriculumGroup;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
-import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.YearMonthDay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pt.utl.ist.fenix.tools.util.excel.Spreadsheet;
 import pt.utl.ist.fenix.tools.util.excel.Spreadsheet.Row;
-import java.util.Locale;
 
 public class AlumniReportFile extends AlumniReportFile_Base {
 
     private static final Logger logger = LoggerFactory.getLogger(AlumniReportFile.class);
 
-    private static final String GABINETE_ESTUDOS_PLANEAMENTO = "Gabinete de Estudos e Planeamento";
-    private transient ResourceBundle eBundle;
-    private transient ResourceBundle appBundle;
-
     private final static String NOT_AVAILABLE = "n/a";
     private final static String DATE_FORMAT = "dd/MM/yyyy";
+
+    private final static Locale PT = new Locale("pt", "PT");
 
     private AlumniReportFile() {
         super();
@@ -69,9 +83,6 @@ public class AlumniReportFile extends AlumniReportFile_Base {
 
     @Override
     public QueueJobResult execute() throws Exception {
-        eBundle = ResourceBundle.getBundle("resources.EnumerationResources", new Locale("pt", "PT"));
-        appBundle = ResourceBundle.getBundle("resources.ApplicationResources", new Locale("pt", "PT"));
-
         ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
 
         Spreadsheet.exportToXLSSheets(byteArrayOS, buildReport());
@@ -87,10 +98,8 @@ public class AlumniReportFile extends AlumniReportFile_Base {
 
     @Override
     public String getFilename() {
-        final ResourceBundle bundle = ResourceBundle.getBundle("resources/GEPResources", I18N.getLocale());
-        return MessageFormat.format(
-                getFullReport() ? bundle.getString("alumni.full.reports.name") : bundle.getString("alumni.partial.reports.name"),
-                getRequestDate());
+        return getFullReport() ? BundleUtil.getString(Bundle.GEP, "alumni.full.reports.name") : BundleUtil.getString(Bundle.GEP,
+                "alumni.partial.reports.name", getRequestDate().toString());
     }
 
     private List<Spreadsheet> buildReport() {
@@ -182,8 +191,7 @@ public class AlumniReportFile extends AlumniReportFile_Base {
                         row.setCell(NOT_AVAILABLE);
                     }
                     row.setCell("Bolonha");
-                    row.setCell(alumni != null && alumni.getIsEmployed() != null ? appBundle.getString("label."
-                            + alumni.getIsEmployed()) : NOT_AVAILABLE);
+                    row.setCell(alumni != null && alumni.getIsEmployed() != null ? getApp("label." + alumni.getIsEmployed()) : NOT_AVAILABLE);
                 }
             } else {
                 if (registration.isRegistrationConclusionProcessed()) {
@@ -194,8 +202,7 @@ public class AlumniReportFile extends AlumniReportFile_Base {
                     row.setCell(registration.getStartDate().toString(DATE_FORMAT));
                     row.setCell(registration.getConclusionDate() != null ? registration.getConclusionDate().toString(DATE_FORMAT) : NOT_AVAILABLE);
                     row.setCell("Pre-Bolonha");
-                    row.setCell(alumni != null && alumni.getIsEmployed() != null ? appBundle.getString("label."
-                            + alumni.getIsEmployed()) : NOT_AVAILABLE);
+                    row.setCell(alumni != null && alumni.getIsEmployed() != null ? getApp("label." + alumni.getIsEmployed()) : NOT_AVAILABLE);
                 }
             }
         }
@@ -281,6 +288,14 @@ public class AlumniReportFile extends AlumniReportFile_Base {
         return person.getEmailForSendingEmails();
     }
 
+    private String getEnum(final String key) {
+        return BundleUtil.getString(Bundle.ENUMERATION, PT, key);
+    }
+
+    private String getApp(final String key) {
+        return BundleUtil.getString(Bundle.APPLICATION, PT, key);
+    }
+
     private void addJobDataRow(Spreadsheet sheet, String alumniName, Integer studentNumber, Job job) {
         // "IDENTIFICADOR", "NOME", "NUMERO_ALUNO", "EMPREGADOR", "CIDADE",
         // "PAIS",
@@ -299,10 +314,10 @@ public class AlumniReportFile extends AlumniReportFile_Base {
         row.setCell(job.getPosition());
         row.setCell(job.getBeginDate() != null ? job.getBeginDate().toString(DATE_FORMAT) : NOT_AVAILABLE);
         row.setCell(job.getEndDate() != null ? job.getEndDate().toString(DATE_FORMAT) : NOT_AVAILABLE);
-        row.setCell(job.getContractType() != null ? eBundle.getString(job.getContractType().getQualifiedName()) : NOT_AVAILABLE);
-        row.setCell(job.getJobApplicationType() != null ? eBundle.getString(job.getJobApplicationType().getQualifiedName()) : NOT_AVAILABLE);
+        row.setCell(job.getContractType() != null ? getEnum(job.getContractType().getQualifiedName()) : NOT_AVAILABLE);
+        row.setCell(job.getJobApplicationType() != null ? getEnum(job.getJobApplicationType().getQualifiedName()) : NOT_AVAILABLE);
         row.setCell(job.getSalary() != null ? job.getSalary().toString() : NOT_AVAILABLE);
-        row.setCell(job.getSalaryType() != null ? eBundle.getString(job.getSalaryType().getQualifiedName()) : NOT_AVAILABLE);
+        row.setCell(job.getSalaryType() != null ? getEnum(job.getSalaryType().getQualifiedName()) : NOT_AVAILABLE);
         row.setCell(job.getLastModifiedDate() != null ? job.getLastModifiedDate().toString(DATE_FORMAT) : NOT_AVAILABLE);
         AlumniIdentityCheckRequest lastIdentityRequest = job.getPerson().getStudent().getAlumni().getLastIdentityRequest();
         row.setCell(lastIdentityRequest != null ? lastIdentityRequest.getCreationDateTime().toString(DATE_FORMAT) : NOT_AVAILABLE);
@@ -318,8 +333,8 @@ public class AlumniReportFile extends AlumniReportFile_Base {
         row.setCell(formation.getExternalId());
         row.setCell(alumniName);
         row.setCell(studentNumber);
-        row.setCell(formation.getFormationType() != null ? eBundle.getString(formation.getFormationType().getQualifiedName()) : NOT_AVAILABLE);
-        row.setCell(formation.getType() != null ? eBundle.getString(formation.getType().getQualifiedName()) : NOT_AVAILABLE);
+        row.setCell(formation.getFormationType() != null ? getEnum(formation.getFormationType().getQualifiedName()) : NOT_AVAILABLE);
+        row.setCell(formation.getType() != null ? getEnum(formation.getType().getQualifiedName()) : NOT_AVAILABLE);
         row.setCell(formation.getInstitution() != null ? formation.getInstitution().getUnitName().getName() : NOT_AVAILABLE);
         row.setCell(formation.getEducationArea() != null ? formation.getEducationArea().getCode() : NOT_AVAILABLE);
         row.setCell(formation.getEducationArea() != null ? formation.getEducationArea().getDescription().replace(';', '|') : NOT_AVAILABLE);

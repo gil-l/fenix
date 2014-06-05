@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.messaging;
 
 import java.util.Comparator;
@@ -11,6 +29,7 @@ import net.sourceforge.fenixedu.domain.FileContent;
 import net.sourceforge.fenixedu.domain.Person;
 import net.sourceforge.fenixedu.domain.Site;
 import net.sourceforge.fenixedu.domain.exceptions.DomainException;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.fenixedu.bennu.core.groups.Group;
 
@@ -138,28 +157,28 @@ public class ExecutionCourseAnnouncementBoard extends ExecutionCourseAnnouncemen
 
     @Override
     public void logCreate(Announcement announcement) {
-        ContentManagementLog.createLog(this.getExecutionCourse(), "resources.MessagingResources",
+        ContentManagementLog.createLog(this.getExecutionCourse(), Bundle.MESSAGING,
                 "log.executionCourse.content.announcement.added", announcement.getName().getContent(), this.getExecutionCourse()
                         .getNome(), this.getExecutionCourse().getDegreePresentationString());
     }
 
     @Override
     public void logEdit(Announcement announcement) {
-        ContentManagementLog.createLog(this.getExecutionCourse(), "resources.MessagingResources",
+        ContentManagementLog.createLog(this.getExecutionCourse(), Bundle.MESSAGING,
                 "log.executionCourse.content.announcement.edited", announcement.getName().getContent(), this.getExecutionCourse()
                         .getNome(), this.getExecutionCourse().getDegreePresentationString());
     }
 
     @Override
     public void logRemove(Announcement announcement) {
-        ContentManagementLog.createLog(this.getExecutionCourse(), "resources.MessagingResources",
+        ContentManagementLog.createLog(this.getExecutionCourse(), Bundle.MESSAGING,
                 "log.executionCourse.content.announcement.removed", announcement.getName().getContent(), this
                         .getExecutionCourse().getNome(), this.getExecutionCourse().getDegreePresentationString());
     }
 
     @Override
     public void logAddFile(FileContent attachment) {
-        ContentManagementLog.createLog(getExecutionCourse(), "resources.MessagingResources",
+        ContentManagementLog.createLog(getExecutionCourse(), Bundle.MESSAGING,
                 "log.executionCourse.content.file.added", attachment.getDisplayName(), getExecutionCourse().getNome(),
                 getExecutionCourse().getDegreePresentationString());
     }

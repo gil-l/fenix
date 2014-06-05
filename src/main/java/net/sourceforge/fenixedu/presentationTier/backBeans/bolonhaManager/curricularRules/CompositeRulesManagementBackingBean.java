@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 /*
  * Created on Feb 21, 2006
  */
@@ -15,7 +33,10 @@ import net.sourceforge.fenixedu.applicationTier.Servico.exceptions.NotAuthorized
 import net.sourceforge.fenixedu.domain.curricularRules.CurricularRule;
 import net.sourceforge.fenixedu.domain.exceptions.DomainException;
 import net.sourceforge.fenixedu.domain.util.LogicOperator;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.CurricularRuleLabelFormatter;
+
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 public class CompositeRulesManagementBackingBean extends CurricularRulesManagementBackingBean {
 
@@ -82,7 +103,7 @@ public class CompositeRulesManagementBackingBean extends CurricularRulesManageme
         if (endExecutionPeriodItemsForCompositeRule == null) {
             endExecutionPeriodItemsForCompositeRule = new UISelectItems();
             final List<SelectItem> values = new ArrayList<SelectItem>(readExecutionPeriodItems());
-            values.add(0, new SelectItem(NO_SELECTION_STRING, bolonhaResources.getString("opened")));
+            values.add(0, new SelectItem(NO_SELECTION_STRING, BundleUtil.getString(Bundle.BOLONHA, "opened")));
             endExecutionPeriodItemsForCompositeRule.setValue(values);
         }
         return endExecutionPeriodItemsForCompositeRule;
@@ -98,11 +119,11 @@ public class CompositeRulesManagementBackingBean extends CurricularRulesManageme
             setSelectedCurricularRuleIDs(null);
             getCurricularRuleItems().setValue(readCurricularRulesLabels());
         } catch (NotAuthorizedException e) {
-            addErrorMessage(bolonhaResources.getString("error.notAuthorized"));
+            addErrorMessage(BundleUtil.getString(Bundle.BOLONHA, "error.notAuthorized"));
         } catch (FenixServiceException e) {
-            addErrorMessage(bolonhaResources.getString(e.getMessage()));
+            addErrorMessage(BundleUtil.getString(Bundle.BOLONHA, e.getMessage()));
         } catch (DomainException e) {
-            addErrorMessage(domainResources.getString(e.getMessage()));
+            addErrorMessage(BundleUtil.getString(Bundle.DOMAIN_EXCEPTION, e.getMessage()));
         }
         return "";
     }

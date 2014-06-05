@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.backBeans.bolonhaManager.curricularPlans;
 
 import java.util.List;
@@ -6,6 +24,10 @@ import net.sourceforge.fenixedu.domain.ExecutionYear;
 import net.sourceforge.fenixedu.domain.degreeStructure.CycleCourseGroup;
 import net.sourceforge.fenixedu.domain.degreeStructure.CycleCourseGroupInformation;
 import net.sourceforge.fenixedu.domain.exceptions.DomainException;
+import net.sourceforge.fenixedu.util.Bundle;
+
+import org.fenixedu.bennu.core.i18n.BundleUtil;
+
 import pt.ist.fenixframework.FenixFramework;
 
 public class CycleCourseGroupInformationManagementBackingBean extends CurricularCourseManagementBackingBean {
@@ -37,7 +59,7 @@ public class CycleCourseGroupInformationManagementBackingBean extends Curricular
             courseGroup.createCycleCourseGroupInformation(getInformationExecutionYear(), getGraduatedTitle(),
                     getGraduatedTitleEn());
 
-            this.addInfoMessage(bolonhaBundle.getString("cycleCourseGroupInformationAdded"));
+            this.addInfoMessage(BundleUtil.getString(Bundle.BOLONHA, "cycleCourseGroupInformationAdded"));
 
             setInformationExecutionYearId(null);
             setGraduatedTitle("");
@@ -45,7 +67,7 @@ public class CycleCourseGroupInformationManagementBackingBean extends Curricular
 
             return "editCurricularPlanStructure";
         } catch (DomainException e) {
-            this.addErrorMessage(bolonhaBundle.getString(e.getMessage()));
+            this.addErrorMessage(BundleUtil.getString(Bundle.BOLONHA, e.getMessage()));
             return "";
         }
     }
@@ -64,7 +86,7 @@ public class CycleCourseGroupInformationManagementBackingBean extends Curricular
             CycleCourseGroupInformation information = getInformation();
             information.edit(getEditInformationExecutionYear(), getEditGraduatedTitle(), getEditGraduatedTitleEn());
 
-            this.addInfoMessage(bolonhaBundle.getString("cycleCourseGroupInformationEdit"));
+            this.addInfoMessage(BundleUtil.getString(Bundle.BOLONHA, "cycleCourseGroupInformationEdit"));
 
             setEditGraduatedTitle("");
             setEditGraduatedTitleEn("");
@@ -72,7 +94,7 @@ public class CycleCourseGroupInformationManagementBackingBean extends Curricular
 
             return "editCurricularPlanStructure";
         } catch (DomainException e) {
-            this.addErrorMessage(bolonhaBundle.getString(e.getMessage()));
+            this.addErrorMessage(BundleUtil.getString(Bundle.BOLONHA, e.getMessage()));
             return "";
         }
     }

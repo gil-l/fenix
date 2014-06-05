@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 /*
  * Created on Sep 16, 2005
  *	by mrsp
@@ -10,7 +28,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -42,12 +59,13 @@ import net.sourceforge.fenixedu.domain.util.email.UnitBasedSender;
 import net.sourceforge.fenixedu.domain.vigilancy.ExamCoordinator;
 import net.sourceforge.fenixedu.domain.vigilancy.VigilantGroup;
 import net.sourceforge.fenixedu.injectionCode.AccessControl;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.domain.OrderedRelationAdapter;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.Group;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.StringNormalizer;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.YearMonthDay;
@@ -57,8 +75,6 @@ import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
 public class Unit extends Unit_Base {
 
-    private static final ResourceBundle applicationResourcesBundle = ResourceBundle.getBundle("resources.ApplicationResources",
-            new Locale("pt"));
     public static OrderedRelationAdapter<Unit, Function> FUNCTION_ORDERED_ADAPTER;
     static {
         FUNCTION_ORDERED_ADAPTER = new OrderedRelationAdapter<Unit, Function>("activeFunctions", "functionOrder");
@@ -922,11 +938,11 @@ public class Unit extends Unit_Base {
     public String getPresentationNameWithParentsAndBreakLine() {
         String parentUnits = getParentUnitsPresentationNameWithBreakLine();
         return (!StringUtils.isEmpty(parentUnits.trim())) ? parentUnits
-                + applicationResourcesBundle.getString("label.html.breakLine") + getPresentationName() : getPresentationName();
+                + BundleUtil.getString(Bundle.APPLICATION, "label.html.breakLine") + getPresentationName() : getPresentationName();
     }
 
     public String getParentUnitsPresentationNameWithBreakLine() {
-        return getParentUnitsPresentationName(applicationResourcesBundle.getString("label.html.breakLine"));
+        return getParentUnitsPresentationName(BundleUtil.getString(Bundle.APPLICATION, "label.html.breakLine"));
     }
 
     public String getParentUnitsPresentationName() {
@@ -1274,9 +1290,7 @@ public class Unit extends Unit_Base {
             }
         }
         if (result.isEmpty()) {
-            result =
-                    result.with(Locale.getDefault(),
-                            BundleUtil.getStringFromResourceBundle("resources/GlobalResources", "institution.name"));
+            result = result.with(Locale.getDefault(), BundleUtil.getString(Bundle.GLOBAL, "institution.name"));
         }
 
         return result;
@@ -1292,7 +1306,7 @@ public class Unit extends Unit_Base {
             }
         }
         if (result.isEmpty()) {
-            result = BundleUtil.getStringFromResourceBundle("resources/GlobalResources", "institution.name.abbreviation");
+            result = BundleUtil.getString(Bundle.GLOBAL, "institution.name.abbreviation");
         }
 
         return result;

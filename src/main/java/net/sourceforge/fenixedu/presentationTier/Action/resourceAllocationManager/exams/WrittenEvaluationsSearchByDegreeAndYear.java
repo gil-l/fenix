@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.resourceAllocationManager.exams;
 
 import java.util.ArrayList;
@@ -23,6 +41,7 @@ import net.sourceforge.fenixedu.domain.time.calendarStructure.AcademicInterval;
 import net.sourceforge.fenixedu.domain.time.calendarStructure.AcademicPeriod;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixContextDispatchAction;
 import net.sourceforge.fenixedu.presentationTier.Action.resourceAllocationManager.RAMApplication.RAMEvaluationsApp;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.commons.beanutils.BeanComparator;
 import org.apache.struts.action.ActionForm;
@@ -62,8 +81,8 @@ public class WrittenEvaluationsSearchByDegreeAndYear extends FenixContextDispatc
         AcademicInterval academicInterval = (AcademicInterval) bean.getObject();
         request.setAttribute("bean", bean);
 
-        final MessageResources enumMessages = MessageResources.getMessageResources("resources/EnumerationResources");
-        final MessageResources messages = MessageResources.getMessageResources("resources/PublicDegreeInformation");
+        final MessageResources enumMessages = MessageResources.getMessageResources(Bundle.ENUMERATION);
+        final MessageResources messages = MessageResources.getMessageResources(Bundle.DEGREE);
 
         final List<LabelValueBean> executionDegreeLabelValueBeans = new ArrayList<LabelValueBean>();
         for (final ExecutionDegree executionDegree : ExecutionDegree.filterByAcademicInterval(academicInterval)) {

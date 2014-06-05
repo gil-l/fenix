@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain;
 
 import java.math.BigDecimal;
@@ -9,7 +27,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -44,6 +61,7 @@ import net.sourceforge.fenixedu.domain.studentCurriculum.InternalEnrolmentWrappe
 import net.sourceforge.fenixedu.domain.studentCurriculum.OptionalDismissal;
 import net.sourceforge.fenixedu.domain.thesis.Thesis;
 import net.sourceforge.fenixedu.domain.util.FactoryExecutor;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.EnrolmentAction;
 import net.sourceforge.fenixedu.util.EnrolmentEvaluationState;
 
@@ -51,6 +69,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.comparators.ComparatorChain;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.joda.time.DateTime;
 import org.joda.time.YearMonthDay;
@@ -101,10 +120,6 @@ public class Enrolment extends Enrolment_Base implements IEnrolment {
             return s1 == s2 ? e1.getExternalId().compareTo(e2.getExternalId()) : s1 - s2;
         }
     };
-
-    private Integer accumulatedWeight;
-
-    private Double accumulatedEctsCredits;
 
     public Enrolment() {
         super();
@@ -233,14 +248,6 @@ public class Enrolment extends Enrolment_Base implements IEnrolment {
     }
 
     // end
-
-    final public Integer getAccumulatedWeight() {
-        return accumulatedWeight;
-    }
-
-    final public void setAccumulatedWeight(Integer accumulatedWeight) {
-        this.accumulatedWeight = accumulatedWeight;
-    }
 
     protected void initializeAsNew(StudentCurricularPlan studentCurricularPlan, CurricularCourse curricularCourse,
             ExecutionSemester executionSemester, EnrollmentCondition enrolmentCondition, String createdBy) {
@@ -1163,14 +1170,6 @@ public class Enrolment extends Enrolment_Base implements IEnrolment {
         return getLatestEnrolmentEvaluationBy(EnrolmentEvaluationType.EQUIVALENCE);
     }
 
-    final public Double getAccumulatedEctsCredits() {
-        return accumulatedEctsCredits;
-    }
-
-    final public void setAccumulatedEctsCredits(Double ectsCredits) {
-        this.accumulatedEctsCredits = ectsCredits;
-    }
-
     @Override
     final public List<Enrolment> getEnrolments() {
         return Collections.singletonList(this);
@@ -1410,14 +1409,8 @@ public class Enrolment extends Enrolment_Base implements IEnrolment {
 
     @Override
     final public double getAccumulatedEctsCredits(final ExecutionSemester executionSemester) {
-        if (!isBolonhaDegree()) {
-            return accumulatedEctsCredits;
-        }
-        if (!parentAllowAccumulatedEctsCredits()) {
-            return 0d;
-        }
-
-        return getStudentCurricularPlan().getAccumulatedEctsCredits(executionSemester, getCurricularCourse());
+        return isBolonhaDegree() && !parentAllowAccumulatedEctsCredits() ? 0d : getStudentCurricularPlan()
+                .getAccumulatedEctsCredits(executionSemester, getCurricularCourse());
     }
 
     final public boolean isImprovementEnroled() {
@@ -1764,8 +1757,7 @@ public class Enrolment extends Enrolment_Base implements IEnrolment {
 
     @Override
     public String getModuleTypeName() {
-        ResourceBundle enumerationResources = ResourceBundle.getBundle("resources.EnumerationResources");
-        return enumerationResources.getString(this.getClass().getName());
+        return BundleUtil.getString(Bundle.ENUMERATION, this.getClass().getName());
     }
 
     @ConsistencyPredicate

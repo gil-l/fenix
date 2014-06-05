@@ -1,9 +1,25 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.internationalRelatOffice.internship;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -17,11 +33,13 @@ import net.sourceforge.fenixedu.domain.internship.InternshipCandidacy;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction;
 import net.sourceforge.fenixedu.presentationTier.Action.exceptions.FenixActionException;
 import net.sourceforge.fenixedu.presentationTier.Action.internationalRelatOffice.InternationalRelationsApplication.InternRelationsInternshipApp;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.portal.EntryPoint;
 import org.fenixedu.bennu.portal.StrutsFunctionality;
 import org.joda.time.Interval;
@@ -49,9 +67,6 @@ import pt.utl.ist.fenix.tools.util.excel.Spreadsheet.Row;
 public class InternshipCandidacyDA extends FenixDispatchAction {
 
     private static final Logger logger = LoggerFactory.getLogger(InternshipCandidacyDA.class);
-
-    private static final ResourceBundle ENUMERATION_RESOURCES = ResourceBundle.getBundle("resources/EnumerationResources",
-            new Locale("pt"));
 
     private static final String[] HEADERS = new String[] { "Nº Candidatura", "Universidade", "Nº Aluno", "Ano", "Curso", "Ramo",
             "Nome", "Sexo", "Data Nascimento", "Naturalidade", "Nacionalidade", "B.I. (ou Cartão do Cidadão)", "Arquivo",
@@ -200,10 +215,10 @@ public class InternshipCandidacyDA extends FenixDispatchAction {
                     .toLowerCase() : ""));
             row.setCell(StringUtils.capitalize(bean.getThirdDestination() != null ? bean.getThirdDestination().getName()
                     .toLowerCase() : ""));
-            row.setCell(ENUMERATION_RESOURCES.getString(bean.getEnglish().getQualifiedKey()));
-            row.setCell(ENUMERATION_RESOURCES.getString(bean.getFrench().getQualifiedKey()));
-            row.setCell(ENUMERATION_RESOURCES.getString(bean.getSpanish().getQualifiedKey()));
-            row.setCell(ENUMERATION_RESOURCES.getString(bean.getGerman().getQualifiedKey()));
+            row.setCell(BundleUtil.getString(Bundle.ENUMERATION, bean.getEnglish().getQualifiedKey()));
+            row.setCell(BundleUtil.getString(Bundle.ENUMERATION, bean.getFrench().getQualifiedKey()));
+            row.setCell(BundleUtil.getString(Bundle.ENUMERATION, bean.getSpanish().getQualifiedKey()));
+            row.setCell(BundleUtil.getString(Bundle.ENUMERATION, bean.getGerman().getQualifiedKey()));
             row.setCell(bean.getPreviousCandidacy() ? "Sim" : "Não");
         }
 

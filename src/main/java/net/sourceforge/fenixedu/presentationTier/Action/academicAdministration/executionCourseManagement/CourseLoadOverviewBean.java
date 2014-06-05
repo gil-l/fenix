@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.academicAdministration.executionCourseManagement;
 
 import java.io.Serializable;
@@ -14,7 +32,8 @@ import net.sourceforge.fenixedu.domain.ExecutionSemester;
 import net.sourceforge.fenixedu.domain.Lesson;
 import net.sourceforge.fenixedu.domain.Shift;
 import net.sourceforge.fenixedu.domain.ShiftType;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
@@ -47,7 +66,7 @@ public class CourseLoadOverviewBean implements Serializable {
 
     public StyledExcelSpreadsheet getInconsistencySpreadsheet() {
         final StyledExcelSpreadsheet spreadsheet =
-                new StyledExcelSpreadsheet(BundleUtil.getStringFromResourceBundle("resources.AcademicAdminOffice",
+                new StyledExcelSpreadsheet(BundleUtil.getString(Bundle.ACADEMIC,
                         "label.course.load.inconsistency.filename")
                         + "_"
                         + executionSemester.getExecutionYear().getYear().replace('/', '_')
@@ -72,21 +91,21 @@ public class CourseLoadOverviewBean implements Serializable {
         yellowStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
 
         spreadsheet.newHeaderRow();
-        spreadsheet.addHeader(BundleUtil.getStringFromResourceBundle("resources.AcademicAdminOffice", "label.department"));
-        spreadsheet.addHeader(BundleUtil.getStringFromResourceBundle("resources.AcademicAdminOffice", "label.degree"));
-        spreadsheet.addHeader(BundleUtil.getStringFromResourceBundle("resources.AcademicAdminOffice", "label.executionCourse"));
-        spreadsheet.addHeader(BundleUtil.getStringFromResourceBundle("resources.AcademicAdminOffice", "label.shift"));
-        spreadsheet.addHeader(BundleUtil.getStringFromResourceBundle("resources.AcademicAdminOffice", "label.shiftType"));
-        spreadsheet.addHeader(BundleUtil.getStringFromResourceBundle("resources.AcademicAdminOffice",
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.ACADEMIC, "label.department"));
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.ACADEMIC, "label.degree"));
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.ACADEMIC, "label.executionCourse"));
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.ACADEMIC, "label.shift"));
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.ACADEMIC, "label.shiftType"));
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.ACADEMIC,
                 "label.load.competenceCourse"));
-        spreadsheet.addHeader(BundleUtil.getStringFromResourceBundle("resources.AcademicAdminOffice",
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.ACADEMIC,
                 "label.load.curricularCourse"));
-        spreadsheet.addHeader(BundleUtil.getStringFromResourceBundle("resources.AcademicAdminOffice",
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.ACADEMIC,
                 "label.load.executionCourse"));
-        spreadsheet.addHeader(BundleUtil.getStringFromResourceBundle("resources.AcademicAdminOffice",
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.ACADEMIC,
                 "label.load.lessonInstances"));
-        spreadsheet.addHeader(BundleUtil.getStringFromResourceBundle("resources.AcademicAdminOffice", "label.load.lesson.count"));
-        spreadsheet.addHeader(BundleUtil.getStringFromResourceBundle("resources.AcademicAdminOffice",
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.ACADEMIC, "label.load.lesson.count"));
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.ACADEMIC,
                 "label.load.lessonInstances.count"));
 
         for (final ExecutionCourse executionCourse : executionSemester.getAssociatedExecutionCoursesSet()) {

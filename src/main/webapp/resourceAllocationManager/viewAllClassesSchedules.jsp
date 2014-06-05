@@ -1,3 +1,23 @@
+<%--
+
+    Copyright © 2002 Instituto Superior Técnico
+
+    This file is part of FenixEdu Core.
+
+    FenixEdu Core is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    FenixEdu Core is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+
+--%>
 <%@ page language="java" %>
 <%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@ taglib uri="http://jakarta.apache.org/taglibs/struts-example-1.0" prefix="app" %>
@@ -11,6 +31,7 @@
 <c:forEach var="degree" items="${degrees}">
 	<c:forEach var="schoolClass" items="${degree.schoolClassesSet}">
 		<c:if test="${schoolClass.academicInterval == academicInterval}">
+			<div class="single">
 			<div class="alert alert-warning">
 				${degree.presentationName} - ${academicInterval.pathName}
 			</div>
@@ -21,9 +42,17 @@
 			</div>
 			<br /><br />
 			<c:set var="foundAny" value="${true}" />
+			</div>
 		</c:if>
 	</c:forEach>
 </c:forEach>
+
+<style type="text/css" media="print">
+.single {
+	page-break-after: always;
+	page-break-inside: avoid;
+}
+</style>
 
 <c:if test="${!foundAny}">
 	<span class="error"><bean:message key="message.classes.notExisting"/></span>

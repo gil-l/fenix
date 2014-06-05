@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.backBeans.bolonhaManager.curricularPlans;
 
 import java.util.ArrayList;
@@ -6,14 +24,15 @@ import java.util.List;
 
 import javax.faces.model.SelectItem;
 
-import org.fenixedu.commons.i18n.I18N;
-
 import net.sourceforge.fenixedu.applicationTier.Servico.bolonhaManager.CreateBranchCourseGroup;
 import net.sourceforge.fenixedu.applicationTier.Servico.exceptions.FenixServiceException;
 import net.sourceforge.fenixedu.domain.degreeStructure.BranchType;
 import net.sourceforge.fenixedu.domain.exceptions.DomainException;
 import net.sourceforge.fenixedu.injectionCode.IllegalDataAccessException;
-import java.util.Locale;
+import net.sourceforge.fenixedu.util.Bundle;
+
+import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.commons.i18n.I18N;
 
 public class BranchCourseGroupManagementBackingBean extends CourseGroupManagementBackingBean {
 
@@ -21,7 +40,7 @@ public class BranchCourseGroupManagementBackingBean extends CourseGroupManagemen
     private List<SelectItem> branchTypes = null;
 
     public String getBranchTypeName() {
-        return (branchTypeName != null) ? branchTypeName : BranchType.MAJOR.getName();//BundleUtil.getStringFromResourceBundle("resources.BolonhaManagerResources", "choose");
+        return (branchTypeName != null) ? branchTypeName : BranchType.MAJOR.getName();
     }
 
     public void setBranchTypeName(String branchTypeName) {
@@ -30,13 +49,6 @@ public class BranchCourseGroupManagementBackingBean extends CourseGroupManagemen
 
     public BranchType getBranchType() {
         return BranchType.valueOf(getBranchTypeName());
-        /*
-        if(branchType == null && getCourseGroupID() != null) {
-            CourseGroup group = getCourseGroup(getCourseGroupID());
-            return (group instanceof BranchCourseGroup ? ((BranchCourseGroup) group).getBranchType() : branchType);
-        }
-            return branchType;
-            */
     }
 
     public List<SelectItem> getBranchTypes() {
@@ -56,15 +68,15 @@ public class BranchCourseGroupManagementBackingBean extends CourseGroupManagemen
         try {
             CreateBranchCourseGroup.run(getDegreeCurricularPlanID(), getParentCourseGroupID(), getName(), getNameEn(),
                     getBranchType(), getBeginExecutionPeriodID(), getFinalEndExecutionPeriodID());
-            addInfoMessage(bolonhaBundle.getString("branchCourseGroupCreated"));
+            addInfoMessage(BundleUtil.getString(Bundle.BOLONHA, "branchCourseGroupCreated"));
             return "editCurricularPlanStructure";
         } catch (IllegalDataAccessException e) {
-            this.addErrorMessage(bolonhaBundle.getString("error.notAuthorized"));
+            this.addErrorMessage(BundleUtil.getString(Bundle.BOLONHA, "error.notAuthorized"));
             return "editCurricularPlanStructure";
         } catch (final FenixServiceException e) {
-            addErrorMessage(bolonhaBundle.getString(e.getMessage()));
+            addErrorMessage(BundleUtil.getString(Bundle.BOLONHA, e.getMessage()));
         } catch (final DomainException e) {
-            addErrorMessage(domainExceptionBundle.getString(e.getMessage()));
+            addErrorMessage(BundleUtil.getString(Bundle.DOMAIN_EXCEPTION, e.getMessage()));
         }
         return "";
     }

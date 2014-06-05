@@ -1,7 +1,24 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.accessControl;
 
 import java.util.HashSet;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import net.sourceforge.fenixedu.domain.Degree;
@@ -9,12 +26,13 @@ import net.sourceforge.fenixedu.domain.organizationalStructure.Function;
 import net.sourceforge.fenixedu.domain.organizationalStructure.FunctionType;
 import net.sourceforge.fenixedu.domain.organizationalStructure.PersonFunction;
 import net.sourceforge.fenixedu.domain.student.Student;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.fenixedu.bennu.core.annotation.GroupArgument;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
-import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 
 import com.google.common.base.Objects;
@@ -53,17 +71,17 @@ public class DelegatesGroup extends FenixGroup {
 
     @Override
     public String getPresentationName() {
-        final ResourceBundle resourceBundle = ResourceBundle.getBundle(getPresentationNameBundle(), I18N.getLocale());
         if (degree != null) {
-            return resourceBundle.getString("label." + getClass().getSimpleName()) + " " + resourceBundle.getString("label.of")
-                    + " " + degree.getSigla();
+            return BundleUtil.getString(getPresentationNameBundle(), "label." + getClass().getSimpleName()) + " "
+                    + BundleUtil.getString(getPresentationNameBundle(), "label.of") + " " + degree.getSigla();
         }
-        return resourceBundle.getString("label." + getClass().getSimpleName() + "." + function.getName());
+        return BundleUtil
+                .getString(getPresentationNameBundle(), "label." + getClass().getSimpleName() + "." + function.getName());
     }
 
     @Override
     public String getPresentationNameBundle() {
-        return "resources.DelegateResources";
+        return Bundle.DELEGATE;
     }
 
     @Override

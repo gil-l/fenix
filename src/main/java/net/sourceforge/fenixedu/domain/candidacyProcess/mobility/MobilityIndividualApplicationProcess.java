@@ -1,9 +1,26 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.candidacyProcess.mobility;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import net.sourceforge.fenixedu.caseHandling.StartActivity;
@@ -38,12 +55,13 @@ import net.sourceforge.fenixedu.domain.exceptions.DomainException;
 import net.sourceforge.fenixedu.domain.period.MobilityApplicationPeriod;
 import net.sourceforge.fenixedu.domain.person.RoleType;
 import net.sourceforge.fenixedu.domain.student.Student;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -296,8 +314,7 @@ public class MobilityIndividualApplicationProcess extends MobilityIndividualAppl
 
     @Override
     public String getDisplayName() {
-        return ResourceBundle.getBundle("resources/CaseHandlingResources", I18N.getLocale())
-                .getString(getClass().getSimpleName());
+        return BundleUtil.getString(Bundle.CASE_HANDLEING, getClass().getSimpleName());
     }
 
     public List<CurricularCourse> getSortedSelectedCurricularCourses() {
@@ -376,23 +393,21 @@ public class MobilityIndividualApplicationProcess extends MobilityIndividualAppl
     }
 
     public String getErasmusCandidacyStateDescription() {
-        ResourceBundle bundle = ResourceBundle.getBundle("resources.CandidateResources", I18N.getLocale());
-
         String registeredMessage =
-                getCandidacy().hasRegistration() ? "/" + bundle.getString("label.erasmus.candidacy.state.registered") : "";
+                getCandidacy().hasRegistration() ? "/" + BundleUtil.getString(Bundle.CANDIDATE, "label.erasmus.candidacy.state.registered") : "";
         if (isCandidacyCancelled()) {
-            return bundle.getString("label.erasmus.candidacy.state.description.cancelled") + registeredMessage;
+            return BundleUtil.getString(Bundle.CANDIDATE, "label.erasmus.candidacy.state.description.cancelled") + registeredMessage;
         }
 
         if (isCandidacyRejected()) {
-            return bundle.getString("label.erasmus.candidacy.state.description.rejected") + registeredMessage;
+            return BundleUtil.getString(Bundle.CANDIDATE, "label.erasmus.candidacy.state.description.rejected") + registeredMessage;
         }
 
         if (isCandidacyInStandBy() && isStudentAccepted()) {
-            return bundle.getString("label.erasmus.candidacy.state.description.student.accepted") + registeredMessage;
+            return BundleUtil.getString(Bundle.CANDIDATE, "label.erasmus.candidacy.state.description.student.accepted") + registeredMessage;
         }
 
-        return bundle.getString("label.erasmus.candidacy.state.description.student.pending") + registeredMessage;
+        return BundleUtil.getString(Bundle.CANDIDATE, "label.erasmus.candidacy.state.description.student.pending") + registeredMessage;
     }
 
     @StartActivity

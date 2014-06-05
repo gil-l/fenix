@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 /*
  * Created on Jan 16, 2006
  *	by mrsp
@@ -39,7 +57,7 @@ import net.sourceforge.fenixedu.domain.Summary;
 import net.sourceforge.fenixedu.domain.Teacher;
 import net.sourceforge.fenixedu.domain.teacher.DegreeTeachingService;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.lang.StringUtils;
@@ -47,6 +65,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.util.LabelValueBean;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.portal.EntryPoint;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -502,7 +521,7 @@ public abstract class SummariesControlAction extends FenixDispatchAction {
         String controlCategory = null;
         if (!StringUtils.isEmpty(categoryControl)) {
             summaryControlCategory = SummaryControlCategory.valueOf(categoryControl);
-            controlCategory = getResourceMessage(ENUMERATION_MODULE, summaryControlCategory.toString());
+            controlCategory = BundleUtil.getString(Bundle.ENUMERATION, summaryControlCategory.toString());
         } else {
             controlCategory = "0-100";
         }
@@ -517,7 +536,7 @@ public abstract class SummariesControlAction extends FenixDispatchAction {
             String date = fmt.print(dt);
 
             final String filename =
-                    getResourceMessage(DEFAULT_MODULE, "link.summaries.control").replaceAll(" ", "_") + "_" + controlCategory
+                    BundleUtil.getString(Bundle.APPLICATION,  "link.summaries.control").replaceAll(" ", "_") + "_" + controlCategory
                             + "_" + sigla + "_" + date + ".xls";
 
             response.setContentType("application/vnd.ms-excel");
@@ -534,7 +553,7 @@ public abstract class SummariesControlAction extends FenixDispatchAction {
     private void exportToXls(DepartmentSummaryElement departmentSummaryResume, final Department department,
             final ExecutionSemester executionSemester, final OutputStream os) throws IOException {
         final StyledExcelSpreadsheet spreadsheet =
-                new StyledExcelSpreadsheet(getResourceMessage(DEFAULT_MODULE, "link.summaries.control"));
+                new StyledExcelSpreadsheet(BundleUtil.getString(Bundle.APPLICATION,  "link.summaries.control"));
 
         fillSpreadSheet(departmentSummaryResume, department, executionSemester, spreadsheet);
         spreadsheet.getWorkbook().write(os);
@@ -603,20 +622,17 @@ public abstract class SummariesControlAction extends FenixDispatchAction {
     private void setHeaders(final StyledExcelSpreadsheet spreadsheet) {
         spreadsheet.newHeaderRow();
 
-        spreadsheet.addHeader(getResourceMessage(DEFAULT_MODULE, "label.excel.semester"));
-        spreadsheet.addHeader(getResourceMessage(DEFAULT_MODULE, "label.excel.department"), 10000);
-        spreadsheet.addHeader(getResourceMessage(DEFAULT_MODULE, "label.excel.course"), 10000);
-        spreadsheet.addHeader(getResourceMessage(DEFAULT_MODULE, "label.excel.lessons"));
-        spreadsheet.addHeader(getResourceMessage(DEFAULT_MODULE, "label.excel.lessons.summaries"));
-        spreadsheet.addHeader(getResourceMessage(DEFAULT_MODULE, "label.excel.lessons.summaries.percentage"));
-        spreadsheet.addHeader(getResourceMessage(DEFAULT_MODULE, "label.excel.lessons.notTaught.summaries"));
-        spreadsheet.addHeader(getResourceMessage(DEFAULT_MODULE, "label.excel.lessons.notTaught.summaries.percentage"));
-        spreadsheet.addHeader(getResourceMessage(DEFAULT_MODULE, "label.excel.professorName"), 10000);
-        spreadsheet.addHeader(getResourceMessage(DEFAULT_MODULE, "label.excel.professorUsername"));
-        spreadsheet.addHeader(getResourceMessage(DEFAULT_MODULE, "label.excel.professorEmail"), 10000);
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.APPLICATION,  "label.excel.semester"));
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.APPLICATION,  "label.excel.department"), 10000);
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.APPLICATION,  "label.excel.course"), 10000);
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.APPLICATION,  "label.excel.lessons"));
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.APPLICATION,  "label.excel.lessons.summaries"));
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.APPLICATION,  "label.excel.lessons.summaries.percentage"));
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.APPLICATION,  "label.excel.lessons.notTaught.summaries"));
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.APPLICATION,  "label.excel.lessons.notTaught.summaries.percentage"));
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.APPLICATION,  "label.excel.professorName"), 10000);
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.APPLICATION,  "label.excel.professorUsername"));
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.APPLICATION,  "label.excel.professorEmail"), 10000);
     }
 
-    static private String getResourceMessage(String module, String key) {
-        return BundleUtil.getMessageFromModuleOrApplication(module, key);
-    }
 }

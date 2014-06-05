@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 /*
  * Author : Goncalo Luiz
  * Creation Date: Jul 20, 2006,8:42:24 AM
@@ -39,12 +57,13 @@ import com.sun.syndication.feed.synd.SyndContentImpl;
 public class AnnouncementRSS extends RSSAction {
 
     protected String getFeedTitle(HttpServletRequest request, AnnouncementBoard board) {
+        if (board == null) {
+            return null;
+        }
         MessageResources resources = this.getResources(request, "MESSAGING_RESOURCES");
         String titlePrefix = resources.getMessage(this.getLocale(request), "messaging.announcements.channelTitlePrefix");
         StringBuilder buffer = new StringBuilder();
-        if (board != null) {
-            buffer.append(titlePrefix).append(" ").append(board.getName());
-        }
+        buffer.append(titlePrefix).append(" ").append(board.getName());
         return buffer.toString();
     }
 

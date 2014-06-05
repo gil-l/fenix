@@ -1,3 +1,23 @@
+<%--
+
+    Copyright © 2002 Instituto Superior Técnico
+
+    This file is part of FenixEdu Core.
+
+    FenixEdu Core is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    FenixEdu Core is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+
+--%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
 <%@page import="com.google.common.base.Strings"%>
 <%@page import="com.google.common.base.Joiner"%>
@@ -214,7 +234,7 @@
 						</logic:present>
 					</logic:present>
 
-					<bean:define id="personSpaces" name="personalInfo"
+					<%-- <bean:define id="personSpaces" name="personalInfo"
 						property="activePersonSpaces"></bean:define>
 					<logic:notEmpty name="personSpaces">
 						<tr>
@@ -227,7 +247,7 @@
 									</fr:layout>
 								</fr:view></td>
 						</tr>
-					</logic:notEmpty>
+					</logic:notEmpty> --%>
 
 					<logic:notEmpty name="personalInfo" property="teacher">
 						<logic:notEmpty name="personalInfo"

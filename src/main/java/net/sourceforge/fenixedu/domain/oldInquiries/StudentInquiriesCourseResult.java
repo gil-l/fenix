@@ -1,10 +1,27 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.oldInquiries;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.Collator;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,8 +57,6 @@ public class StudentInquiriesCourseResult extends StudentInquiriesCourseResult_B
                 }
 
             };
-
-    transient private Map<String, String> valuesMap = null;
 
     public StudentInquiriesCourseResult() {
         super();
@@ -655,22 +670,15 @@ public class StudentInquiriesCourseResult extends StudentInquiriesCourseResult_B
     }
 
     public Map<String, String> getValuesMap() {
-        if (this.valuesMap == null) {
-            synchronized (this) {
-                if (this.valuesMap == null) {
-                    Map<String, String> tmpMap = new HashMap<String, String>();
-                    if (!StringUtils.isEmpty(getHeaders()) && !StringUtils.isEmpty(getRawValues())) {
-                        String[] headers = getHeaders().split("\t");
-                        String[] values = getRawValues().split("\t");
-                        for (int i = 0; i < values.length; i++) {
-                            tmpMap.put(headers[i], values[i]);
-                        }
-                    }
-                    this.valuesMap = Collections.unmodifiableMap(tmpMap);
-                }
+        final Map<String, String> tmpMap = new HashMap<String, String>();
+        if (!StringUtils.isEmpty(getHeaders()) && !StringUtils.isEmpty(getRawValues())) {
+            String[] headers = getHeaders().split("\t");
+            String[] values = getRawValues().split("\t");
+            for (int i = 0; i < values.length; i++) {
+                tmpMap.put(headers[i], values[i]);
             }
         }
-        return valuesMap;
+        return tmpMap;
     }
 
     @Override
@@ -785,8 +793,6 @@ public class StudentInquiriesCourseResult extends StudentInquiriesCourseResult_B
                     .setUnsatisfactoryResultsCUEvaluation(fieldToBoolean(columns[unsatisfactoryResultsCUEvaluationIndex]));
             studentInquiriesCourseResult
                     .setUnsatisfactoryResultsCUOrganization(fieldToBoolean(columns[unsatisfactoryResultsCUOrganizationIndex]));
-            studentInquiriesCourseResult.valuesMap = null;
-
         }
 
     }
@@ -846,7 +852,6 @@ public class StudentInquiriesCourseResult extends StudentInquiriesCourseResult_B
     }
 
     private void resetValues() {
-        this.valuesMap = null; // invalidate cache
         setApprovedRatio(null);
         setAuditCU(false);
         setAvailableToInquiry(false);

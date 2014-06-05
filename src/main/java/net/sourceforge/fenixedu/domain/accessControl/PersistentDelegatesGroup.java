@@ -1,15 +1,31 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.accessControl;
+
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import net.sourceforge.fenixedu.domain.Degree;
 import net.sourceforge.fenixedu.domain.organizationalStructure.FunctionType;
 
 import org.fenixedu.bennu.core.groups.Group;
-
-import pt.ist.fenixframework.Atomic;
-import pt.ist.fenixframework.Atomic.TxMode;
-
-import com.google.common.base.Objects;
-import com.google.common.base.Predicate;
 
 public class PersistentDelegatesGroup extends PersistentDelegatesGroup_Base {
     public PersistentDelegatesGroup(Degree degree, FunctionType function) {
@@ -33,31 +49,12 @@ public class PersistentDelegatesGroup extends PersistentDelegatesGroup_Base {
     }
 
     public static PersistentDelegatesGroup getInstance(Degree degree, FunctionType function) {
-        PersistentDelegatesGroup instance = select(degree, function);
-        return instance != null ? instance : create(degree, function);
+        return singleton(() -> select(degree, function), () -> new PersistentDelegatesGroup(degree, function));
     }
 
-    @Atomic(mode = TxMode.WRITE)
-    private static PersistentDelegatesGroup create(Degree degree, FunctionType function) {
-        PersistentDelegatesGroup instance = select(degree, function);
-        return instance != null ? instance : new PersistentDelegatesGroup(degree, function);
-    }
-
-    private static PersistentDelegatesGroup select(Degree degree, final FunctionType function) {
-        if (degree != null) {
-            for (PersistentDelegatesGroup candidate : degree.getDelegatesGroupSet()) {
-                if (Objects.equal(candidate.getFunction(), function)) {
-                    return candidate;
-                }
-            }
-        } else {
-            return filter(PersistentDelegatesGroup.class).firstMatch(new Predicate<PersistentDelegatesGroup>() {
-                @Override
-                public boolean apply(PersistentDelegatesGroup group) {
-                    return Objects.equal(group.getFunction(), function);
-                }
-            }).orNull();
-        }
-        return null;
+    private static Optional<PersistentDelegatesGroup> select(Degree degree, final FunctionType function) {
+        Stream<PersistentDelegatesGroup> options =
+                degree != null ? degree.getDelegatesGroupSet().stream() : filter(PersistentDelegatesGroup.class);
+        return options.filter(group -> Objects.equals(group.getFunction(), function)).findAny();
     }
 }

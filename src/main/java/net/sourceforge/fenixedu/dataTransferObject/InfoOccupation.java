@@ -1,7 +1,26 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.dataTransferObject;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import net.sourceforge.fenixedu.domain.ShiftType;
 import net.sourceforge.fenixedu.util.DayType;
@@ -9,16 +28,10 @@ import net.sourceforge.fenixedu.util.DiaSemana;
 import net.sourceforge.fenixedu.util.renderer.GanttDiagramEvent;
 
 import org.fenixedu.commons.i18n.I18N;
-import org.fenixedu.spaces.domain.Space;
 import org.fenixedu.spaces.domain.occupation.Occupation;
 import org.joda.time.Interval;
 
 import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
-
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
 
 public class InfoOccupation extends InfoShowOccupation implements GanttDiagramEvent {
 
@@ -47,7 +60,7 @@ public class InfoOccupation extends InfoShowOccupation implements GanttDiagramEv
 
     @Override
     public DiaSemana getDiaSemana() {
-        return new DiaSemana(interval.getStart().getDayOfWeek());
+        return DiaSemana.fromJodaWeekDay(interval.getStart().getDayOfWeek());
     }
 
     @Override
@@ -82,19 +95,7 @@ public class InfoOccupation extends InfoShowOccupation implements GanttDiagramEv
 
     @Override
     public String getGanttDiagramEventObservations() {
-        return Joiner.on(" ").join(FluentIterable.from(occupation.getSpaceSet()).filter(new Predicate<Space>() {
-
-            @Override
-            public boolean apply(Space input) {
-                return input.isActive();
-            }
-        }).transform(new Function<Space, String>() {
-            @Override
-            public String apply(Space input) {
-                return input.getName();
-            }
-
-        }).toSet());
+        return occupation.getSpaces().stream().map(space -> space.getName()).collect(Collectors.joining(" "));
     }
 
     @Override
@@ -137,5 +138,10 @@ public class InfoOccupation extends InfoShowOccupation implements GanttDiagramEv
 
     public String getDescription() {
         return occupation.getDescription();
+    }
+
+    @Override
+    public String getExternalId() {
+        return occupation.getExternalId();
     }
 }

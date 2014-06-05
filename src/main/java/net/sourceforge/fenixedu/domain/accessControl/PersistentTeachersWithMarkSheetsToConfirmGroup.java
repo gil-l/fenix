@@ -1,11 +1,27 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.accessControl;
 
 import net.sourceforge.fenixedu.domain.DegreeCurricularPlan;
 import net.sourceforge.fenixedu.domain.ExecutionSemester;
 
 import org.fenixedu.bennu.core.groups.Group;
-
-import com.google.common.base.Supplier;
 
 public class PersistentTeachersWithMarkSheetsToConfirmGroup extends PersistentTeachersWithMarkSheetsToConfirmGroup_Base {
     protected PersistentTeachersWithMarkSheetsToConfirmGroup(ExecutionSemester period, DegreeCurricularPlan degreeCurricularPlan) {
@@ -20,12 +36,7 @@ public class PersistentTeachersWithMarkSheetsToConfirmGroup extends PersistentTe
 
     public static PersistentTeachersWithMarkSheetsToConfirmGroup getInstance(final ExecutionSemester period,
             final DegreeCurricularPlan degreeCurricularPlan) {
-        return getInstance(PersistentTeachersWithMarkSheetsToConfirmGroup.class, period, degreeCurricularPlan,
-                new Supplier<PersistentTeachersWithMarkSheetsToConfirmGroup>() {
-                    @Override
-                    public PersistentTeachersWithMarkSheetsToConfirmGroup get() {
-                        return new PersistentTeachersWithMarkSheetsToConfirmGroup(period, degreeCurricularPlan);
-                    }
-                });
+        return singleton(PersistentTeachersWithMarkSheetsToConfirmGroup.class, period, degreeCurricularPlan,
+                () -> new PersistentTeachersWithMarkSheetsToConfirmGroup(period, degreeCurricularPlan));
     }
 }

@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.util.report;
 
 import java.io.ByteArrayOutputStream;
@@ -12,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.print.PrintService;
@@ -25,7 +42,6 @@ import javax.print.attribute.standard.OrientationRequested;
 import net.sf.jasperreports.engine.JRAbstractExporter;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
-import net.sf.jasperreports.engine.JRParameter;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -97,10 +113,9 @@ public class ReportsUtils extends PropertiesManager {
         return reportsPropertiesFile;
     }
 
-    static public boolean exportToPdfFile(String key, Map parameters, ResourceBundle bundle, Collection dataSource,
-            String destination) {
+    static public boolean exportToPdfFile(String key, Map parameters, Collection dataSource, String destination) {
         try {
-            final JasperPrint jasperPrint = createJasperPrint(key, parameters, bundle, dataSource);
+            final JasperPrint jasperPrint = createJasperPrint(key, parameters, dataSource);
             if (jasperPrint != null) {
                 JasperExportManager.exportReportToPdfFile(jasperPrint, destination);
                 return true;
@@ -112,9 +127,9 @@ public class ReportsUtils extends PropertiesManager {
         }
     }
 
-    static public byte[] exportToPdfFileAsByteArray(final String key, final Map parameters, final ResourceBundle bundle,
-            final Collection dataSource) throws JRException {
-        final JasperPrint jasperPrint = createJasperPrint(key, parameters, bundle, dataSource);
+    static public byte[] exportToPdfFileAsByteArray(final String key, final Map parameters, final Collection dataSource)
+            throws JRException {
+        final JasperPrint jasperPrint = createJasperPrint(key, parameters, dataSource);
 
         if (jasperPrint != null) {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -140,8 +155,7 @@ public class ReportsUtils extends PropertiesManager {
 
         for (final FenixReport report : reports) {
             JasperPrint jasperPrint =
-                    createJasperPrint(report.getReportTemplateKey(), report.getParameters(), report.getResourceBundle(),
-                            report.getDataSource());
+                    createJasperPrint(report.getReportTemplateKey(), report.getParameters(), report.getDataSource());
 
             if (jasperPrint == null) {
                 throw new NullPointerException();
@@ -193,10 +207,10 @@ public class ReportsUtils extends PropertiesManager {
         }
     }
 
-    static public boolean printReport(final String key, final Map parameters, final ResourceBundle bundle,
-            final Collection dataSource, final String printerName) {
+    static public boolean printReport(final String key, final Map parameters, final Collection dataSource,
+            final String printerName) {
         try {
-            final JasperPrint jasperPrint = createJasperPrint(key, parameters, bundle, dataSource);
+            final JasperPrint jasperPrint = createJasperPrint(key, parameters, dataSource);
             final PrintService printService = FenixConfigurationManager.getPrinterManager().getPrintServiceByName(printerName);
             if (jasperPrint != null && printService != null) {
                 export(new JRPrintServiceExporter(), Collections.singletonList(jasperPrint), (ByteArrayOutputStream) null,
@@ -224,8 +238,8 @@ public class ReportsUtils extends PropertiesManager {
 
     }
 
-    static private JasperPrint createJasperPrint(final String key, final Map parameters, final ResourceBundle bundle,
-            Collection dataSource) throws JRException {
+    static private JasperPrint createJasperPrint(final String key, final Map parameters, Collection dataSource)
+            throws JRException {
         JasperReport report = reportsMap.get(key);
 
         if (report == null) {
@@ -237,10 +251,6 @@ public class ReportsUtils extends PropertiesManager {
         }
 
         if (report != null) {
-            if (parameters != null && bundle != null) {
-                parameters.put(JRParameter.REPORT_RESOURCE_BUNDLE, bundle);
-            }
-
             if (dataSource == null || dataSource.isEmpty()) {
                 // dummy, engine seems to work not very well with empty data
                 // sources

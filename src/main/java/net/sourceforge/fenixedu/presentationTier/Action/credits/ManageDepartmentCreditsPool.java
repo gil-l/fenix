@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.credits;
 
 import java.io.IOException;
@@ -15,7 +33,8 @@ import net.sourceforge.fenixedu.domain.credits.util.DepartmentCreditsPoolBean;
 import net.sourceforge.fenixedu.domain.credits.util.DepartmentCreditsPoolBean.DepartmentExecutionCourse;
 import net.sourceforge.fenixedu.domain.exceptions.DomainException;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -126,19 +145,19 @@ public class ManageDepartmentCreditsPool extends FenixDispatchAction {
             String sheetname) {
         spreadsheet.getSheet(sheetname);
         spreadsheet.newHeaderRow();
-        spreadsheet.addHeader(BundleUtil.getStringFromResourceBundle("resources.TeacherCreditsSheetResources", "label.course"),
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.course"),
                 10000);
-        spreadsheet.addHeader(BundleUtil.getStringFromResourceBundle("resources.TeacherCreditsSheetResources", "label.degrees"));
-        spreadsheet.addHeader(BundleUtil.getStringFromResourceBundle("resources.TeacherCreditsSheetResources",
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.degrees"));
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS,
                 "label.execution-period"));
         spreadsheet.addHeader(BundleUtil
-                .getStringFromResourceBundle("resources.TeacherCreditsSheetResources", "label.effortRate"));
-        spreadsheet.addHeader(BundleUtil.getStringFromResourceBundle("resources.TeacherCreditsSheetResources",
+                .getString(Bundle.TEACHER_CREDITS, "label.effortRate"));
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS,
                 "label.departmentEffectiveLoad"));
-        spreadsheet.addHeader(BundleUtil.getStringFromResourceBundle("resources.TeacherCreditsSheetResources",
+        spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS,
                 "label.totalEffectiveLoad"));
         spreadsheet.addHeader(BundleUtil
-                .getStringFromResourceBundle("resources.TeacherCreditsSheetResources", "label.unitCredit"));
+                .getString(Bundle.TEACHER_CREDITS, "label.unitCredit"));
         for (DepartmentExecutionCourse departmentExecutionCourse : executionCourses) {
             spreadsheet.newRow();
             spreadsheet.addCell(departmentExecutionCourse.getExecutionCourse().getName());

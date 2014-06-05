@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.docs;
 
 import java.io.Serializable;
@@ -6,7 +24,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import net.sourceforge.fenixedu.util.DateI18NUtil;
 import net.sourceforge.fenixedu.util.JasperPrintProcessor;
@@ -25,12 +42,6 @@ abstract public class FenixReport implements Serializable {
     final private Collection dataSource;
 
     final private Map<String, Object> parameters = new HashMap<String, Object>();
-
-    private ResourceBundle resourceBundle;
-
-    private final ResourceBundle applicationBundle;
-
-    private final ResourceBundle enumerationBundle;
 
     private final Locale locale;
 
@@ -58,8 +69,6 @@ abstract public class FenixReport implements Serializable {
 
     private FenixReport(final Collection<?> dataSource, final Locale locale) {
         this.dataSource = dataSource == null ? new ArrayList<Object>() : dataSource;
-        this.enumerationBundle = ResourceBundle.getBundle("resources.EnumerationResources", locale);
-        this.applicationBundle = ResourceBundle.getBundle("resources.ApplicationResources", locale);
         this.locale = locale;
         this.language = locale;
     }
@@ -70,22 +79,6 @@ abstract public class FenixReport implements Serializable {
 
     public final Map<String, Object> getParameters() {
         return parameters;
-    }
-
-    public final ResourceBundle getResourceBundle() {
-        return resourceBundle;
-    }
-
-    public void setResourceBundle(ResourceBundle resourceBundle) {
-        this.resourceBundle = resourceBundle;
-    }
-
-    public ResourceBundle getApplicationBundle() {
-        return applicationBundle;
-    }
-
-    public ResourceBundle getEnumerationBundle() {
-        return enumerationBundle;
     }
 
     public Locale getLocale() {
@@ -130,8 +123,7 @@ abstract public class FenixReport implements Serializable {
     }
 
     protected String verboseDate(LocalDate date) {
-        return "dia " + DateI18NUtil.verboseNumber(date.getDayOfMonth(), getEnumerationBundle()) + " do mês de "
-                + date.toString("MMMM", new Locale("pt")) + " de "
-                + DateI18NUtil.verboseNumber(date.getYear(), getEnumerationBundle());
+        return "dia " + DateI18NUtil.verboseNumber(date.getDayOfMonth()) + " do mês de "
+                + date.toString("MMMM", new Locale("pt")) + " de " + DateI18NUtil.verboseNumber(date.getYear());
     }
 }

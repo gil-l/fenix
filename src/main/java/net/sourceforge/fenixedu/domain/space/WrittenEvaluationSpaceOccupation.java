@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.space;
 
 import static net.sourceforge.fenixedu.injectionCode.AccessControl.check;
@@ -33,7 +51,7 @@ public class WrittenEvaluationSpaceOccupation extends WrittenEvaluationSpaceOccu
 
         Occupation allocation =
                 SpaceUtils
-                        .getFirstOccurrenceOfResourceAllocationByClass(allocatableSpace, WrittenEvaluationSpaceOccupation.class);
+                .getFirstOccurrenceOfResourceAllocationByClass(allocatableSpace, WrittenEvaluationSpaceOccupation.class);
         if (allocation != null) {
             throw new DomainException("error.WrittenEvaluationSpaceOccupation.occupation.for.this.space.already.exists");
         }
@@ -51,9 +69,7 @@ public class WrittenEvaluationSpaceOccupation extends WrittenEvaluationSpaceOccu
         }
 
         if (!writtenEvaluation.canBeAssociatedToRoom(getRoom())) {
-            String name;
-            name = getRoom().getName();
-            throw new DomainException("error.roomOccupied", name);
+            throw new DomainException("error.roomOccupied", getRoom().getName());
         }
 
         addWrittenEvaluations(writtenEvaluation);
@@ -96,7 +112,7 @@ public class WrittenEvaluationSpaceOccupation extends WrittenEvaluationSpaceOccu
 
     @Override
     public Group getAccessGroup() {
-        return getSpace().getOccupationsAccessGroupWithChainOfResponsability();
+        return getSpace().getOccupationsGroupWithChainOfResponsability();
     }
 
     @Override

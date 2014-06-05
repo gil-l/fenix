@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.docs.academicAdministrativeOffice;
 
 import java.text.MessageFormat;
@@ -12,10 +30,12 @@ import net.sourceforge.fenixedu.domain.phd.PhdIndividualProgramProcess;
 import net.sourceforge.fenixedu.domain.phd.serviceRequests.documentRequests.certificates.PhdFinalizationCertificateRequest;
 import net.sourceforge.fenixedu.domain.serviceRequests.documentRequests.DocumentRequestType;
 import net.sourceforge.fenixedu.domain.serviceRequests.documentRequests.IDocumentRequest;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.FenixStringTools;
 import net.sourceforge.fenixedu.util.Money;
 
 import org.apache.commons.lang.StringUtils;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 
 import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
@@ -56,15 +76,15 @@ public class PhdFinalizationCertificate extends AdministrativeOfficeDocument {
         StringBuilder builder1 = new StringBuilder();
 
         if (getLanguage().equals(MultiLanguageString.pt)) {
-            builder1.append(getResourceBundle().getString("label.with")).append(SINGLE_SPACE);
+            builder1.append(BundleUtil.getString(Bundle.ACADEMIC, "label.with")).append(SINGLE_SPACE);
         }
 
-        builder1.append(getResourceBundle().getString("label.phd.finalization.certificate.identity.card"));
-        builder1.append(SINGLE_SPACE).append(getResourceBundle().getString("label.number.short"));
+        builder1.append(BundleUtil.getString(Bundle.ACADEMIC, "label.phd.finalization.certificate.identity.card"));
+        builder1.append(SINGLE_SPACE).append(BundleUtil.getString(Bundle.ACADEMIC, "label.number.short"));
         builder1.append(SINGLE_SPACE).append(person.getDocumentIdNumber());
 
         StringBuilder builder2 = new StringBuilder();
-        builder2.append(getResourceBundle().getString("documents.birthLocale"));
+        builder2.append(BundleUtil.getString(Bundle.ACADEMIC, "documents.birthLocale"));
         builder2.append(SINGLE_SPACE).append(getBirthLocale(person, false));
 
         if (getDocumentRequest().getDocumentRequestType().equals(DocumentRequestType.APPROVEMENT_MOBILITY_CERTIFICATE)) {
@@ -84,10 +104,10 @@ public class PhdFinalizationCertificate extends AdministrativeOfficeDocument {
     protected void setNationality(final Person person) {
         StringBuilder builder = new StringBuilder();
         if (getLanguage().equals(MultiLanguageString.pt)) {
-            builder.append(getResourceBundle().getString("label.and")).append(SINGLE_SPACE);
+            builder.append(BundleUtil.getString(Bundle.ACADEMIC, "label.and")).append(SINGLE_SPACE);
         }
 
-        builder.append(getResourceBundle().getString("documents.nationality.one"));
+        builder.append(BundleUtil.getString(Bundle.ACADEMIC, "documents.nationality.one"));
         final String nationality = person.getCountry().getFilteredNationality(getLocale());
         builder.append(SINGLE_SPACE).append(nationality.toUpperCase()).append(SINGLE_SPACE);
 
@@ -121,19 +141,19 @@ public class PhdFinalizationCertificate extends AdministrativeOfficeDocument {
         String student;
 
         if (phdIndividualProgramProcess.getStudent().getPerson().isMale()) {
-            student = getResourceBundle().getString("label.academicDocument.declaration.maleStudent");
+            student = BundleUtil.getString(Bundle.ACADEMIC, "label.academicDocument.declaration.maleStudent");
         } else {
-            student = getResourceBundle().getString("label.academicDocument.declaration.femaleStudent");
+            student = BundleUtil.getString(Bundle.ACADEMIC, "label.academicDocument.declaration.femaleStudent");
         }
         StringBuilder studentNumber = new StringBuilder();
-        String stringTemplate = getResourceBundle().getString("label.academicDocument.declaration.footer.studentNumber");
+        String stringTemplate = BundleUtil.getString(Bundle.ACADEMIC, "label.academicDocument.declaration.footer.studentNumber");
         studentNumber.append(MessageFormat.format(stringTemplate, student, phdIndividualProgramProcess.getStudent().getNumber()
                 .toString()));
         studentNumber.append("/D");
         addParameter("studentNumber", studentNumber.toString());
 
         StringBuilder documentNumber = new StringBuilder();
-        stringTemplate = getResourceBundle().getString("label.serviceRequestNumberYear");
+        stringTemplate = BundleUtil.getString(Bundle.ACADEMIC, "label.serviceRequestNumberYear");
         documentNumber.append(stringTemplate);
         documentNumber.append(": ");
         documentNumber.append(documentRequest.getServiceRequestNumberYear());
@@ -147,7 +167,7 @@ public class PhdFinalizationCertificate extends AdministrativeOfficeDocument {
         String institutionName = getInstitutionName();
         String universityName = getUniversityName(new DateTime());
 
-        String stringTemplate = getResourceBundle().getString("label.academicDocument.declaration.firstParagraph");
+        String stringTemplate = BundleUtil.getString(Bundle.ACADEMIC, "label.academicDocument.declaration.firstParagraph");
 
         addParameter(
                 "firstParagraph",
@@ -156,12 +176,12 @@ public class PhdFinalizationCertificate extends AdministrativeOfficeDocument {
                                 adminOfficeName.toUpperCase(getLocale()), institutionName.toUpperCase(getLocale()),
                                 universityName.toUpperCase(getLocale())));
 
-        addParameter("certificate", getResourceBundle().getString("message.phd.finalization.certificate.certifies.that"));
+        addParameter("certificate", BundleUtil.getString(Bundle.ACADEMIC, "message.phd.finalization.certificate.certifies.that"));
     }
 
     private void addProgrammeInfo() {
         PhdIndividualProgramProcess phdIndividualProgramProcess = getDocumentRequest().getPhdIndividualProgramProcess();
-        String stringTemplate = getResourceBundle().getString("label.phd.finalization.certificate.concluded.in");
+        String stringTemplate = BundleUtil.getString(Bundle.ACADEMIC, "label.phd.finalization.certificate.concluded.in");
         String conclusionDate =
                 MessageFormat.format(stringTemplate, phdIndividualProgramProcess.getConclusionDate().toString("dd/MM/yyyy"));
         addParameter("conclusionDate", conclusionDate);
@@ -174,7 +194,7 @@ public class PhdFinalizationCertificate extends AdministrativeOfficeDocument {
 
         StringBuilder builder = new StringBuilder();
         builder.append(
-                getResourceBundle().getString("message.phd.finalization.certificate.made.thesis.presentation.on.doctoral.grade"))
+                BundleUtil.getString(Bundle.ACADEMIC, "message.phd.finalization.certificate.made.thesis.presentation.on.doctoral.grade"))
                 .append(":").append(SINGLE_SPACE);
 
         builder.append(phdIndividualProgramProcess.getPhdProgram().getName().getContent(getLanguage()).toUpperCase());
@@ -198,11 +218,11 @@ public class PhdFinalizationCertificate extends AdministrativeOfficeDocument {
 
         if (phdIndividualProgramProcess.isBolonha() && phdIndividualProgramProcess.hasRegistryDiplomaRequest()) {
             return String
-                    .format(getResourceBundle().getString(
+                    .format(BundleUtil.getString(Bundle.ACADEMIC, 
                             "message.phd.finalization.info.thesis.grade.approved.by.jury.registry.diploma"), thesisFinalGrade,
                             phdIndividualProgramProcess.getRegistryDiplomaRequest().getRegistryCode().getCode());
         } else {
-            return String.format(getResourceBundle().getString("message.phd.finalization.info.thesis.grade.approved.by.jury"),
+            return String.format(BundleUtil.getString(Bundle.ACADEMIC, "message.phd.finalization.info.thesis.grade.approved.by.jury"),
                     thesisFinalGrade);
         }
     }
@@ -213,9 +233,9 @@ public class PhdFinalizationCertificate extends AdministrativeOfficeDocument {
         String genderPrefix;
 
         if (person.isMale()) {
-            genderPrefix = getResourceBundle().getString("label.phd.finalization.certificate.father.prefix.for.male");
+            genderPrefix = BundleUtil.getString(Bundle.ACADEMIC, "label.phd.finalization.certificate.father.prefix.for.male");
         } else {
-            genderPrefix = getResourceBundle().getString("label.phd.finalization.certificate.father.prefix.for.female");
+            genderPrefix = BundleUtil.getString(Bundle.ACADEMIC, "label.phd.finalization.certificate.father.prefix.for.female");
         }
 
         StringBuilder builder = new StringBuilder();
@@ -225,7 +245,7 @@ public class PhdFinalizationCertificate extends AdministrativeOfficeDocument {
         addParameter("fatherName", FenixStringTools.multipleLineRightPad(builder.toString(), LINE_LENGTH, END_CHAR));
 
         builder = new StringBuilder();
-        builder.append(getResourceBundle().getString("label.phd.finalization.certificate.mother.prefix.for.female")).append(
+        builder.append(BundleUtil.getString(Bundle.ACADEMIC, "label.phd.finalization.certificate.mother.prefix.for.female")).append(
                 SINGLE_SPACE);
         builder.append(person.getNameOfMother().toUpperCase());
         addParameter("motherName", FenixStringTools.multipleLineRightPad(builder.toString(), LINE_LENGTH, END_CHAR));

@@ -1,11 +1,26 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.renderers;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ResourceBundle;
-
-import org.fenixedu.commons.i18n.I18N;
 
 import net.sourceforge.fenixedu.dataTransferObject.teacher.executionCourse.SearchExecutionCourseAttendsBean;
 import net.sourceforge.fenixedu.dataTransferObject.teacher.executionCourse.SearchExecutionCourseAttendsBean.StudentAttendsStateType;
@@ -15,6 +30,10 @@ import net.sourceforge.fenixedu.domain.Shift;
 import net.sourceforge.fenixedu.domain.ShiftType;
 import net.sourceforge.fenixedu.domain.StudentGroup;
 import net.sourceforge.fenixedu.domain.student.registrationStates.RegistrationState;
+import net.sourceforge.fenixedu.util.Bundle;
+
+import org.fenixedu.bennu.core.i18n.BundleUtil;
+
 import pt.ist.fenixWebFramework.renderers.OutputRenderer;
 import pt.ist.fenixWebFramework.renderers.components.HtmlBlockContainer;
 import pt.ist.fenixWebFramework.renderers.components.HtmlComponent;
@@ -29,14 +48,8 @@ import pt.ist.fenixWebFramework.renderers.components.HtmlTableHeader;
 import pt.ist.fenixWebFramework.renderers.components.HtmlTableRow;
 import pt.ist.fenixWebFramework.renderers.layouts.Layout;
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
-import java.util.Locale;
 
 public class ExecutionCourseAttendsSpreadSheetRenderer extends OutputRenderer {
-
-    private final ResourceBundle enumerationResources = ResourceBundle.getBundle("resources.EnumerationResources",
-            I18N.getLocale());
-    private final ResourceBundle applicationResources = ResourceBundle.getBundle("resources.ApplicationResources",
-            I18N.getLocale());
 
     private String attendsListTableClasses;
     private String summaryClasses;
@@ -103,37 +116,37 @@ public class ExecutionCourseAttendsSpreadSheetRenderer extends OutputRenderer {
 
             HtmlTableRow row1 = tableHeader.createRow();
             if (bean.getViewPhoto()) {
-                HtmlTableCell photoCell = row1.createCell(applicationResources.getString("label.photo"));
+                HtmlTableCell photoCell = row1.createCell(BundleUtil.getString(Bundle.APPLICATION, "label.photo"));
                 photoCell.setRowspan(rowSpan);
             }
-            HtmlTableCell numberCell = row1.createCell(applicationResources.getString("label.number"));
+            HtmlTableCell numberCell = row1.createCell(BundleUtil.getString(Bundle.APPLICATION, "label.number"));
             numberCell.setRowspan(rowSpan);
 
-            HtmlTableCell numberOfEnrolmentsCell = row1.createCell(applicationResources.getString("label.numberOfEnrollments"));
+            HtmlTableCell numberOfEnrolmentsCell = row1.createCell(BundleUtil.getString(Bundle.APPLICATION, "label.numberOfEnrollments"));
             numberOfEnrolmentsCell.setRowspan(rowSpan);
 
-            HtmlTableCell enrolmentStateCell1 = row1.createCell(applicationResources.getString("label.attends.enrollmentState"));
+            HtmlTableCell enrolmentStateCell1 = row1.createCell(BundleUtil.getString(Bundle.APPLICATION, "label.attends.enrollmentState"));
             enrolmentStateCell1.setRowspan(rowSpan);
 
-            HtmlTableCell degreeCell = row1.createCell(applicationResources.getString("label.Degree"));
+            HtmlTableCell degreeCell = row1.createCell(BundleUtil.getString(Bundle.APPLICATION, "label.Degree"));
             degreeCell.setRowspan(rowSpan);
 
-            HtmlTableCell registrationStateCell = row1.createCell(applicationResources.getString("label.registration.state"));
+            HtmlTableCell registrationStateCell = row1.createCell(BundleUtil.getString(Bundle.APPLICATION, "label.registration.state"));
             registrationStateCell.setRowspan(rowSpan);
 
-            HtmlTableCell nameCell = row1.createCell(applicationResources.getString("label.name"));
+            HtmlTableCell nameCell = row1.createCell(BundleUtil.getString(Bundle.APPLICATION, "label.name"));
             nameCell.setRowspan(rowSpan);
 
             if (!groupings.isEmpty()) {
-                HtmlTableCell groupingCell = row1.createCell(applicationResources.getString("label.projectGroup"));
+                HtmlTableCell groupingCell = row1.createCell(BundleUtil.getString(Bundle.APPLICATION, "label.projectGroup"));
                 groupingCell.setColspan(groupings.size());
             }
 
-            HtmlTableCell emailCell = row1.createCell(applicationResources.getString("label.mail"));
+            HtmlTableCell emailCell = row1.createCell(BundleUtil.getString(Bundle.APPLICATION, "label.mail"));
             emailCell.setRowspan(rowSpan);
 
             if (!shiftTypes.isEmpty()) {
-                HtmlTableCell shiftCell = row1.createCell(applicationResources.getString("label.attends.shifts"));
+                HtmlTableCell shiftCell = row1.createCell(BundleUtil.getString(Bundle.APPLICATION, "label.attends.shifts"));
                 shiftCell.setColspan(shiftTypes.size());
             }
 
@@ -142,7 +155,7 @@ public class ExecutionCourseAttendsSpreadSheetRenderer extends OutputRenderer {
                 row2.createCell(grouping.getName());
             }
             for (ShiftType shiftType : shiftTypes) {
-                row2.createCell(enumerationResources.getString(shiftType.getName()));
+                row2.createCell(BundleUtil.getString(Bundle.ENUMERATION, shiftType.getName()));
             }
 
             List<Attends> attendsResult = new ArrayList<Attends>(bean.getAttendsResult());
@@ -165,7 +178,7 @@ public class ExecutionCourseAttendsSpreadSheetRenderer extends OutputRenderer {
                 }
 
                 final StudentAttendsStateType stateType = attends.getAttendsStateType();
-                row.createCell(stateType != null ? enumerationResources.getString(stateType.getQualifiedName()) : "--");
+                row.createCell(stateType != null ? BundleUtil.getString(Bundle.ENUMERATION, stateType.getQualifiedName()) : "--");
                 row.createCell(attends.getStudentCurricularPlanFromAttends().getDegreeCurricularPlan().getName());
                 final RegistrationState registrationState =
                         attends.getRegistration().getLastRegistrationState(attends.getExecutionYear());

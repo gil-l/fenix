@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.thesis;
 
 import static net.sourceforge.fenixedu.injectionCode.AccessControl.check;
@@ -12,7 +30,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import net.sourceforge.fenixedu.dataTransferObject.degreeAdministrativeOffice.gradeSubmission.MarkSheetEnrolmentEvaluationBean;
@@ -49,12 +66,13 @@ import net.sourceforge.fenixedu.domain.util.email.Recipient;
 import net.sourceforge.fenixedu.domain.util.email.Sender;
 import net.sourceforge.fenixedu.injectionCode.AccessControl;
 import net.sourceforge.fenixedu.predicates.ThesisPredicates;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.EvaluationType;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.UserGroup;
-import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 import org.joda.time.YearMonthDay;
 
@@ -674,8 +692,7 @@ public class Thesis extends Thesis_Base {
     }
 
     protected String getMessage(final String key, final Object... args) {
-        final ResourceBundle bundle = ResourceBundle.getBundle("resources.ScientificCouncilResources", I18N.getLocale());
-        final String message = bundle.getString(key);
+        final String message = BundleUtil.getString(Bundle.SCIENTIFIC, key);
         return MessageFormat.format(message, args);
     }
 
@@ -772,7 +789,7 @@ public class Thesis extends Thesis_Base {
 
             updateMarkSheet();
 
-            setDocumentsAvailableAfter(new DateTime().plusMonths(6));
+            setDocumentsAvailableAfter(new DateTime().plusMonths(9));
         } else {
             throw new DomainException("thesis.already.evaluated");
         }

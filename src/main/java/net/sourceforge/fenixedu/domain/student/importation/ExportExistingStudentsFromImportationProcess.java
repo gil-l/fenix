@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.student.importation;
 
 import java.io.ByteArrayOutputStream;
@@ -46,7 +64,7 @@ public class ExportExistingStudentsFromImportationProcess extends ExportExisting
 
         final Spreadsheet spreadsheet = new Spreadsheet("Shifts");
         spreadsheet
-                .setHeaders(new String[] { "Número de Aluno", "Nome", "BI", "Curso", "Ano", "Campus", "Ficheiro de importacao" });
+        .setHeaders(new String[] { "Número de Aluno", "Nome", "BI", "Curso", "Ano", "Campus", "Ficheiro de importacao" });
 
         for (DgesStudentImportationProcess importationProcess : DgesStudentImportationProcess.readDoneJobs(getExecutionYear())) {
             if (!importationProcess.getEntryPhase().equals(getEntryPhase())) {
@@ -78,7 +96,7 @@ public class ExportExistingStudentsFromImportationProcess extends ExportExisting
                     addRow(spreadsheet, person.getStudent().getNumber().toString(), person.getName(),
                             person.getDocumentIdNumber(), dto.getExecutionDegree(getExecutionYear(),
                                     importationProcess.getDgesStudentImportationForCampus()), getExecutionYear(),
-                            importationProcess.getDgesStudentImportationForCampus(), importationProcess
+                                    importationProcess.getDgesStudentImportationForCampus(), importationProcess
                                     .getDgesStudentImportationFile().getFilename());
 
                     personSet.add(person);
@@ -100,9 +118,7 @@ public class ExportExistingStudentsFromImportationProcess extends ExportExisting
         row.setCell(2, documentIdNumber);
         row.setCell(3, executionDegree.getDegreeCurricularPlan().getName());
         row.setCell(4, executionYear.getYear());
-        String name;
-        name = campus.getName();
-        row.setCell(5, name);
+        row.setCell(5, campus.getName());
         row.setCell(6, importationFilename);
     }
 

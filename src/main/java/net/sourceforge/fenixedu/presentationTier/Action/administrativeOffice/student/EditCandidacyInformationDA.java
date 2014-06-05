@@ -1,8 +1,25 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.administrativeOffice.student;
 
 import java.io.Serializable;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,10 +32,12 @@ import net.sourceforge.fenixedu.domain.phd.PhdIndividualProgramProcess;
 import net.sourceforge.fenixedu.domain.student.Registration;
 import net.sourceforge.fenixedu.domain.student.Student;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.i18n.I18N;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
@@ -148,8 +167,7 @@ public class EditCandidacyInformationDA extends FenixDispatchAction {
                 return getRegistration().getDegreeCurricularPlanName();
             } else {
                 Locale locale = I18N.getLocale();
-                ResourceBundle bundle = ResourceBundle.getBundle("resources.PhdResources", locale);
-                StringBuilder stringBuilder = new StringBuilder(bundle.getString("label.phd")).append(" ");
+                StringBuilder stringBuilder = new StringBuilder(BundleUtil.getString(Bundle.PHD, "label.phd")).append(" ");
                 stringBuilder.append(getPhdIndividualProgramProcess().getPhdProgram().getName().getContent(locale));
                 return stringBuilder.toString();
             }

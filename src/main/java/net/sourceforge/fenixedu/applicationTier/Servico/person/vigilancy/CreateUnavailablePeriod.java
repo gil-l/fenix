@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.applicationTier.Servico.person.vigilancy;
 
 import java.util.Collections;
@@ -10,7 +28,8 @@ import net.sourceforge.fenixedu.domain.util.email.Message;
 import net.sourceforge.fenixedu.domain.util.email.Sender;
 import net.sourceforge.fenixedu.domain.vigilancy.UnavailablePeriod;
 import net.sourceforge.fenixedu.domain.vigilancy.VigilantGroup;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
@@ -44,11 +63,11 @@ public class CreateUnavailablePeriod {
                             + String.format("%02d", end.getHourOfDay()) + ":" + String.format("%02d", end.getMinuteOfHour())
                             + "h";;
             String message =
-                    BundleUtil.getStringFromResourceBundle("resources.VigilancyResources", "email.convoke.unavailablePeriod",
+                    BundleUtil.getString(Bundle.VIGILANCY, "email.convoke.unavailablePeriod",
                             new String[] { person.getName(), beginDate, endDate, justification });
 
             String subject =
-                    BundleUtil.getStringFromResourceBundle("resources.VigilancyResources",
+                    BundleUtil.getString(Bundle.VIGILANCY,
                             "email.convoke.unavailablePeriod.subject", new String[] { group.getName() });
 
             Sender sender = Bennu.getInstance().getSystemSender();

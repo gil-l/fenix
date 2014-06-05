@@ -1,11 +1,29 @@
-<%@page import="net.sourceforge.fenixedu.domain.thesis.ThesisVisibilityType"%>
+<%--
+
+    Copyright © 2002 Instituto Superior Técnico
+
+    This file is part of FenixEdu Core.
+
+    FenixEdu Core is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    FenixEdu Core is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+
+--%>
+<%@page import="org.fenixedu.bennu.core.security.Authenticate"%>
 <%@ page language="java" %>
 <%@ taglib uri="http://struts.apache.org/tags-html" prefix="html" %><%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr" %>
 
-
-<%@page import="net.sourceforge.fenixedu.injectionCode.AccessControl"%><html:xhtml/>
 
 <bean:define id="listThesesActionPath" name="listThesesActionPath"/>
 <bean:define id="listThesesContext" name="listThesesContext"/>
@@ -52,63 +70,49 @@
 
 <h3 class="mtop15 mbottom05"><bean:message key="title.thesis.details.publication"/></h3>
 
-<logic:notEmpty name="thesis" property="publication">
+<logic:equal name="thesis" property="evaluated" value="true">
 
-	<bean:define id="files" name="thesis" property="publication.resultDocumentFiles"/>
-	<bean:define id="extAbstract" name="thesis" property="extendedAbstract"/>
-
-	<fr:view name="thesis" property="publication.title"/>,
-	<fr:view name="thesis" property="publication.authorsNames"/>,
-	<fr:view name="thesis" property="publication.year"/>,
-	<fr:view name="thesis" property="publication.organization"/>
+	<fr:view name="thesis" property="finalTitle"/>,
+	<fr:view name="thesis" property="student.name"/>,
+	<fr:view name="thesis" property="discussed.year"/>,
 
 	<bean:define id="thesis" name="thesis" type="net.sourceforge.fenixedu.domain.thesis.Thesis"/>
-	<bean:define id="publicationId" name="thesis" property="publication.externalId"/>
 	<p>
 	<%
-		if (thesis.getDissertation().isPersonAllowedToAccess(AccessControl.getPerson())) {
+		if (thesis.getDissertation().isAccessible(Authenticate.getUser())) {
 	%>
-		(<html:link target="_blank" page="<%="/bibtexExport.do?method=exportPublicationToBibtex&publicationId="+ publicationId %>">
-			<bean:message bundle="RESEARCHER_RESOURCES" key="researcher.result.publication.exportToBibTeX" />
-		</html:link>,
-		
-		<bean:define id="extAbstractDownloadUrl" name="extAbstract" property="downloadUrl" type="java.lang.String"/>
+		(<bean:define id="extAbstractDownloadUrl" name="thesis" property="extendedAbstract.downloadUrl" type="java.lang.String"/>
 		<html:link href="<%= extAbstractDownloadUrl %>">
 			<html:img page="/images/icon_pdf.gif" module=""/>
 			<bean:message bundle="RESEARCHER_RESOURCES" key="link.dissertation.download.extendedAbstract"/>
-			<fr:view name="extAbstract" property="size" layout="fileSize"/>
+			<fr:view name="thesis" property="extendedAbstract.size" layout="fileSize"/>
 		</html:link>
-		
-		<logic:iterate id="file" name="files" length="1">,
-			<bean:define id="downloadUrl" name="file" property="downloadUrl" type="java.lang.String"/>	
-			<html:link href="<%= downloadUrl %>">
-				<html:img page="/images/icon_pdf.gif" module=""/>
-				<bean:message bundle="RESEARCHER_RESOURCES" key="link.dissertation.download.thesis"/>
-				<fr:view name="file" property="size" layout="fileSize"/>
-			</html:link>
-		</logic:iterate>)
+
+		<bean:define id="downloadUrl" name="thesis" property="dissertation.downloadUrl" type="java.lang.String"/>
+		<html:link href="<%= downloadUrl %>">
+			<html:img page="/images/icon_pdf.gif" module=""/>
+			<bean:message bundle="RESEARCHER_RESOURCES" key="link.dissertation.download.thesis"/>
+			<fr:view name="thesis" property="dissertation.size" layout="fileSize"/>
+		</html:link>)
 	<%
 		} else {
 	%>
-		(<bean:message bundle="RESEARCHER_RESOURCES" key="researcher.result.publication.exportToBibTeX" />,
-		
-		<html:img page="/images/icon_pdf.gif" module=""/>
+		(<html:img page="/images/icon_pdf.gif" module=""/>
 		<bean:message bundle="RESEARCHER_RESOURCES" key="link.dissertation.download.extendedAbstract"/>
-		<fr:view name="extAbstract" property="size" layout="fileSize"/>
-		
-		<logic:iterate id="file" name="files" length="1">,
-		<bean:define id="downloadUrl" name="file" property="downloadUrl" type="java.lang.String"/>	
-			<html:img page="/images/icon_pdf.gif" module=""/>
-			<bean:message bundle="RESEARCHER_RESOURCES" key="link.dissertation.download.thesis"/>
-			<fr:view name="file" property="size" layout="fileSize"/>
-		</logic:iterate>)
+		<fr:view name="thesis" property="extendedAbstract.size" layout="fileSize"/>
+
+		<html:img page="/images/icon_pdf.gif" module=""/>
+		<bean:message bundle="RESEARCHER_RESOURCES" key="link.dissertation.download.thesis"/>
+		<fr:view name="thesis" property="dissertation.size" layout="fileSize"/>)
 	<%
 		}
 	%>
 	</p>
-		
-</logic:notEmpty>
+	<p>
+		<bean:message bundle="RESEARCHER_RESOURCES" key="label.publication.subject.to.copyright"/>
+	</p>
+</logic:equal>
 
-<logic:empty name="thesis" property="publication">
+<logic:equal name="thesis" property="evaluated" value="false">
 	<em><bean:message key="message.thesis.publication.notAvailable"/></em>
-</logic:empty>
+</logic:equal>

@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.scientificCouncil;
 
 import java.io.IOException;
@@ -26,7 +44,8 @@ import net.sourceforge.fenixedu.injectionCode.AccessControl;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction;
 import net.sourceforge.fenixedu.presentationTier.Action.exceptions.FenixActionException;
 import net.sourceforge.fenixedu.presentationTier.Action.scientificCouncil.ScientificCouncilApplication.ScientificTeachersApp;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
@@ -222,7 +241,7 @@ public class TeacherAuthorizationManagement extends FenixDispatchAction {
                     final String[] parts = tline.split(splitChar);
 
                     if (parts.length != 6) {
-                        messages.add(BundleUtil.getStringFromResourceBundle("resources.ScientificCouncilResources",
+                        messages.add(BundleUtil.getString(Bundle.SCIENTIFIC,
                                 "label.message.invalid.line.format", Integer.toString(lineCount)));
                         continue;
                     }
@@ -239,25 +258,25 @@ public class TeacherAuthorizationManagement extends FenixDispatchAction {
                     final Department department = Department.find(parts[5].trim());
 
                     if (istUsername == null || istUsername.isEmpty() || User.findByUsername(istUsername) == null) {
-                        messages.add(BundleUtil.getStringFromResourceBundle("resources.ScientificCouncilResources",
+                        messages.add(BundleUtil.getString(Bundle.SCIENTIFIC,
                                 "label.message.istUsername.invalid", Integer.toString(lineCount), parts[0].trim()));
                         continue;
                     }
 
                     if (professionalCategory == null) {
-                        messages.add(BundleUtil.getStringFromResourceBundle("resources.ScientificCouncilResources",
+                        messages.add(BundleUtil.getString(Bundle.SCIENTIFIC,
                                 "label.message.professionalCategory.invalid", Integer.toString(lineCount), parts[1].trim()));
                         continue;
                     }
 
                     if (department == null) {
-                        messages.add(BundleUtil.getStringFromResourceBundle("resources.ScientificCouncilResources",
+                        messages.add(BundleUtil.getString(Bundle.SCIENTIFIC,
                                 "label.message.department.invalid", Integer.toString(lineCount), parts[5].trim()));
                         continue;
                     }
 
                     if (lessonHours == null) {
-                        messages.add(BundleUtil.getStringFromResourceBundle("resources.ScientificCouncilResources",
+                        messages.add(BundleUtil.getString(Bundle.SCIENTIFIC,
                                 "label.message.lessonHours.invalid", Integer.toString(lineCount), parts[2].trim()));
                         continue;
                     }
@@ -283,7 +302,7 @@ public class TeacherAuthorizationManagement extends FenixDispatchAction {
                 try {
                     bean.create();
                 } catch (final FenixActionException ex) {
-                    messages.add(BundleUtil.getStringFromResourceBundle("resources.ScientificCouncilResources", ex.getMessage(),
+                    messages.add(BundleUtil.getString(Bundle.SCIENTIFIC, ex.getMessage(),
                             bean.getIstUsername()));
                 }
             }

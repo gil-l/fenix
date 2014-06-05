@@ -1,10 +1,27 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.renderers;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import net.sourceforge.fenixedu.dataTransferObject.administrativeOffice.studentEnrolment.CurriculumModuleBean;
 import net.sourceforge.fenixedu.dataTransferObject.administrativeOffice.studentEnrolment.StudentEnrolmentBean;
@@ -17,8 +34,10 @@ import net.sourceforge.fenixedu.domain.enrolment.DegreeModuleToEnrol;
 import net.sourceforge.fenixedu.domain.studentCurriculum.CurriculumGroup;
 import net.sourceforge.fenixedu.domain.studentCurriculum.CurriculumLine;
 import net.sourceforge.fenixedu.presentationTier.renderers.converters.DegreeModuleToEnrolKeyConverter;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.commons.beanutils.BeanComparator;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import pt.ist.fenixWebFramework.rendererExtensions.controllers.CopyCheckBoxValuesController;
 import pt.ist.fenixWebFramework.rendererExtensions.converters.DomainObjectKeyArrayConverter;
@@ -38,10 +57,6 @@ import pt.ist.fenixWebFramework.renderers.model.MetaObjectFactory;
 import pt.ist.fenixWebFramework.renderers.schemas.Schema;
 
 public class StudentCurricularPlanEnrolmentsRenderer extends InputRenderer {
-
-    private static final ResourceBundle enumerationResources = ResourceBundle.getBundle("resources.EnumerationResources");
-
-    private final ResourceBundle academicAdminOfficeResources = ResourceBundle.getBundle("resources.AcademicAdminOffice");
 
     private Integer initialWidth = 70;
 
@@ -324,7 +339,7 @@ public class StudentCurricularPlanEnrolmentsRenderer extends InputRenderer {
 
                     final StringBuilder ects = new StringBuilder();
                     ects.append(curricularCourse.getEctsCredits()).append(" ")
-                            .append(academicAdminOfficeResources.getString("credits.abbreviation"));
+                            .append(BundleUtil.getString(Bundle.ACADEMIC, "credits.abbreviation"));
                     ectsCell.setBody(new HtmlText(ects.toString()));
 
                     HtmlTableCell checkBoxCell = htmlTableRow.createCell();
@@ -345,7 +360,7 @@ public class StudentCurricularPlanEnrolmentsRenderer extends InputRenderer {
                     linkTableCell.setClasses(getCurricularCourseCheckBoxClasses());
 
                     final HtmlLink htmlLink = new HtmlLink();
-                    htmlLink.setText(academicAdminOfficeResources.getString("link.option.choose.curricular.course"));
+                    htmlLink.setText(BundleUtil.getString(Bundle.ACADEMIC, "link.option.choose.curricular.course"));
                     htmlLink.setUrl(getLinkURL());
                     htmlLink.setParameter("scpID", studentEnrolmentBean.getStudentCurricularPlan().getExternalId());
                     htmlLink.setParameter("executionPeriodID", studentEnrolmentBean.getExecutionPeriod().getExternalId());
@@ -389,7 +404,7 @@ public class StudentCurricularPlanEnrolmentsRenderer extends InputRenderer {
             final StringBuilder semester = new StringBuilder();
             semester.append(enrolment.getExecutionPeriod().getSemester().toString());
             semester.append(" ");
-            semester.append(enumerationResources.getString("SEMESTER.ABBREVIATION"));
+            semester.append(BundleUtil.getString(Bundle.ENUMERATION, "SEMESTER.ABBREVIATION"));
             semesterCell.setBody(new HtmlText(semester.toString()));
 
             // Ects
@@ -398,7 +413,7 @@ public class StudentCurricularPlanEnrolmentsRenderer extends InputRenderer {
 
             final StringBuilder ects = new StringBuilder();
             ects.append(enrolment.getCurricularCourse().getEctsCredits()).append(" ")
-                    .append(academicAdminOfficeResources.getString("credits.abbreviation"));
+                    .append(BundleUtil.getString(Bundle.ACADEMIC, "credits.abbreviation"));
             ectsCell.setBody(new HtmlText(ects.toString()));
 
             MetaObject enrolmentMetaObject = MetaObjectFactory.createObject(enrolment, new Schema(Enrolment.class));

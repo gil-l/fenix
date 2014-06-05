@@ -1,3 +1,23 @@
+<%--
+
+    Copyright © 2002 Instituto Superior Técnico
+
+    This file is part of FenixEdu Core.
+
+    FenixEdu Core is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    FenixEdu Core is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+
+--%>
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f"%>
 <%@ taglib uri="http://fenixedu.org/taglib/jsf-portal" prefix="fp"%>
 <%@ taglib uri="http://java.sun.com/jsf/html" prefix="h"%>
@@ -145,25 +165,25 @@
 						<f:facet name="header">
 							<h:outputText value="#{bundle['property.room.name']}"/>
 						</f:facet>
-						<h:outputText value="#{room.spaceInformation.identification}"/>
+						<h:outputText value="#{room.name}"/>
 					</h:column>
 					<h:column>
 						<f:facet name="header">
 							<h:outputText value="#{bundle['property.room.building']}"/>
 						</f:facet>
-						<h:outputText value="#{room.spaceBuilding.spaceInformation.name}"/>
+						<h:outputText value="#{room.edificio}"/>
 					</h:column>
 					<h:column>
 						<f:facet name="header">
 							<h:outputText value="#{bundle['property.room.floor']}"/>
 						</f:facet>
-						<h:outputText value="#{room.spaceFloor.spaceInformation.presentationName}"/>
+						<h:outputText value="#{room.piso}"/>
 					</h:column>
 					<h:column>
 						<f:facet name="header">
 							<h:outputText value="#{bundle['property.room.type']}"/>
 						</f:facet>
-						<h:outputText value="#{room.tipo.name}" rendered="#{room.tipo != null}"/>
+						<h:outputText value="#{room.tipo}" rendered="#{room.tipo != null}"/>
 					</h:column>
 					<h:column>
 						<f:facet name="header">
@@ -199,9 +219,9 @@
 			
 			<h:outputText value="<tr>" escape="false"/>
 				<h:outputText value="<td>#{calendarLinks.key.nome}</td>" escape="false"/>
-				<h:outputText value="<td>#{calendarLinks.key.spaceBuilding.name}</td>" escape="false"/>
+				<h:outputText value="<td>#{calendarLinks.key.edificio}</td>" escape="false"/>
 				<h:outputText value="<td>#{calendarLinks.key.piso}</td>" escape="false"/>
-				<h:outputText value="<td>#{calendarLinks.key.tipo.name}</td>" rendered="#{calendarLinks.key.tipo != null}" escape="false"/>
+				<h:outputText value="<td>#{calendarLinks.key.tipo}</td>" rendered="#{calendarLinks.key.tipo != null}" escape="false"/>
 				<h:outputText value="<td>#{calendarLinks.key.capacidadeNormal}</td>" escape="false"/>
 				<h:outputText value="<td>#{calendarLinks.key.capacidadeExame}</td>" escape="false"/>
 			<h:outputText value="</tr>" escape="false"/>

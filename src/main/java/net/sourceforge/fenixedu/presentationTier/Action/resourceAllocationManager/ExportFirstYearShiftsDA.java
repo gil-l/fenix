@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.resourceAllocationManager;
 
 import java.io.IOException;
@@ -19,7 +37,8 @@ import net.sourceforge.fenixedu.domain.degree.DegreeType;
 import net.sourceforge.fenixedu.domain.time.calendarStructure.AcademicInterval;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixContextDispatchAction;
 import net.sourceforge.fenixedu.presentationTier.Action.resourceAllocationManager.RAMApplication.RAMFirstYearShiftsApp;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -104,20 +123,20 @@ public class ExportFirstYearShiftsDA extends FenixContextDispatchAction {
     }
 
     private void addHeader(final Spreadsheet spreadsheet, final EntryPhase phase) {
-        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ResourceAllocationManagerResources",
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.RESOURCE_ALLOCATION,
                 "label.manager.degree.name"));
-        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ResourceAllocationManagerResources",
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.RESOURCE_ALLOCATION,
                 "label.class"));
-        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ResourceAllocationManagerResources",
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.RESOURCE_ALLOCATION,
                 "property.executionCourse.name"));
-        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ResourceAllocationManagerResources",
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.RESOURCE_ALLOCATION,
                 "property.shift"));
-        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ResourceAllocationManagerResources",
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.RESOURCE_ALLOCATION,
                 "property.shift.type"));
-        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ResourceAllocationManagerResources",
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.RESOURCE_ALLOCATION,
                 "property.shift.capacity"));
         if (!phase.equals(EntryPhase.FIRST_PHASE)) {
-            spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ResourceAllocationManagerResources",
+            spreadsheet.setHeader(BundleUtil.getString(Bundle.RESOURCE_ALLOCATION,
                     "property.shift.ocupation"));
         }
 

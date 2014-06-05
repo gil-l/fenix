@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.student;
 
 import static net.sourceforge.fenixedu.injectionCode.AccessControl.check;
@@ -13,7 +31,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -62,7 +79,6 @@ import net.sourceforge.fenixedu.domain.administrativeOffice.AdministrativeOffice
 import net.sourceforge.fenixedu.domain.candidacy.Ingression;
 import net.sourceforge.fenixedu.domain.candidacy.PersonalInformationBean;
 import net.sourceforge.fenixedu.domain.candidacy.StudentCandidacy;
-import net.sourceforge.fenixedu.domain.curriculum.EnrollmentCondition;
 import net.sourceforge.fenixedu.domain.degree.DegreeType;
 import net.sourceforge.fenixedu.domain.degreeStructure.CycleType;
 import net.sourceforge.fenixedu.domain.elections.DelegateElection;
@@ -107,6 +123,7 @@ import net.sourceforge.fenixedu.domain.thesis.Thesis;
 import net.sourceforge.fenixedu.domain.transactions.InsuranceTransaction;
 import net.sourceforge.fenixedu.injectionCode.AccessControl;
 import net.sourceforge.fenixedu.predicates.RegistrationPredicates;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.PeriodState;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -115,10 +132,10 @@ import org.apache.commons.collections.comparators.ComparatorChain;
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.spaces.domain.Space;
-import org.fenixedu.spaces.domain.UnavailableException;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.ReadableInstant;
@@ -164,12 +181,6 @@ public class Registration extends Registration_Base {
             RegistrationAgreement.SMILE, RegistrationAgreement.IST_USP, RegistrationAgreement.BRAZIL_AGREEMENTS,
             RegistrationAgreement.SCIENCE_WITHOUT_BORDERS, RegistrationAgreement.RUSSIA_AGREEMENTS,
             RegistrationAgreement.IBERO_SANTANDER, RegistrationAgreement.TECMIC, RegistrationAgreement.INOV_IST);
-
-    private transient Double approvationRatio;
-
-    private transient Double arithmeticMean;
-
-    private transient Integer approvedEnrollmentsNumber = 0;
 
     private Registration() {
         super();
@@ -524,113 +535,6 @@ public class Registration extends Registration_Base {
         return null;
     }
 
-    /**
-     * @Deprecated Use Curriculum algorithm instead
-     */
-    @Deprecated
-    final public void calculateApprovationRatioAndArithmeticMeanIfActive(boolean onlyPreviousExecutionYear) {
-
-        int enrollmentsNumber = 0;
-        int approvedEnrollmentsNumber = 0;
-        int actualApprovedEnrollmentsNumber = 0;
-        int totalGrade = 0;
-
-        ExecutionYear currentExecutionYear = ExecutionYear.readCurrentExecutionYear();
-        ExecutionYear previousExecutionYear = currentExecutionYear.getPreviousExecutionYear();
-
-        for (StudentCurricularPlan studentCurricularPlan : getStudentCurricularPlans()) {
-            for (Enrolment enrolment : studentCurricularPlan.getEnrolmentsSet()) {
-                if (enrolment.getEnrolmentCondition() == EnrollmentCondition.INVISIBLE) {
-                    continue;
-                }
-
-                ExecutionYear enrolmentExecutionYear = enrolment.getExecutionPeriod().getExecutionYear();
-                if (onlyPreviousExecutionYear && (previousExecutionYear != enrolmentExecutionYear)) {
-                    continue;
-                }
-
-                if (enrolmentExecutionYear != currentExecutionYear) {
-
-                    enrollmentsNumber++;
-                    if (enrolment.isApproved()) {
-                        actualApprovedEnrollmentsNumber++;
-
-                        Integer finalGrade = enrolment.getFinalGrade();
-                        if (finalGrade != null) {
-                            approvedEnrollmentsNumber++;
-                            totalGrade += finalGrade;
-                        } else {
-                            enrollmentsNumber--;
-                        }
-                    }
-                }
-            }
-        }
-
-        setApprovedEnrollmentsNumber(Integer.valueOf(actualApprovedEnrollmentsNumber));
-
-        setApprovationRatio((enrollmentsNumber == 0) ? 0 : (double) approvedEnrollmentsNumber / enrollmentsNumber);
-        setArithmeticMean((approvedEnrollmentsNumber == 0) ? 0 : (double) totalGrade / approvedEnrollmentsNumber);
-
-    }
-
-    /**
-     * @Deprecated Use Curriculum algorithm instead
-     */
-    @Deprecated
-    private void setApprovationRatio(Double approvationRatio) {
-        this.approvationRatio = approvationRatio;
-    }
-
-    /**
-     * @Deprecated Use Curriculum algorithm instead
-     */
-    @Deprecated
-    private void setArithmeticMean(Double arithmeticMean) {
-        this.arithmeticMean = arithmeticMean;
-    }
-
-    /**
-     * @Deprecated Use Curriculum algorithm instead
-     */
-    @Deprecated
-    final public Integer getApprovedEnrollmentsNumber() {
-        if (this.approvedEnrollmentsNumber == null) {
-            calculateApprovationRatioAndArithmeticMeanIfActive(true);
-        }
-        return approvedEnrollmentsNumber;
-    }
-
-    /**
-     * @Deprecated Use Curriculum algorithm instead
-     */
-    @Deprecated
-    private void setApprovedEnrollmentsNumber(Integer approvedEnrollmentsNumber) {
-        this.approvedEnrollmentsNumber = approvedEnrollmentsNumber;
-    }
-
-    /**
-     * @Deprecated Use Curriculum algorithm instead
-     */
-    @Deprecated
-    final public Double getApprovationRatio() {
-        if (this.approvationRatio == null) {
-            calculateApprovationRatioAndArithmeticMeanIfActive(true);
-        }
-        return this.approvationRatio;
-    }
-
-    /**
-     * @Deprecated Use Curriculum algorithm instead
-     */
-    @Deprecated
-    final public Double getArithmeticMean() {
-        if (this.arithmeticMean == null) {
-            calculateApprovationRatioAndArithmeticMeanIfActive(true);
-        }
-        return Double.valueOf(Math.round(this.arithmeticMean * 100) / 100.0);
-    }
-
     final public ICurriculum getCurriculum() {
         return getCurriculum(new DateTime(), (ExecutionYear) null, (CycleType) null);
     }
@@ -809,7 +713,7 @@ public class Registration extends Registration_Base {
 
     final public String getFinalAverageDescription(final CycleType cycleType) {
         final Integer finalAverage = getFinalAverage(cycleType);
-        return finalAverage == null ? null : ResourceBundle.getBundle("resources.EnumerationResources").getString(
+        return finalAverage == null ? null : BundleUtil.getString(Bundle.ENUMERATION, 
                 finalAverage.toString());
     }
 
@@ -849,7 +753,7 @@ public class Registration extends Registration_Base {
                 final CurricularCourse enrolmentCurricularCourse = enrolment.getCurricularCourse();
                 if (enrolmentCurricularCourse == curricularCourse
                         || (enrolmentCurricularCourse.getCompetenceCourse() != null && enrolmentCurricularCourse
-                                .getCompetenceCourse() == curricularCourse.getCompetenceCourse())
+                        .getCompetenceCourse() == curricularCourse.getCompetenceCourse())
                         || hasGlobalEquivalence(curricularCourse, enrolmentCurricularCourse)) {
                     enrolments.add(enrolment);
                 }
@@ -1999,11 +1903,11 @@ public class Registration extends Registration_Base {
         final StudentCurricularPlan toAsk =
                 getStudentCurricularPlan(getStartExecutionYear()) == null ? getFirstStudentCurricularPlan() : getStudentCurricularPlan(getStartExecutionYear());
 
-        if (toAsk == null) {
-            return StringUtils.EMPTY;
-        }
+                if (toAsk == null) {
+                    return StringUtils.EMPTY;
+                }
 
-        return toAsk.getPresentationName(getStartExecutionYear());
+                return toAsk.getPresentationName(getStartExecutionYear());
     }
 
     public String getDegreeNameWithDescription() {
@@ -2034,13 +1938,11 @@ public class Registration extends Registration_Base {
     final public String getDegreeDescription(ExecutionYear executionYear, final CycleType cycleType, final Locale locale) {
         final StringBuilder res = new StringBuilder();
 
-        final ResourceBundle bundle = ResourceBundle.getBundle("resources.AcademicAdminOffice", locale);
-
         final Degree degree = getDegree();
         final DegreeType degreeType = degree.getDegreeType();
         if (getDegreeType() != DegreeType.BOLONHA_ADVANCED_FORMATION_DIPLOMA && cycleType != null) {
             res.append(cycleType.getDescription(locale)).append(",");
-            res.append(" ").append(bundle.getString("label.of.the.male")).append(" ");
+            res.append(" ").append(BundleUtil.getString(Bundle.ACADEMIC,"label.of.the.male")).append(" ");
         }
 
         if (!isEmptyDegree() && !degreeType.isEmpty()) {
@@ -2050,7 +1952,7 @@ public class Registration extends Registration_Base {
             if (getDegreeType() == DegreeType.BOLONHA_ADVANCED_FORMATION_DIPLOMA && cycleType != null) {
                 res.append(" (").append(cycleType.getDescription(locale)).append(")");
             }
-            res.append(" ").append(bundle.getString("label.in")).append(" ");
+            res.append(" ").append(BundleUtil.getString(Bundle.ACADEMIC,"label.in")).append(" ");
         }
 
         res.append(degree.getFilteredName(executionYear, locale).toUpperCase());
@@ -3312,7 +3214,7 @@ public class Registration extends Registration_Base {
         return scp == null ? getLastStudentCurricularPlan().getCampus(executionYear) : scp.getCampus(executionYear);
     }
 
-    final public String getIstUniversity() throws UnavailableException {
+    final public String getIstUniversity() {
         return getCampus().getName();
     }
 
@@ -3859,7 +3761,7 @@ public class Registration extends Registration_Base {
                 if (registrationState.getExecutionYear() == executionYear
                         && (registrationState.isActive() || registrationState.getStateType() == RegistrationStateType.TRANSITED)
                         && (previous.getStateType() == RegistrationStateType.EXTERNAL_ABANDON
-                                || previous.getStateType() == RegistrationStateType.INTERRUPTED || previous.getStateType() == RegistrationStateType.FLUNKED)) {
+                        || previous.getStateType() == RegistrationStateType.INTERRUPTED || previous.getStateType() == RegistrationStateType.FLUNKED)) {
                     return true;
                 }
             }
@@ -3952,15 +3854,13 @@ public class Registration extends Registration_Base {
     }
 
     public void exportValues(StringBuilder result) {
-        final ResourceBundle bundle = ResourceBundle.getBundle("resources.AcademicAdminOffice", I18N.getLocale());
-
         Formatter formatter = new Formatter(result);
         final Student student = getStudent();
-        formatter.format("%s: %s\n", bundle.getString("label.ingression"), getIngression() == null ? " - " : getIngression()
+        formatter.format("%s: %s\n", BundleUtil.getString(Bundle.ACADEMIC,"label.ingression"), getIngression() == null ? " - " : getIngression()
                 .getFullDescription());
-        formatter.format("%s: %d\n", bundle.getString("label.studentNumber"), student.getNumber());
-        formatter.format("%s: %s\n", bundle.getString("label.Student.Person.name"), student.getPerson().getName());
-        formatter.format("%s: %s\n", bundle.getString("label.degree"), getDegree().getPresentationName());
+        formatter.format("%s: %d\n", BundleUtil.getString(Bundle.ACADEMIC,"label.studentNumber"), student.getNumber());
+        formatter.format("%s: %s\n", BundleUtil.getString(Bundle.ACADEMIC,"label.Student.Person.name"), student.getPerson().getName());
+        formatter.format("%s: %s\n", BundleUtil.getString(Bundle.ACADEMIC,"label.degree"), getDegree().getPresentationName());
         formatter.close();
     }
 

@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.credits.util;
 
 import java.io.Serializable;
@@ -17,7 +35,8 @@ import net.sourceforge.fenixedu.domain.organizationalStructure.Unit;
 import net.sourceforge.fenixedu.domain.organizationalStructure.UnitName;
 import net.sourceforge.fenixedu.domain.teacher.TeacherService;
 import net.sourceforge.fenixedu.domain.teacher.TeacherServiceLog;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import pt.ist.fenixframework.Atomic;
 
 public class PersonFunctionBean implements Serializable {
@@ -146,7 +165,7 @@ public class PersonFunctionBean implements Serializable {
             } else {
                 thisPersonFunctionShared.setPercentage(getPercentage());
             }
-            log.append(BundleUtil.getStringFromResourceBundle("resources.TeacherCreditsSheetResources",
+            log.append(BundleUtil.getString(Bundle.TEACHER_CREDITS,
                     "label.teacher.personFunction.createOrEdit", getFunction().getName(), getUnit().getPresentationName(),
                     getTeacher().getPerson().getNickname(), getPercentage().toString()));
         } else {
@@ -156,7 +175,7 @@ public class PersonFunctionBean implements Serializable {
             } else {
                 thisPersonFunction.setCredits(getCredits().doubleValue());
             }
-            log.append(BundleUtil.getStringFromResourceBundle("resources.TeacherCreditsSheetResources",
+            log.append(BundleUtil.getString(Bundle.TEACHER_CREDITS,
                     "label.teacher.personFunction.createOrEdit", getFunction().getName(), getUnit().getPresentationName(),
                     getTeacher().getPerson().getNickname(), getCredits().toString()));
 
@@ -191,12 +210,12 @@ public class PersonFunctionBean implements Serializable {
             teacherService = new TeacherService(getTeacher(), getExecutionSemester());
         }
         if (getFunction() instanceof SharedFunction) {
-            new TeacherServiceLog(teacherService, BundleUtil.getStringFromResourceBundle(
-                    "resources.TeacherCreditsSheetResources", "label.teacher.personFunction.delete", getFunction().getName(),
+            new TeacherServiceLog(teacherService, BundleUtil.getString(
+                    Bundle.TEACHER_CREDITS, "label.teacher.personFunction.delete", getFunction().getName(),
                     getUnit().getPresentationName(), getTeacher().getPerson().getNickname(), getPercentage().toString()));
         } else {
-            new TeacherServiceLog(teacherService, BundleUtil.getStringFromResourceBundle(
-                    "resources.TeacherCreditsSheetResources", "label.teacher.personFunction.delete", getFunction().getName(),
+            new TeacherServiceLog(teacherService, BundleUtil.getString(
+                    Bundle.TEACHER_CREDITS, "label.teacher.personFunction.delete", getFunction().getName(),
                     getUnit().getPresentationName(), getTeacher().getPerson().getNickname(), getCredits().toString()));
         }
     }

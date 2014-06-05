@@ -1,6 +1,23 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.servlets.startup;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
@@ -11,8 +28,6 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import javax.servlet.ServletException;
-import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpServletRequest;
 
@@ -32,10 +47,9 @@ import net.sourceforge.fenixedu.webServices.jersey.api.FenixJerseyAPIConfig;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.User.UserPresentationStrategy;
-import org.fenixedu.bennu.core.presentationTier.servlets.filters.ExceptionHandlerFilter;
-import org.fenixedu.bennu.core.presentationTier.servlets.filters.ExceptionHandlerFilter.CustomHandler;
 import org.fenixedu.bennu.core.rest.Healthcheck;
 import org.fenixedu.bennu.core.rest.SystemResource;
+import org.fenixedu.bennu.core.servlets.ExceptionHandlerFilter;
 import org.fenixedu.bennu.core.util.CoreConfiguration;
 import org.fenixedu.bennu.portal.servlet.PortalBackendRegistry;
 import org.slf4j.Logger;
@@ -243,16 +257,18 @@ public class FenixInitializer implements ServletContextListener {
         });
     }
 
-    public static class FenixCustomExceptionHandler implements CustomHandler {
-        @Override
-        public boolean isCustomizedFor(Throwable t) {
-            return true;
-        }
+    private void registerUncaughtExceptionHandler() {
+        ExceptionHandlerFilter.setExceptionHandler((request, response, t) -> {
+            if (response.isCommitted()) {
+                // We cannot forward to the error form after the response is committed
+                return false;
+            }
 
-        @Override
-        public void handle(HttpServletRequest request, ServletResponse response, final Throwable t) throws ServletException,
-                IOException {
-            ExceptionInformation exceptionInfo = new ExceptionInformation(request, t);
+            HttpServletRequest req = (HttpServletRequest) request;
+
+            ExceptionInformation exceptionInfo = new ExceptionInformation(req, t);
+
+            logger.error("Request at " + req.getRequestURI() + " threw an exception: ", t);
 
             if (CoreConfiguration.getConfiguration().developmentMode()) {
                 request.setAttribute("debugExceptionInfo", exceptionInfo);
@@ -262,11 +278,8 @@ public class FenixInitializer implements ServletContextListener {
             }
 
             request.getRequestDispatcher("/showErrorPage.do").forward(request, response);
-        }
-    }
-
-    private void registerUncaughtExceptionHandler() {
-        ExceptionHandlerFilter.register(new FenixCustomExceptionHandler());
+            return true;
+        });
     }
 
 }

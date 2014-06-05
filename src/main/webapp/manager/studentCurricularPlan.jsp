@@ -1,3 +1,23 @@
+<%--
+
+    Copyright © 2002 Instituto Superior Técnico
+
+    This file is part of FenixEdu Core.
+
+    FenixEdu Core is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    FenixEdu Core is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+
+--%>
 <%@ taglib uri="http://struts.apache.org/tags-html" prefix="html" %><html:xhtml/><%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %><%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %><%@ taglib uri="http://jakarta.apache.org/taglibs/datetime-1.0" prefix="dt" %><%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr"%><%@ taglib uri="http://fenix-ashes.ist.utl.pt/taglib/enum" prefix="e" %><h2><bean:message bundle="MANAGER_RESOURCES" key="link.manager.studentsManagement"/></h2><br /><p><span class="error"><!-- Error messages go here --><html:errors /></span></p>
 <logic:messagesPresent message="true">
 		<ul>
@@ -8,9 +28,7 @@
 		<br />
 </logic:messagesPresent><jsp:include page="studentCurricularPlanHeader.jsp"/>	<bean:define id="studentNumber" name="studentCurricularPlanForm" property="number"/>	<bean:define id="degreeType" name="studentCurricularPlanForm" property="degreeType"/>	<html:link module="/manager" page="<%= "/studentsManagement.do?method=prepareCreateStudentCurricularPlan&amp;page=0&amp;number="				+ pageContext.findAttribute("studentNumber").toString()				+ "&amp;degreeType="				+ pageContext.findAttribute("degreeType").toString()			%>">		<bean:message bundle="MANAGER_RESOURCES" key="link.create.student.curricular.plan"/>	</html:link>
 	
-	<br/><br/>
-	<html:link page="/createClassificationsForStudents.do?method=prepare"><bean:message key="button.createClassifications" bundle="MANAGER_RESOURCES" /></html:link>
-	<br/>	<logic:present name="infoStudentCurricularPlans">		<br/>		<bean:define id="deleteConfirmStudentCurricularPlan">			return confirm('<bean:message bundle="MANAGER_RESOURCES" key="message.confirm.delete.studentCurricularPlan"/>')		</bean:define>		<bean:define id="deleteConfirmEnrollment">			return confirm('<bean:message bundle="MANAGER_RESOURCES" key="message.confirm.delete.enrollment"/>')		</bean:define>				<logic:iterate id="infoStudentCurricularPlan" name="infoStudentCurricularPlans">			<bean:define id="studentCurricularPlanId" name="infoStudentCurricularPlan" property="externalId"/>			<bean:define id="studentNumber" name="infoStudentCurricularPlan" property="infoStudent.number"/>			<bean:define id="degreeType" name="infoStudentCurricularPlan" property="infoStudent.degreeType"/>
+	<br/>	<logic:present name="infoStudentCurricularPlans">		<br/>		<bean:define id="deleteConfirmStudentCurricularPlan">			return confirm('<bean:message bundle="MANAGER_RESOURCES" key="message.confirm.delete.studentCurricularPlan"/>')		</bean:define>		<bean:define id="deleteConfirmEnrollment">			return confirm('<bean:message bundle="MANAGER_RESOURCES" key="message.confirm.delete.enrollment"/>')		</bean:define>				<logic:iterate id="infoStudentCurricularPlan" name="infoStudentCurricularPlans">			<bean:define id="studentCurricularPlanId" name="infoStudentCurricularPlan" property="externalId"/>			<bean:define id="studentNumber" name="infoStudentCurricularPlan" property="infoStudent.number"/>			<bean:define id="degreeType" name="infoStudentCurricularPlan" property="infoStudent.degreeType"/>
 			
 			<strong>
 				<bean:write name="infoStudentCurricularPlan" property="studentCurricularPlan.registration.student.person.name" /> - 

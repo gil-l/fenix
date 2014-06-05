@@ -1,3 +1,23 @@
+<!--
+
+    Copyright © 2002 Instituto Superior Técnico
+
+    This file is part of FenixEdu Core.
+
+    FenixEdu Core is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    FenixEdu Core is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
 <!-- ExecutionCourse CourseLoad Management Schemas -->
 
 <schema name="ExecutionCourseCourseLoadManagement" type="net.sourceforge.fenixedu.dataTransferObject.resourceAllocationManager.CourseLoadBean" bundle="SOP_RESOURCES">
@@ -131,4 +151,28 @@
         <property name="nullOptionHidden" value="true" />
         <property name="destination" value="academicIntervalPostBack" />
     </slot>
+</schema>
+
+<schema name="SpaceOccupationEventBean" type="net.sourceforge.fenixedu.dataTransferObject.resourceAllocationManager.SpaceOccupationEventBean" bundle="SPACE_RESOURCES">
+	<slot name="day" key="label.search.spaces.events.day"/>
+	<slot name="startTime" key="label.search.spaces.events.start"/>
+	<slot name="endTime" key="label.search.spaces.events.end"/>
+	<slot name="spaceName" key="label.search.spaces.events.spaceName"/>
+	<slot name="occupationType" key="label.search.spaces.events.occupationType"/>
+	<slot name="description" key="label.search.spaces.events.description"/>
+</schema>
+
+<schema name="SearchSpaceEvents" type="net.sourceforge.fenixedu.dataTransferObject.resourceAllocationManager.SearchOccupationEventsBean" bundle="SPACE_RESOURCES">
+	<slot name="start" layout="picker" key="label.search.spaces.events.start" 
+		validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator" />
+	<slot name="end" layout="picker" key="label.search.spaces.events.end" 
+		validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator" />
+	<slot name="building" key="label.search.spaces.events.building" layout="menu-select" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator">	
+		<property name="providerClass" value="net.sourceforge.fenixedu.presentationTier.renderers.providers.spaceManager.AllBuildingsProvider"/>		
+		<property name="format"	value="${presentationName}" />	
+	</slot>
+	<slot name="types" key="label.search.spaces.events.occupationType" layout="option-select">
+		<property name="providerClass"	value="net.sourceforge.fenixedu.presentationTier.renderers.providers.choiceType.replacement.multiple.OccupationTypeProvider" />
+		<property name="classes" value="list2"/>
+	</slot>	
 </schema>

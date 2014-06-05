@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.docs.academicAdministrativeOffice;
 
 import java.math.BigDecimal;
@@ -6,7 +24,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -26,21 +43,15 @@ import net.sourceforge.fenixedu.domain.studentCurriculum.Dismissal;
 import net.sourceforge.fenixedu.domain.studentCurriculum.ExternalCurriculumGroup;
 import net.sourceforge.fenixedu.domain.studentCurriculum.ExternalEnrolment;
 import net.sourceforge.fenixedu.domain.studentCurriculum.NoCourseGroupCurriculumGroup;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.HtmlToTextConverterUtil;
 
 import org.apache.commons.lang.StringUtils;
-import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
-import java.util.Locale;
 import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
 public class ApprovementInfoForEquivalenceProcess {
-
-    static final private ResourceBundle resourceBundle = ResourceBundle.getBundle("resources.AcademicAdminOffice",
-            I18N.getLocale());
-
-    static final private ResourceBundle enumBundle = ResourceBundle.getBundle("resources.EnumerationResources",
-            I18N.getLocale());
 
     static final protected String[] identifiers = { "*", "#", "+", "**", "***" };
 
@@ -96,7 +107,7 @@ public class ApprovementInfoForEquivalenceProcess {
             final StringBuilder unit = new StringBuilder();
 
             unit.append(academicUnitId.getValue());
-            unit.append(SINGLE_SPACE).append(getResourceBundle().getString("documents.external.curricular.courses.one"));
+            unit.append(SINGLE_SPACE).append(BundleUtil.getString(Bundle.ACADEMIC, "documents.external.curricular.courses.one"));
             unit.append(SINGLE_SPACE).append(getMLSTextContent(academicUnitId.getKey().getPartyName()));
             result.append(unit.toString());
             result.append(LINE_BREAK);
@@ -112,7 +123,7 @@ public class ApprovementInfoForEquivalenceProcess {
         if (remainingCredits != BigDecimal.ZERO) {
             result.append(LINE_BREAK);
 
-            final String remainingCreditsInfo = getResourceBundle().getString("documents.remainingCreditsInfo");
+            final String remainingCreditsInfo = BundleUtil.getString(Bundle.ACADEMIC, "documents.remainingCreditsInfo");
             result.append(remainingCreditsInfo + ":" + remainingCredits);
 
             result.append(LINE_BREAK);
@@ -242,10 +253,10 @@ public class ApprovementInfoForEquivalenceProcess {
         result.append(SINGLE_SPACE);
         getCreditsInfo(result, entry, registration);
         result.append(entry.getGradeValue());
-        result.append("(" + enumBundle.getString(entry.getGradeValue()) + ")");
+        result.append("(" + BundleUtil.getString(Bundle.ENUMERATION, entry.getGradeValue()) + ")");
 
         result.append(SINGLE_SPACE);
-        final String in = getResourceBundle().getString("label.in");
+        final String in = BundleUtil.getString(Bundle.ACADEMIC, "label.in");
         if (executionYear != null) {
             result.append(in);
             result.append(SINGLE_SPACE).append(executionYear.getYear());
@@ -325,10 +336,6 @@ public class ApprovementInfoForEquivalenceProcess {
     static private String convert(final String content) {
         return HtmlToTextConverterUtil.convertToText(content).replace("\n\n", "\t").replace(LINE_BREAK, StringUtils.EMPTY)
                 .replace("\t", "\n\n").trim();
-    }
-
-    private static ResourceBundle getResourceBundle() {
-        return resourceBundle;
     }
 
 }

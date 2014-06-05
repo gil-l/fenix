@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.academicAdministration.executionCourseManagement;
 
 import java.util.Collections;
@@ -25,7 +43,8 @@ import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction
 import net.sourceforge.fenixedu.presentationTier.Action.exceptions.FenixActionException;
 import net.sourceforge.fenixedu.presentationTier.Action.resourceAllocationManager.utils.PresentationConstants;
 import net.sourceforge.fenixedu.presentationTier.Action.utils.RequestUtils;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.collections.CollectionUtils;
@@ -186,7 +205,7 @@ public class SeperateExecutionCourseDispatchAction extends FenixDispatchAction {
         Collections.sort(executionDegreeList, new BeanComparator("label"));
         executionDegreeList.add(
                 0,
-                new LabelValueBean(BundleUtil.getStringFromResourceBundle("resources.RendererResources",
+                new LabelValueBean(BundleUtil.getString(Bundle.RENDERER,
                         "renderers.menu.default.title"), ""));
     }
 
@@ -380,7 +399,7 @@ public class SeperateExecutionCourseDispatchAction extends FenixDispatchAction {
         if (sb.length() > 1) {
             sb.setLength(sb.length() - 2); // trim ", "
         } else {
-            sb.append(BundleUtil.getStringFromResourceBundle("resources.ApplicationResources", "label.empty"));
+            sb.append(BundleUtil.getString(Bundle.APPLICATION, "label.empty"));
         }
         return sb.toString();
     }

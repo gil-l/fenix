@@ -1,16 +1,31 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.jsf.components.degreeStructure;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
-
-import org.fenixedu.commons.i18n.I18N;
 
 import net.sourceforge.fenixedu.domain.ExecutionSemester;
 import net.sourceforge.fenixedu.domain.ExecutionYear;
@@ -18,8 +33,11 @@ import net.sourceforge.fenixedu.domain.curricularRules.CurricularRule;
 import net.sourceforge.fenixedu.domain.degreeStructure.Context;
 import net.sourceforge.fenixedu.domain.degreeStructure.DegreeModule;
 import net.sourceforge.fenixedu.predicates.AcademicPredicates;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.CurricularRuleLabelFormatter;
-import java.util.Locale;
+
+import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.commons.i18n.I18N;
 
 public class UIDegreeModule extends UIInput {
     public static final String COMPONENT_TYPE =
@@ -103,11 +121,6 @@ public class UIDegreeModule extends UIInput {
         }
     }
 
-    protected String getBundleValue(String bundleName, String bundleKey) {
-        ResourceBundle bundle = ResourceBundle.getBundle("resources/" + bundleName, I18N.getLocale());
-        return bundle.getString(bundleKey);
-    }
-
     private static final String CODE_NAME_SEPARATOR = " - ";
 
     protected void appendCodeAndName() throws IOException {
@@ -123,7 +136,7 @@ public class UIDegreeModule extends UIInput {
         writer.startElement("a", this);
         encodeLinkHref(page, aditionalParameters, blank);
         for (String bundleKey : bundleKeys) {
-            writer.write(this.getBundleValue("BolonhaManagerResources", bundleKey));
+            writer.write(BundleUtil.getString(Bundle.BOLONHA, bundleKey));
         }
         writer.endElement("a");
     }

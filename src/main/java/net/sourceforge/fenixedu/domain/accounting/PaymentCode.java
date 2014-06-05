@@ -1,19 +1,37 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.accounting;
 
 import java.util.Comparator;
-import java.util.ResourceBundle;
 
 import net.sourceforge.fenixedu.domain.ExecutionYear;
 import net.sourceforge.fenixedu.domain.Person;
 import net.sourceforge.fenixedu.domain.accounting.util.PaymentCodeGenerator;
 import net.sourceforge.fenixedu.domain.accounting.util.PaymentCodeGeneratorFactory;
 import net.sourceforge.fenixedu.domain.exceptions.DomainException;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.FenixConfigurationManager;
 import net.sourceforge.fenixedu.util.Money;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 import org.joda.time.YearMonthDay;
 
@@ -222,8 +240,7 @@ public abstract class PaymentCode extends PaymentCode_Base {
     }
 
     public String getDescription() {
-        final ResourceBundle enumerationResources = ResourceBundle.getBundle("resources.EnumerationResources", I18N.getLocale());
-        return enumerationResources.getString(getType().getQualifiedName());
+        return BundleUtil.getString(Bundle.ENUMERATION, getType().getQualifiedName());
     }
 
     abstract protected void internalProcess(final Person person, final Money amount, final DateTime whenRegistered,

@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.library;
 
 import java.io.Serializable;
@@ -45,10 +63,9 @@ public class LibraryAttendance implements Serializable {
         public Object provide(Object source, Object currentValue) {
             LibraryAttendance attendance = (LibraryAttendance) source;
             Set<Space> availableSpaces = new HashSet<Space>();
-            for (org.fenixedu.spaces.domain.Space space : attendance.getLibrary().getValidChildrenSet()) {
-                Space newSpace = (Space) space;
-                if (SpaceUtils.currentAttendaceCount(newSpace) < newSpace.getAllocatableCapacity()) {
-                    availableSpaces.add(newSpace);
+            for (Space space : attendance.getLibrary().getChildren()) {
+                if (SpaceUtils.currentAttendaceCount(space) < space.getAllocatableCapacity()) {
+                    availableSpaces.add(space);
                 }
             }
             return availableSpaces;
@@ -185,8 +202,8 @@ public class LibraryAttendance implements Serializable {
         if (person != null) {
             Set<Space> spaces = new HashSet<Space>();
             spaces.add(library);
-            for (org.fenixedu.spaces.domain.Space newSpace : library.getChildrenSet()) {
-                spaces.add((Space) newSpace);
+            for (Space newSpace : library.getChildren()) {
+                spaces.add(newSpace);
             }
             for (Space space : spaces) {
                 for (SpaceAttendances attendance : space.getCurrentAttendanceSet()) {
@@ -305,19 +322,15 @@ public class LibraryAttendance implements Serializable {
     public Set<SpaceAttendances> getLibraryAttendances() {
         Set<SpaceAttendances> attendances = new HashSet<SpaceAttendances>();
         attendances.addAll(library.getCurrentAttendanceSet());
-        for (org.fenixedu.spaces.domain.Space space : library.getValidChildrenSet()) {
-            Space newSpace = (Space) space;
+        for (org.fenixedu.spaces.domain.Space space : library.getChildren()) {
+            Space newSpace = space;
             attendances.addAll(newSpace.getCurrentAttendanceSet());
         }
         return attendances;
     }
 
     public boolean isFull() {
-        Space r = getLibrary();
-        Integer allocatableCapacity;
-        allocatableCapacity = r.getAllocatableCapacity();
-
-        return SpaceUtils.currentAttendaceCount(r) < allocatableCapacity;
+        return SpaceUtils.currentAttendaceCount(getLibrary()) >= getLibrary().getAllocatableCapacity();
     }
 
     public void search() {
@@ -369,9 +382,7 @@ public class LibraryAttendance implements Serializable {
         if (person == null) {
             return null;
         }
-        Integer allocatableCapacity;
-        allocatableCapacity = space.getAllocatableCapacity();
-        if (!(SpaceUtils.currentAttendaceCount(space) < allocatableCapacity)) {
+        if (!(SpaceUtils.currentAttendaceCount(space) < space.getAllocatableCapacity())) {
             throw new DomainException("error.space.maximumAttendanceExceeded");
         }
         SpaceAttendances attendance = new SpaceAttendances(person.getIstUsername(), responsibleUsername, new DateTime());

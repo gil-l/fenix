@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.applicationTier.Servico.resourceAllocationManager.exams;
 
 import java.util.ArrayList;
@@ -12,7 +30,6 @@ import net.sourceforge.fenixedu.applicationTier.Filtro.ResourceAllocationManager
 import net.sourceforge.fenixedu.applicationTier.Servico.exceptions.FenixServiceException;
 import net.sourceforge.fenixedu.applicationTier.Servico.exceptions.InvalidArgumentsServiceException;
 import net.sourceforge.fenixedu.applicationTier.Servico.exceptions.NotAuthorizedException;
-import net.sourceforge.fenixedu.applicationTier.Servico.resourceAllocationManager.GOPSendMessageService;
 import net.sourceforge.fenixedu.domain.DegreeModuleScope;
 import net.sourceforge.fenixedu.domain.Exam;
 import net.sourceforge.fenixedu.domain.ExecutionCourse;
@@ -20,6 +37,7 @@ import net.sourceforge.fenixedu.domain.GradeScale;
 import net.sourceforge.fenixedu.domain.Person;
 import net.sourceforge.fenixedu.domain.WrittenEvaluation;
 import net.sourceforge.fenixedu.domain.WrittenTest;
+import net.sourceforge.fenixedu.domain.exceptions.DomainException;
 import net.sourceforge.fenixedu.domain.person.RoleType;
 import net.sourceforge.fenixedu.domain.space.EventSpaceOccupation;
 import net.sourceforge.fenixedu.domain.util.email.ConcreteReplyTo;
@@ -33,6 +51,7 @@ import net.sourceforge.fenixedu.util.Season;
 
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.UserGroup;
+import org.fenixedu.core.service.GOPSendMessageService;
 import org.fenixedu.spaces.domain.Space;
 import org.fenixedu.spaces.domain.occupation.Occupation;
 import org.joda.time.DateTime;
@@ -116,8 +135,7 @@ public class EditWrittenEvaluation {
                                 eventSpaceOccupation.getEventSpaceOccupationIntervals(beginDateTime, endDateTime);
                         intervalCount += intervals.size();
                         if (intervalCount > 1) {
-                            String name;
-                            name = allocatableSpace.getName();
+                            throw new DomainException("error.noRoom", allocatableSpace.getName());
                         }
                     }
                 }

@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.Action.teacher.teacher;
 
 import java.io.IOException;
@@ -21,11 +39,12 @@ import net.sourceforge.fenixedu.domain.onlineTests.OnlineTest;
 import net.sourceforge.fenixedu.domain.student.Registration;
 import net.sourceforge.fenixedu.presentationTier.Action.base.FenixDispatchAction;
 import net.sourceforge.fenixedu.presentationTier.Action.teacher.ManageExecutionCourseDA;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import pt.ist.fenixWebFramework.struts.annotations.Mapping;
 import pt.utl.ist.fenix.tools.util.excel.Spreadsheet;
@@ -40,10 +59,10 @@ public class DownloadStudentsWithAttendsByExecutionCourseListWithGradesActionFor
         final ExecutionCourse executionCourse = getDomainObject(request, "executionCourseOID");
 
         final Spreadsheet spreadsheet = new Spreadsheet(executionCourse.getSigla());
-        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ApplicationResources", "label.number"));
-        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ApplicationResources", "label.name"));
-        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ApplicationResources", "label.degree.code"));
-        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ApplicationResources",
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.APPLICATION, "label.number"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.APPLICATION, "label.name"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.APPLICATION, "label.degree.code"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.APPLICATION,
                 "label.attends.enrollmentState"));
         final List<Evaluation> evaluations = executionCourse.getOrderedAssociatedEvaluations();
         for (final Evaluation evaluation : evaluations) {
@@ -52,7 +71,7 @@ public class DownloadStudentsWithAttendsByExecutionCourseListWithGradesActionFor
                 spreadsheet.setHeader(adHocEvaluation.getName());
             } else if (evaluation instanceof FinalEvaluation) {
                 final FinalEvaluation finalEvaluation = (FinalEvaluation) evaluation;
-                spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ApplicationResources",
+                spreadsheet.setHeader(BundleUtil.getString(Bundle.APPLICATION,
                         "label.final.evaluation"));
             } else if (evaluation instanceof OnlineTest) {
                 final OnlineTest onlineTest = (OnlineTest) evaluation;
@@ -62,7 +81,7 @@ public class DownloadStudentsWithAttendsByExecutionCourseListWithGradesActionFor
                 spreadsheet.setHeader(project.getName());
             } else if (evaluation instanceof Exam) {
                 final Exam exam = (Exam) evaluation;
-                spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ApplicationResources", exam.getSeason()
+                spreadsheet.setHeader(BundleUtil.getString(Bundle.APPLICATION, exam.getSeason()
                         .getKey()));
             } else if (evaluation instanceof WrittenTest) {
                 final WrittenTest writtenTest = (WrittenTest) evaluation;
@@ -82,7 +101,7 @@ public class DownloadStudentsWithAttendsByExecutionCourseListWithGradesActionFor
                 final EnrolmentEvaluationType enrolmentEvaluationType = attends.getEnrolmentEvaluationType();
                 row.setCell(enrolmentEvaluationType.getDescription());
             } else {
-                row.setCell(BundleUtil.getStringFromResourceBundle("resources.ApplicationResources",
+                row.setCell(BundleUtil.getString(Bundle.APPLICATION,
                         "label.attends.enrollmentState.notEnrolled"));
             }
             for (final Evaluation evaluation : evaluations) {

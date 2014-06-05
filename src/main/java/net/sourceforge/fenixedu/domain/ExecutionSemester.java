@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain;
 
 import static net.sourceforge.fenixedu.injectionCode.AccessControl.check;
@@ -9,8 +27,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import net.sourceforge.fenixedu.applicationTier.Servico.commons.ReadExecutionPeriods;
@@ -34,11 +50,13 @@ import net.sourceforge.fenixedu.domain.time.calendarStructure.TeacherCreditsFill
 import net.sourceforge.fenixedu.domain.time.calendarStructure.TeacherCreditsFillingForDepartmentAdmOfficeCE;
 import net.sourceforge.fenixedu.domain.time.calendarStructure.TeacherCreditsFillingForTeacherCE;
 import net.sourceforge.fenixedu.predicates.RolePredicates;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.FenixConfigurationManager;
 import net.sourceforge.fenixedu.util.Month;
 import net.sourceforge.fenixedu.util.PeriodState;
 
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.StringNormalizer;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
@@ -57,10 +75,6 @@ import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
  * 
  */
 public class ExecutionSemester extends ExecutionSemester_Base implements Comparable<ExecutionSemester> {
-
-    private static final ResourceBundle applicationResourcesBundle = ResourceBundle.getBundle("resources.ApplicationResources",
-            new Locale("pt"));
-    private transient OccupationPeriod lessonsPeriod;
 
     public static final Comparator<ExecutionSemester> COMPARATOR_BY_SEMESTER_AND_YEAR = new Comparator<ExecutionSemester>() {
 
@@ -125,14 +139,8 @@ public class ExecutionSemester extends ExecutionSemester_Base implements Compara
         super.setExecutionYear(executionYear);
     }
 
-    // Temp hack for maximum performance during enrollment period.
-    private Integer semester = null;
-
     public Integer getSemester() {
-        if (semester == null) {
-            semester = getAcademicInterval().getAcademicSemesterOfAcademicYear();
-        }
-        return semester;
+        return getAcademicInterval().getAcademicSemesterOfAcademicYear();
     }
 
     public ExecutionSemester getNextExecutionPeriod() {
@@ -188,9 +196,8 @@ public class ExecutionSemester extends ExecutionSemester_Base implements Compara
             AcademicCalendarEntry parentEntry = getAcademicInterval().getAcademicCalendarEntry();
             AcademicCalendarRootEntry rootEntry = getAcademicInterval().getAcademicCalendar();
 
-            new TeacherCreditsFillingForDepartmentAdmOfficeCE(parentEntry, new MultiLanguageString(
-                    applicationResourcesBundle.getString("label.TeacherCreditsFillingCE.entry.title")), null, begin, end,
-                    rootEntry);
+            new TeacherCreditsFillingForDepartmentAdmOfficeCE(parentEntry, new MultiLanguageString(BundleUtil.getString(
+                    Bundle.APPLICATION, "label.TeacherCreditsFillingCE.entry.title")), null, begin, end, rootEntry);
 
         } else {
             creditsFillingCE.edit(begin, end);
@@ -206,9 +213,8 @@ public class ExecutionSemester extends ExecutionSemester_Base implements Compara
             AcademicCalendarEntry parentEntry = getAcademicInterval().getAcademicCalendarEntry();
             AcademicCalendarRootEntry rootEntry = getAcademicInterval().getAcademicCalendar();
 
-            new TeacherCreditsFillingForTeacherCE(parentEntry, new MultiLanguageString(
-                    applicationResourcesBundle.getString("label.TeacherCreditsFillingCE.entry.title")), null, begin, end,
-                    rootEntry);
+            new TeacherCreditsFillingForTeacherCE(parentEntry, new MultiLanguageString(BundleUtil.getString(Bundle.APPLICATION,
+                    "label.TeacherCreditsFillingCE.entry.title")), null, begin, end, rootEntry);
             new CreditsPersonFunctionsSharedQueueJob(this);
         } else {
             creditsFillingCE.edit(begin, end);
@@ -470,26 +476,25 @@ public class ExecutionSemester extends ExecutionSemester_Base implements Compara
     }
 
     public OccupationPeriod getLessonsPeriod() {
+        OccupationPeriod lessonsPeriod = null;
 
-        if (lessonsPeriod == null) {
+        Collection<ExecutionDegree> degrees = getExecutionYear().getExecutionDegreesByType(DegreeType.DEGREE);
+        degrees.addAll(getExecutionYear().getExecutionDegreesByType(DegreeType.BOLONHA_DEGREE));
+        degrees.addAll(getExecutionYear().getExecutionDegreesByType(DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE));
+        degrees.addAll(getExecutionYear().getExecutionDegreesByType(DegreeType.BOLONHA_MASTER_DEGREE));
 
-            Collection<ExecutionDegree> degrees = getExecutionYear().getExecutionDegreesByType(DegreeType.DEGREE);
-            degrees.addAll(getExecutionYear().getExecutionDegreesByType(DegreeType.BOLONHA_DEGREE));
-            degrees.addAll(getExecutionYear().getExecutionDegreesByType(DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE));
-            degrees.addAll(getExecutionYear().getExecutionDegreesByType(DegreeType.BOLONHA_MASTER_DEGREE));
-
-            for (ExecutionDegree executionDegree : degrees) {
-                if (getSemester() == 1) {
-                    OccupationPeriod lessonsPeriodFirstSemester = executionDegree.getPeriodLessonsFirstSemester();
-                    lessonsPeriod =
-                            (lessonsPeriod == null || lessonsPeriodFirstSemester.isGreater(lessonsPeriod)) ? lessonsPeriodFirstSemester : lessonsPeriod;
-                } else {
-                    OccupationPeriod lessonsPeriodSecondSemester = executionDegree.getPeriodLessonsSecondSemester();
-                    lessonsPeriod =
-                            (lessonsPeriod == null || lessonsPeriodSecondSemester.isGreater(lessonsPeriod)) ? lessonsPeriodSecondSemester : lessonsPeriod;
-                }
+        for (ExecutionDegree executionDegree : degrees) {
+            if (getSemester() == 1) {
+                OccupationPeriod lessonsPeriodFirstSemester = executionDegree.getPeriodLessonsFirstSemester();
+                lessonsPeriod =
+                        (lessonsPeriod == null || lessonsPeriodFirstSemester.isGreater(lessonsPeriod)) ? lessonsPeriodFirstSemester : lessonsPeriod;
+            } else {
+                OccupationPeriod lessonsPeriodSecondSemester = executionDegree.getPeriodLessonsSecondSemester();
+                lessonsPeriod =
+                        (lessonsPeriod == null || lessonsPeriodSecondSemester.isGreater(lessonsPeriod)) ? lessonsPeriodSecondSemester : lessonsPeriod;
             }
         }
+
         return lessonsPeriod;
     }
 

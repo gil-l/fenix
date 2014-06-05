@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.backBeans.teacher.evaluation;
 
 import java.io.BufferedReader;
@@ -14,9 +32,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
+import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlInputHidden;
@@ -32,7 +51,6 @@ import javax.servlet.http.Part;
 import net.sourceforge.fenixedu.applicationTier.Servico.exceptions.FenixServiceException;
 import net.sourceforge.fenixedu.applicationTier.Servico.exceptions.FenixServiceMultipleException;
 import net.sourceforge.fenixedu.applicationTier.Servico.exceptions.NotAuthorizedException;
-import net.sourceforge.fenixedu.applicationTier.Servico.resourceAllocationManager.GOPSendMessageService;
 import net.sourceforge.fenixedu.applicationTier.Servico.resourceAllocationManager.exams.CreateWrittenEvaluation;
 import net.sourceforge.fenixedu.applicationTier.Servico.resourceAllocationManager.exams.DeleteWrittenEvaluation;
 import net.sourceforge.fenixedu.applicationTier.Servico.resourceAllocationManager.exams.EditWrittenEvaluation;
@@ -43,6 +61,7 @@ import net.sourceforge.fenixedu.applicationTier.Servico.teacher.WriteMarks;
 import net.sourceforge.fenixedu.applicationTier.Servico.teacher.WriteMarks.AttendsMark;
 import net.sourceforge.fenixedu.applicationTier.Servico.teacher.WriteMarks.StudentMark;
 import net.sourceforge.fenixedu.applicationTier.Servico.teacher.WrittenEvaluationRoomDistribution;
+import net.sourceforge.fenixedu.dataTransferObject.InfoRoom;
 import net.sourceforge.fenixedu.domain.Attends;
 import net.sourceforge.fenixedu.domain.CurricularCourse;
 import net.sourceforge.fenixedu.domain.DegreeModuleScope;
@@ -67,11 +86,13 @@ import net.sourceforge.fenixedu.injectionCode.AccessControl;
 import net.sourceforge.fenixedu.injectionCode.IllegalDataAccessException;
 import net.sourceforge.fenixedu.presentationTier.Action.resourceAllocationManager.utils.PresentationConstants;
 import net.sourceforge.fenixedu.presentationTier.backBeans.base.FenixBackingBean;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.Season;
 
 import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.collections.comparators.ReverseComparator;
 import org.apache.struts.util.MessageResources;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.core.service.GOPSendMessageService;
 import org.fenixedu.spaces.domain.Space;
 
 import pt.ist.fenixframework.Atomic;
@@ -85,8 +106,6 @@ public class EvaluationManagementBackingBean extends FenixBackingBean {
     private static final String ENROLMENT_TYPE_FILTER_ALL = "all";
 
     private static final String ENROLMENT_TYPE_FILTER_NOT_ENROLLED = "not.enrolled";
-
-    protected final ResourceBundle enumerationBundle = getResourceBundle("resources/EnumerationResources");
 
     protected String executionCourseID;
 
@@ -594,14 +613,13 @@ public class EvaluationManagementBackingBean extends FenixBackingBean {
             WriteMarks.writeByAttend(getExecutionCourseID(), getEvaluationID(), buildAttendsMark());
         } catch (FenixServiceMultipleException e) {
             for (DomainException domainException : e.getExceptionList()) {
-                addErrorMessage(getFormatedMessage("resources/ApplicationResources", domainException.getKey(),
-                        domainException.getArgs()));
+                addErrorMessage(BundleUtil.getString(Bundle.APPLICATION, domainException.getKey(), domainException.getArgs()));
             }
             return "";
         } catch (IllegalDataAccessException idae) {
-            addErrorMessage(getFormatedMessage("resources/ApplicationResources", "message.teacger.evaluation.editMarks",
-                    ExecutionSemester.readActualExecutionSemester().getExecutionYear().getName(), ExecutionSemester
-                            .readActualExecutionSemester().getName()));
+            addErrorMessage(BundleUtil.getString(Bundle.APPLICATION, "message.teacger.evaluation.editMarks", ExecutionSemester
+                    .readActualExecutionSemester().getExecutionYear().getName(), ExecutionSemester.readActualExecutionSemester()
+                    .getName()));
             return "";
         }
         return getEvaluation().getClass().getSimpleName();
@@ -714,12 +732,11 @@ public class EvaluationManagementBackingBean extends FenixBackingBean {
 
         } catch (FenixServiceMultipleException e) {
             for (DomainException domainException : e.getExceptionList()) {
-                addErrorMessage(getFormatedMessage("resources/ApplicationResources", domainException.getKey(),
-                        domainException.getArgs()));
+                addErrorMessage(BundleUtil.getString(Bundle.APPLICATION, domainException.getKey(), domainException.getArgs()));
             }
             return "";
         } catch (IOException e) {
-            addErrorMessages(getResourceBundle("resources/ApplicationResources"), e.getMessage());
+            addErrorMessage(BundleUtil.getString(Bundle.APPLICATION, e.getMessage()));
             return "";
         } finally {
             if (inputStream != null) {
@@ -865,13 +882,15 @@ public class EvaluationManagementBackingBean extends FenixBackingBean {
         return WrittenTest.class.getSimpleName();
     }
 
-    public List<Space> getEvaluationRooms() throws FenixServiceException {
+    public List<InfoRoom> getEvaluationRooms() throws FenixServiceException {
         final Space[] result = new Space[getEvaluationRoomsPositions().size()];
         for (final Entry<String, Integer> entry : getEvaluationRoomsPositions().entrySet()) {
             final Space room = getRoom(entry.getKey());
             result[entry.getValue() - 1] = room;
         }
-        return Arrays.asList(result);
+//        return Arrays.asList(result);
+
+        return Arrays.stream(result).map(s -> new InfoRoom(s)).collect(Collectors.toList());
     }
 
     private Space getRoom(final String roomID) throws FenixServiceException {
@@ -892,11 +911,19 @@ public class EvaluationManagementBackingBean extends FenixBackingBean {
         return (Map<String, Integer>) getViewState().getAttribute("evaluationRooms");
     }
 
+    public Integer getExamCapacity(Space space) {
+        Optional<Integer> metadata = space.getMetadata("examCapacity");
+        return metadata.isPresent() ? metadata.get() : 0;
+    }
+
     private Map<String, Integer> initializeEvaluationRoomsPositions() throws FenixServiceException {
         final Map<String, Integer> evaluationRooms = new TreeMap();
+        WrittenEvaluation writtenEvaluation = (WrittenEvaluation) getEvaluation();
+
         final List<WrittenEvaluationSpaceOccupation> roomOccupations =
-                new ArrayList(((WrittenEvaluation) getEvaluation()).getWrittenEvaluationSpaceOccupations());
-        Collections.sort(roomOccupations, new ReverseComparator(new BeanComparator("room.examCapacity")));
+                writtenEvaluation.getWrittenEvaluationSpaceOccupationsSet().stream()
+                        .sorted((o1, o2) -> getExamCapacity(o2.getRoom()).compareTo(getExamCapacity(o1.getRoom())))
+                        .collect(Collectors.toList());
         int count = 0;
         for (final WrittenEvaluationSpaceOccupation roomOccupation : roomOccupations) {
             evaluationRooms.put(roomOccupation.getRoom().getExternalId(), Integer.valueOf(++count));
@@ -961,9 +988,9 @@ public class EvaluationManagementBackingBean extends FenixBackingBean {
     }
 
     private List<String> getRoomIDs() throws FenixServiceException {
-        final List<Space> rooms = getEvaluationRooms();
+        final List<InfoRoom> rooms = getEvaluationRooms();
         final List<String> result = new ArrayList(rooms.size());
-        for (final Space room : rooms) {
+        for (final InfoRoom room : rooms) {
             result.add(room.getExternalId());
         }
         return result;
@@ -1058,7 +1085,7 @@ public class EvaluationManagementBackingBean extends FenixBackingBean {
     }
 
     public String publishMarks() throws FenixServiceException {
-        final MessageResources messages = MessageResources.getMessageResources("resources/ApplicationResources");
+        final MessageResources messages = MessageResources.getMessageResources(Bundle.APPLICATION);
         final String announcementTitle =
                 (getPublishMarksMessage() != null && getPublishMarksMessage().length() > 0) ? messages
                         .getMessage("message.publishment") : null;
@@ -1276,7 +1303,7 @@ public class EvaluationManagementBackingBean extends FenixBackingBean {
         List<SelectItem> items = new ArrayList<SelectItem>();
 
         for (GradeScale s : scales) {
-            items.add(new SelectItem(s, enumerationBundle.getString(s.getName())));
+            items.add(new SelectItem(s, BundleUtil.getString(Bundle.ENUMERATION, s.getName())));
         }
 
         return items;
@@ -1307,7 +1334,7 @@ public class EvaluationManagementBackingBean extends FenixBackingBean {
 
     public void exportToExcel() throws FenixServiceException {
         String filename =
-                getResourceBundle("resources/ApplicationResources").getString("title.enrolments") + "-"
+                BundleUtil.getString(Bundle.APPLICATION, "title.enrolments") + "-"
                         + getFileName(Calendar.getInstance().getTime());
         try {
             exportToXls(filename.replace(" ", "_"));
@@ -1321,7 +1348,7 @@ public class EvaluationManagementBackingBean extends FenixBackingBean {
         this.getResponse().setHeader("Content-disposition", "attachment; filename=" + filename + ".xls");
         ServletOutputStream outputStream = this.getResponse().getOutputStream();
 
-        String spreadSheetName = getResourceBundle("resources/ApplicationResources").getString("title.enrolments");
+        String spreadSheetName = BundleUtil.getString(Bundle.APPLICATION, "title.enrolments");
         List<Object> headers = getStudentsEnroledListHeaders();
         Spreadsheet spreadsheet = new Spreadsheet(spreadSheetName, headers);
 
@@ -1335,11 +1362,10 @@ public class EvaluationManagementBackingBean extends FenixBackingBean {
 
     private List<Object> getStudentsEnroledListHeaders() {
         final List<Object> headers = new ArrayList<Object>();
-        ResourceBundle bundle = getResourceBundle("resources/ApplicationResources");
-        headers.add(bundle.getString("label.number"));
-        headers.add(bundle.getString("label.name"));
-        headers.add(bundle.getString("label.room"));
-        headers.add(bundle.getString("label.degree.name"));
+        headers.add(BundleUtil.getString(Bundle.APPLICATION, "label.number"));
+        headers.add(BundleUtil.getString(Bundle.APPLICATION, "label.name"));
+        headers.add(BundleUtil.getString(Bundle.APPLICATION, "label.room"));
+        headers.add(BundleUtil.getString(Bundle.APPLICATION, "label.degree.name"));
         return headers;
     }
 
@@ -1381,11 +1407,12 @@ public class EvaluationManagementBackingBean extends FenixBackingBean {
     public List<SelectItem> getEnrolmentTypeFilterOptions() {
         List<SelectItem> options = new ArrayList<SelectItem>();
 
-        options.add(new SelectItem(ENROLMENT_TYPE_FILTER_ALL, enumerationBundle.getString("filter.all")));
+        options.add(new SelectItem(ENROLMENT_TYPE_FILTER_ALL, BundleUtil.getString(Bundle.ENUMERATION, "filter.all")));
         for (EnrolmentEvaluationType type : EnrolmentEvaluationType.values()) {
             options.add(new SelectItem(type.getName(), type.getDescription()));
         }
-        options.add(new SelectItem(ENROLMENT_TYPE_FILTER_NOT_ENROLLED, enumerationBundle.getString("filter.not.enrolled")));
+        options.add(new SelectItem(ENROLMENT_TYPE_FILTER_NOT_ENROLLED, BundleUtil.getString(Bundle.ENUMERATION,
+                "filter.not.enrolled")));
 
         return options;
     }

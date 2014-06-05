@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.accessControl;
 
 import java.util.HashSet;
@@ -8,7 +26,7 @@ import net.sourceforge.fenixedu.domain.Formation;
 import net.sourceforge.fenixedu.domain.Job;
 import net.sourceforge.fenixedu.domain.contacts.EmailAddress;
 import net.sourceforge.fenixedu.domain.contacts.MobilePhone;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import org.fenixedu.bennu.core.annotation.GroupArgument;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
@@ -61,16 +79,16 @@ public class NotUpdatedAlumniInfoForSpecificDaysGroup extends FenixGroup {
         String key = "label.name.alumniInfoNotUpdated.oneItem";
         int iter = 0;
         if (checkFormationNotUpdated) {
-            args[iter] = BundleUtil.getStringFromResourceBundle(getPresentationNameBundle(), "label.name.alumni.formationInfo");
+            args[iter] = BundleUtil.getString(getPresentationNameBundle(), "label.name.alumni.formationInfo");
             iter++;
         }
         if (checkJobNotUpdated) {
-            args[iter] = BundleUtil.getStringFromResourceBundle(getPresentationNameBundle(), "label.name.alumni.jobInfo");
+            args[iter] = BundleUtil.getString(getPresentationNameBundle(), "label.name.alumni.jobInfo");
             iter++;
         }
         if (checkPersonalDataNotUpdated) {
             args[iter] =
-                    BundleUtil.getStringFromResourceBundle(getPresentationNameBundle(), "label.name.alumni.personalDataInfo");
+                    BundleUtil.getString(getPresentationNameBundle(), "label.name.alumni.personalDataInfo");
             iter++;
         }
         if (iter == 2) {
@@ -79,7 +97,7 @@ public class NotUpdatedAlumniInfoForSpecificDaysGroup extends FenixGroup {
             key = "label.name.alumniInfoNotUpdated.threeItems";
         }
         args[iter] = Integer.toString(daysNotUpdated);
-        return BundleUtil.getStringFromResourceBundle(getPresentationNameBundle(), key, args);
+        return BundleUtil.getString(getPresentationNameBundle(), key, args);
     }
 
     @Override

@@ -1,7 +1,24 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain.phd.reports;
 
 import java.util.List;
-import java.util.ResourceBundle;
 
 import net.sourceforge.fenixedu.domain.Department;
 import net.sourceforge.fenixedu.domain.Teacher;
@@ -9,19 +26,19 @@ import net.sourceforge.fenixedu.domain.phd.InternalPhdParticipant;
 import net.sourceforge.fenixedu.domain.phd.PhdIndividualProgramProcess;
 import net.sourceforge.fenixedu.domain.phd.PhdParticipant;
 import net.sourceforge.fenixedu.domain.phd.SearchPhdIndividualProgramProcessBean;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
 
 public class PhdGuidersReport extends PhdReport {
-    private final ResourceBundle bundle;
     private int rowCounter;
 
     public PhdGuidersReport(HSSFWorkbook workbook) {
         super(workbook);
-        this.bundle = ResourceBundle.getBundle("resources.PhdResources");
         this.rowCounter = 2;
     }
 
@@ -44,9 +61,9 @@ public class PhdGuidersReport extends PhdReport {
     }
 
     private void fillProcess(PhdIndividualProgramProcess process, HSSFSheet sheet) {
-        String guiderRole = this.bundle.getString("label.net.sourceforge.fenixedu.domain.phd.reports.PhdGuidersReport.guider");
+        String guiderRole = BundleUtil.getString(Bundle.PHD, "label.net.sourceforge.fenixedu.domain.phd.reports.PhdGuidersReport.guider");
         String assistantGuiderRole =
-                this.bundle.getString("label.net.sourceforge.fenixedu.domain.phd.reports.PhdGuidersReport.assistantGuider");
+                BundleUtil.getString(Bundle.PHD, "label.net.sourceforge.fenixedu.domain.phd.reports.PhdGuidersReport.assistantGuider");
 
         for (PhdParticipant phdParticipant : process.getGuidings()) {
             HSSFRow row = sheet.createRow(this.rowCounter++);
@@ -105,7 +122,7 @@ public class PhdGuidersReport extends PhdReport {
     }
 
     private String getHeaderInBundle(String field) {
-        return this.bundle.getString("label.net.sourceforge.fenixedu.domain.phd.reports.PhdGuidersReport." + field);
+        return BundleUtil.getString(Bundle.PHD, "label.net.sourceforge.fenixedu.domain.phd.reports.PhdGuidersReport." + field);
     }
 
 }

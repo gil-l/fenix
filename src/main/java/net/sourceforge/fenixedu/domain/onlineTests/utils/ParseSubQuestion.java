@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 /*
  * Created on 25/Jul/2003
  */
@@ -9,11 +27,14 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -67,9 +88,11 @@ public class ParseSubQuestion extends DefaultHandler {
             } catch (Exception e) {
                 throw new ParseQuestionException(e);
             }
+            List<SubQuestion> subQuestions = new ArrayList<SubQuestion>();
             for (QuestionElement questionElement : questionElementList) {
-                question.addSubQuestion(createSubQuestion(questionElement));
+                subQuestions.add(createSubQuestion(questionElement));
             }
+            setSubQuestionFor(question, subQuestions);
         }
         return question;
     }
@@ -987,4 +1010,15 @@ public class ParseSubQuestion extends DefaultHandler {
         }
         return newResponseList;
     }
+
+    private static final ConcurrentMap<Question, List<SubQuestion>> questionsMap = new ConcurrentHashMap<>();
+
+    public static List<SubQuestion> getSubQuestionFor(final Question question) {
+        return questionsMap.getOrDefault(question, Collections.emptyList());
+    }
+
+    private static void setSubQuestionFor(final Question question, final List<SubQuestion> subQuestions) {
+        questionsMap.putIfAbsent(question, subQuestions);
+    }
+
 }

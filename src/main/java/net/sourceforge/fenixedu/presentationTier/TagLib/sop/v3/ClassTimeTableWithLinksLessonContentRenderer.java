@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 /*
  * Created on 18:52:01,20/Out/2004
  *
@@ -12,7 +30,8 @@ import net.sourceforge.fenixedu.dataTransferObject.InfoLessonInstanceAggregation
 import net.sourceforge.fenixedu.dataTransferObject.InfoShowOccupation;
 import net.sourceforge.fenixedu.domain.ExecutionCourse;
 import net.sourceforge.fenixedu.domain.Site;
-import net.sourceforge.fenixedu.util.BundleUtil;
+import net.sourceforge.fenixedu.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.LocalDate;
@@ -112,7 +131,7 @@ public class ClassTimeTableWithLinksLessonContentRenderer extends LessonSlotCont
             final InfoLessonInstanceAggregation infoLessonInstanceAggregation = (InfoLessonInstanceAggregation) showOccupation;
             if (!infoLessonInstanceAggregation.availableInAllWeeks()) {
                 builder.append("<span>");
-                builder.append(BundleUtil.getStringFromResourceBundle("resources.CandidateResources", "label.weeks"));
+                builder.append(BundleUtil.getString(Bundle.CANDIDATE, "label.weeks"));
                 builder.append(": &nbsp;&nbsp;");
                 builder.append(infoLessonInstanceAggregation.prettyPrintWeeks());
                 builder.append("&nbsp;");

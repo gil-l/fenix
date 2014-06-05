@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.backBeans.academicAdministration.curricularPlans;
 
 import java.util.ArrayList;
@@ -20,8 +38,10 @@ import net.sourceforge.fenixedu.domain.exceptions.DomainException;
 import net.sourceforge.fenixedu.injectionCode.IllegalDataAccessException;
 import net.sourceforge.fenixedu.presentationTier.Action.exceptions.FenixActionException;
 import net.sourceforge.fenixedu.presentationTier.backBeans.bolonhaManager.curricularPlans.CurricularCourseManagementBackingBean;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.commons.collections.comparators.ReverseComparator;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 public class AcademicAdministrationCurricularCourseManagementBackingBean extends CurricularCourseManagementBackingBean {
 
@@ -206,22 +226,22 @@ public class AcademicAdministrationCurricularCourseManagementBackingBean extends
                     getWeight(), getEnrollmentWeigth(), getCredits(), getEctsCredits(), getCurricularYearID(),
                     getCurricularSemesterID(), getBeginExecutionPeriodID(), getEndExecutionPeriodID(), getGradeScale());
         } catch (FenixActionException e) {
-            this.addErrorMessage(bolonhaBundle.getString(e.getMessage()));
+            this.addErrorMessage(BundleUtil.getString(Bundle.BOLONHA, e.getMessage()));
             return "";
         } catch (IllegalDataAccessException e) {
-            this.addErrorMessage(bolonhaBundle.getString("error.notAuthorized"));
+            this.addErrorMessage(BundleUtil.getString(Bundle.BOLONHA, "error.notAuthorized"));
             return "buildCurricularPlan";
         } catch (FenixServiceException e) {
-            this.addErrorMessage(bolonhaBundle.getString(e.getMessage()));
+            this.addErrorMessage(BundleUtil.getString(Bundle.BOLONHA, e.getMessage()));
             return "";
         } catch (DomainException e) {
-            this.addErrorMessage(domainExceptionBundle.getString(e.getMessage()));
+            this.addErrorMessage(BundleUtil.getString(Bundle.DOMAIN_EXCEPTION, e.getMessage()));
             return "";
         } catch (Exception e) {
-            this.addErrorMessage(bolonhaBundle.getString("general.error"));
+            this.addErrorMessage(BundleUtil.getString(Bundle.BOLONHA, "general.error"));
             return "buildCurricularPlan";
         }
-        addInfoMessage(bolonhaBundle.getString("curricularCourseCreated"));
+        addInfoMessage(BundleUtil.getString(Bundle.BOLONHA, "curricularCourseCreated"));
         return "buildCurricularPlan";
     }
 
@@ -233,9 +253,9 @@ public class AcademicAdministrationCurricularCourseManagementBackingBean extends
                     getPraticalHours(), getTheoPratHours(), getGradeScale());
             setContextID(null); // resetContextID
         } catch (FenixServiceException e) {
-            addErrorMessage(bolonhaBundle.getString(e.getMessage()));
+            addErrorMessage(BundleUtil.getString(Bundle.BOLONHA, e.getMessage()));
         }
-        addInfoMessage(bolonhaBundle.getString("curricularCourseEdited"));
+        addInfoMessage(BundleUtil.getString(Bundle.BOLONHA, "curricularCourseEdited"));
         return "";
     }
 
@@ -303,9 +323,9 @@ public class AcademicAdministrationCurricularCourseManagementBackingBean extends
 
     public List<SelectItem> getGradeScales() {
         List<SelectItem> res = new ArrayList<SelectItem>();
-        res.add(new SelectItem(this.NO_SELECTION_STRING, bolonhaBundle.getString("choose")));
+        res.add(new SelectItem(this.NO_SELECTION_STRING, BundleUtil.getString(Bundle.BOLONHA, "choose")));
         for (GradeScale gradeScale : GradeScale.values()) {
-            res.add(new SelectItem(gradeScale.getName(), enumerationBundle.getString(gradeScale.getName())));
+            res.add(new SelectItem(gradeScale.getName(), BundleUtil.getString(Bundle.ENUMERATION, gradeScale.getName())));
         }
         return res;
     }

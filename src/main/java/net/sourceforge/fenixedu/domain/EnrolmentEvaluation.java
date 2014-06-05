@@ -1,9 +1,26 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.domain;
 
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.ResourceBundle;
 
 import net.sourceforge.fenixedu.domain.curriculum.CurriculumValidationEvaluationPhase;
 import net.sourceforge.fenixedu.domain.curriculum.EnrollmentState;
@@ -18,11 +35,13 @@ import net.sourceforge.fenixedu.domain.log.EnrolmentEvaluationLog;
 import net.sourceforge.fenixedu.domain.student.Registration;
 import net.sourceforge.fenixedu.domain.student.Student;
 import net.sourceforge.fenixedu.domain.thesis.Thesis;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.EnrolmentEvaluationState;
 import net.sourceforge.fenixedu.util.FenixDigestUtils;
 import net.sourceforge.fenixedu.util.MarkType;
 
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 import org.joda.time.YearMonthDay;
 
@@ -667,15 +686,13 @@ public class EnrolmentEvaluation extends EnrolmentEvaluation_Base implements Com
     private static final String NORMAL_TYPE_SECOND_SEASON_DESCRIPTION =
             "label.curriculum.validation.normal.type.second.season.description";
 
-    private static final ResourceBundle academicResources = ResourceBundle.getBundle("resources.AcademicAdminOffice");
-
     public String getEnrolmentEvaluationTypeDescription() {
         if (EnrolmentEvaluationType.NORMAL.equals(this.getEnrolmentEvaluationType())
                 && CurriculumValidationEvaluationPhase.FIRST_SEASON.equals(this.getCurriculumValidationEvaluationPhase())) {
-            return academicResources.getString(NORMAL_TYPE_FIRST_SEASON_DESCRIPTION);
+            return BundleUtil.getString(Bundle.ACADEMIC, NORMAL_TYPE_FIRST_SEASON_DESCRIPTION);
         } else if (EnrolmentEvaluationType.NORMAL.equals(this.getEnrolmentEvaluationType())
                 && CurriculumValidationEvaluationPhase.SECOND_SEASON.equals(this.getCurriculumValidationEvaluationPhase())) {
-            return academicResources.getString(NORMAL_TYPE_SECOND_SEASON_DESCRIPTION);
+            return BundleUtil.getString(Bundle.ACADEMIC, NORMAL_TYPE_SECOND_SEASON_DESCRIPTION);
         }
 
         return this.getEnrolmentEvaluationType().getDescription();

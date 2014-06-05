@@ -1,4 +1,22 @@
 /**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
+/**
  * 
  */
 package net.sourceforge.fenixedu.dataTransferObject.candidacy;
@@ -10,6 +28,7 @@ import java.io.Serializable;
 
 import net.sourceforge.fenixedu.domain.candidacy.CandidacyDocument;
 import net.sourceforge.fenixedu.domain.candidacy.CandidacyDocumentFile;
+import net.sourceforge.fenixedu.util.Bundle;
 import pt.utl.ist.fenix.tools.resources.LabelFormatter;
 import pt.utl.ist.fenix.tools.util.FileUtils;
 
@@ -41,7 +60,7 @@ public class CandidacyDocumentUploadBean implements Serializable {
 
     public String getActualFile() {
         return (actualFile == null) ? new LabelFormatter().appendLabel("label.file.not.uploaded.yet",
-                "resources.CandidateResources").toString() : actualFile;
+                Bundle.CANDIDATE).toString() : actualFile;
     }
 
     public CandidacyDocument getCandidacyDocument() {
@@ -65,7 +84,7 @@ public class CandidacyDocumentUploadBean implements Serializable {
     }
 
     public String getDocumentDescription() {
-        return new LabelFormatter().appendLabel("label." + documentDescription, "resources.CandidateResources").toString();
+        return new LabelFormatter().appendLabel("label." + documentDescription, Bundle.CANDIDATE).toString();
     }
 
     public boolean getIsFileUploaded() {

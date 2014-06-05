@@ -1,8 +1,25 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.dataTransferObject.serviceRequests;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.ResourceBundle;
 
 import net.sourceforge.fenixedu.domain.Person;
 import net.sourceforge.fenixedu.domain.accessControl.AcademicAuthorizationGroup;
@@ -10,13 +27,12 @@ import net.sourceforge.fenixedu.domain.serviceRequests.AcademicServiceRequest;
 import net.sourceforge.fenixedu.domain.serviceRequests.AcademicServiceRequestSituationType;
 import net.sourceforge.fenixedu.domain.serviceRequests.documentRequests.DocumentRequest;
 import net.sourceforge.fenixedu.injectionCode.AccessControl;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.commons.lang.StringUtils;
-import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 import org.joda.time.YearMonthDay;
-
-import java.util.Locale;
 
 public class AcademicServiceRequestBean implements Serializable {
 
@@ -128,16 +144,13 @@ public class AcademicServiceRequestBean implements Serializable {
         if (StringUtils.isEmpty(justification) && getAcademicServiceRequest().isDocumentRequest()
                 && ((DocumentRequest) getAcademicServiceRequest()).isDiploma()) {
             if (getAcademicServiceRequestSituationType() == AcademicServiceRequestSituationType.CONCLUDED) {
-                return ResourceBundle.getBundle("resources.AcademicAdminOffice", I18N.getLocale()).getString(
-                        "DiplomaRequest.diploma.concluded");
+                return BundleUtil.getString(Bundle.ACADEMIC, "DiplomaRequest.diploma.concluded");
             }
             if (getAcademicServiceRequestSituationType() == AcademicServiceRequestSituationType.SENT_TO_EXTERNAL_ENTITY) {
-                return ResourceBundle.getBundle("resources.AcademicAdminOffice", I18N.getLocale()).getString(
-                        "DiplomaRequest.diploma.sent");
+                return BundleUtil.getString(Bundle.ACADEMIC, "DiplomaRequest.diploma.sent");
             }
             if (getAcademicServiceRequestSituationType() == AcademicServiceRequestSituationType.RECEIVED_FROM_EXTERNAL_ENTITY) {
-                return ResourceBundle.getBundle("resources.AcademicAdminOffice", I18N.getLocale()).getString(
-                        "DiplomaRequest.diploma.received");
+                return BundleUtil.getString(Bundle.ACADEMIC, "DiplomaRequest.diploma.received");
             }
         }
 
@@ -197,6 +210,7 @@ public class AcademicServiceRequestBean implements Serializable {
     }
 
     public Collection<AcademicServiceRequest> searchAcademicServiceRequests() {
-        return AcademicAuthorizationGroup.getAcademicServiceRequests(AccessControl.getPerson(), serviceRequestYear, academicServiceRequestSituationType, null);
+        return AcademicAuthorizationGroup.getAcademicServiceRequests(AccessControl.getPerson(), serviceRequestYear,
+                academicServiceRequestSituationType, null);
     }
 }

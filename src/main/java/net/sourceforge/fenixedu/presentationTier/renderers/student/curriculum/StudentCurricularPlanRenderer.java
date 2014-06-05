@@ -1,8 +1,25 @@
+/**
+ * Copyright © 2002 Instituto Superior Técnico
+ *
+ * This file is part of FenixEdu Core.
+ *
+ * FenixEdu Core is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FenixEdu Core is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.fenixedu.presentationTier.renderers.student.curriculum;
 
 import java.text.DecimalFormat;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -31,10 +48,11 @@ import net.sourceforge.fenixedu.domain.studentCurriculum.Dismissal;
 import net.sourceforge.fenixedu.domain.studentCurriculum.ExternalEnrolment;
 import net.sourceforge.fenixedu.domain.studentCurriculum.NoCourseGroupCurriculumGroup;
 import net.sourceforge.fenixedu.injectionCode.AccessControl;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 import org.joda.time.YearMonthDay;
 
@@ -53,7 +71,6 @@ import pt.ist.fenixWebFramework.renderers.components.HtmlTableRow;
 import pt.ist.fenixWebFramework.renderers.components.HtmlText;
 import pt.ist.fenixWebFramework.renderers.contexts.InputContext;
 import pt.ist.fenixWebFramework.renderers.layouts.Layout;
-import java.util.Locale;
 
 public class StudentCurricularPlanRenderer extends InputRenderer {
 
@@ -122,14 +139,6 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
         }
 
     }
-
-    private final ResourceBundle studentResources = ResourceBundle.getBundle("resources.StudentResources", I18N.getLocale());
-
-    private final ResourceBundle enumerationResources = ResourceBundle.getBundle("resources.EnumerationResources",
-            I18N.getLocale());
-
-    private final ResourceBundle applicationResources = ResourceBundle.getBundle("resources.ApplicationResources",
-            I18N.getLocale());
 
     private OrganizationType organizedBy = OrganizationType.GROUPS;
 
@@ -392,7 +401,7 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
 
             final HtmlContainer container = new HtmlBlockContainer();
             if (this.studentCurricularPlan == null) {
-                container.addChild(createHtmlTextItalic(studentResources.getString("message.no.curricularplan")));
+                container.addChild(createHtmlTextItalic(BundleUtil.getString(Bundle.STUDENT, "message.no.curricularplan")));
 
                 return container;
             }
@@ -401,7 +410,7 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
             this.executionPeriodContext = executionYearContext.getLastExecutionPeriod();
 
             if (isOrganizedByGroups() && !this.studentCurricularPlan.isBoxStructure()) {
-                container.addChild(createHtmlTextItalic(studentResources.getString("not.applicable")));
+                container.addChild(createHtmlTextItalic(BundleUtil.getString(Bundle.STUDENT, "not.applicable")));
 
                 return container;
             }
@@ -459,7 +468,7 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
             if (isToShowDismissals()) {
                 final List<Dismissal> dismissals = this.studentCurricularPlan.getDismissals();
                 if (!dismissals.isEmpty()) {
-                    generateGroupRowWithText(mainTable, studentResources.getString("label.dismissals"), true, 0,
+                    generateGroupRowWithText(mainTable, BundleUtil.getString(Bundle.STUDENT, "label.dismissals"), true, 0,
                             (CurriculumGroup) null);
                     generateDismissalRows(mainTable, dismissals, 0);
                 }
@@ -528,21 +537,21 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
 
                 if (creditsLimit != null) {
                     groupName.append(" <span title=\"");
-                    groupName.append(applicationResources.getString("label.curriculum.credits.legend.minCredits"));
+                    groupName.append(BundleUtil.getString(Bundle.APPLICATION, "label.curriculum.credits.legend.minCredits"));
                     groupName.append(" \">m(");
                     groupName.append(creditsLimit.getMinimumCredits());
                     groupName.append(")</span>,");
                 }
 
                 groupName.append(" <span title=\"");
-                groupName.append(applicationResources.getString("label.curriculum.credits.legend.creditsConcluded"));
+                groupName.append(BundleUtil.getString(Bundle.APPLICATION, "label.curriculum.credits.legend.creditsConcluded"));
                 groupName.append(" \"> c(");
                 groupName.append(curriculumGroup.getCreditsConcluded(executionYearContext));
                 groupName.append(")</span>");
 
                 if (isViewerAdministrativeOfficeEmployeeOrManager(studentCurricularPlan)) {
                     groupName.append(" <span title=\"");
-                    groupName.append(applicationResources.getString("label.curriculum.credits.legend.approvedCredits"));
+                    groupName.append(BundleUtil.getString(Bundle.APPLICATION, "label.curriculum.credits.legend.approvedCredits"));
                     groupName.append(" \">, ca(");
                     groupName.append(curriculumGroup.getAprovedEctsCredits());
                     groupName.append(")</span>");
@@ -550,7 +559,7 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
 
                 if (creditsLimit != null) {
                     groupName.append("<span title=\"");
-                    groupName.append(applicationResources.getString("label.curriculum.credits.legend.maxCredits"));
+                    groupName.append(BundleUtil.getString(Bundle.APPLICATION, "label.curriculum.credits.legend.maxCredits"));
                     groupName.append("\">, M(");
                     groupName.append(creditsLimit.getMaximumCredits());
                     groupName.append(")</span>");
@@ -684,7 +693,7 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
             if (isViewerAdministrativeOfficeEmployeeOrManager(studentCurricularPlan)) {
                 if (creationDate != null) {
                     generateCellWithSpan(enrolmentRow, creationDate.toString(DATE_FORMAT),
-                            applicationResources.getString("creationDate"), getCreationDateCellClass());
+                            BundleUtil.getString(Bundle.APPLICATION, "creationDate"), getCreationDateCellClass());
                 } else {
                     generateCellWithText(enrolmentRow, EMPTY_INFO, getCreationDateCellClass());
                 }
@@ -695,7 +704,7 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
             if (isViewerAdministrativeOfficeEmployeeOrManager(studentCurricularPlan)) {
                 if (evaluationDate != null) {
                     generateCellWithSpan(externalEnrolmentRow, evaluationDate.toString(DATE_FORMAT),
-                            applicationResources.getString("creationDate"), getCreationDateCellClass());
+                            BundleUtil.getString(Bundle.APPLICATION, "creationDate"), getCreationDateCellClass());
                 } else {
                     generateCellWithText(externalEnrolmentRow, EMPTY_INFO, getCreationDateCellClass());
                 }
@@ -705,7 +714,7 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
         private void generateCreatorIfRequired(HtmlTableRow enrolmentRow, String createdBy) {
             if (isViewerAdministrativeOfficeEmployeeOrManager(studentCurricularPlan)) {
                 if (!StringUtils.isEmpty(createdBy)) {
-                    generateCellWithSpan(enrolmentRow, createdBy, applicationResources.getString("creator"),
+                    generateCellWithSpan(enrolmentRow, createdBy, BundleUtil.getString(Bundle.APPLICATION, "creator"),
                             getCreatorCellClass());
                 } else {
                     generateCellWithText(enrolmentRow, EMPTY_INFO, getCreatorCellClass());
@@ -730,7 +739,7 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
             }
 
             final HtmlText text =
-                    new HtmlText(studentResources.getString("label.dismissal."
+                    new HtmlText(BundleUtil.getString(Bundle.STUDENT, "label.dismissal."
                             + dismissal.getCredits().getClass().getSimpleName()));
             container.addChild(text);
 
@@ -749,7 +758,7 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
 
             // } else {
             // generateCellWithText(dismissalRow,
-            // studentResources.getString("label.dismissal." +
+            // BundleUtil.getString(Bundle.STUDENT, "label.dismissal." +
             // dismissal.getCredits().getClass().getSimpleName()),
             // getLabelCellClass(),
             // MAX_COL_SPAN_FOR_TEXT_ON_CURRICULUM_LINES - level);
@@ -899,7 +908,7 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
                 generateCellWithText(enrolmentRow, evaluation.getExecutionPeriod().getExecutionYear().getYear(),
                         getEnrolmentExecutionYearCellClass());
                 generateCellWithText(enrolmentRow, evaluation.getExecutionPeriod().getSemester().toString() + " "
-                        + applicationResources.getString("label.semester.short"), getEnrolmentSemesterCellClass());
+                        + BundleUtil.getString(Bundle.APPLICATION, "label.semester.short"), getEnrolmentSemesterCellClass());
             } else {
                 generateCellWithText(enrolmentRow, EMPTY_INFO, getEnrolmentSemesterCellClass());
                 generateCellWithText(enrolmentRow, EMPTY_INFO, getEnrolmentSemesterCellClass());
@@ -907,7 +916,7 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
 
             if (evaluation != null && evaluation.getExamDateYearMonthDay() != null) {
                 generateCellWithSpan(enrolmentRow, evaluation.getExamDateYearMonthDay().toString(DATE_FORMAT),
-                        applicationResources.getString("label.data.avaliacao"), getCreationDateCellClass());
+                        BundleUtil.getString(Bundle.APPLICATION, "label.data.avaliacao"), getCreationDateCellClass());
             } else {
                 generateCellWithText(enrolmentRow, EMPTY_INFO, getCreationDateCellClass());
             }
@@ -915,7 +924,7 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
             if (evaluation.getPersonResponsibleForGrade() != null) {
                 final Person person = evaluation.getPersonResponsibleForGrade();
                 final String username = getUsername(person);
-                generateCellWithSpan(enrolmentRow, username, applicationResources.getString("label.grade.responsiblePerson"),
+                generateCellWithSpan(enrolmentRow, username, BundleUtil.getString(Bundle.APPLICATION, "label.grade.responsiblePerson"),
                         getCreatorCellClass());
             } else {
                 generateCellWithText(enrolmentRow, EMPTY_INFO, getCreatorCellClass());
@@ -951,7 +960,7 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
 
                     final Person person = lastEnrolmentEvaluation.getPersonResponsibleForGrade();
                     final String username = getUsername(person);
-                    generateCellWithSpan(enrolmentRow, username, applicationResources.getString("label.grade.responsiblePerson"),
+                    generateCellWithSpan(enrolmentRow, username, BundleUtil.getString(Bundle.APPLICATION, "label.grade.responsiblePerson"),
                             getCreatorCellClass());
 
                 } else {
@@ -971,7 +980,7 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
                 if (lastEnrolmentEvaluation != null && lastEnrolmentEvaluation.getExamDateYearMonthDay() != null) {
 
                     generateCellWithSpan(enrolmentRow, lastEnrolmentEvaluation.getExamDateYearMonthDay().toString(DATE_FORMAT),
-                            applicationResources.getString("label.data.avaliacao"), getCreationDateCellClass());
+                            BundleUtil.getString(Bundle.APPLICATION, "label.data.avaliacao"), getCreationDateCellClass());
                 } else {
                     generateCellWithText(enrolmentRow, EMPTY_INFO, getCreationDateCellClass());
                 }
@@ -999,7 +1008,7 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
             if (entry.hasExecutionPeriod()) {
                 semester =
                         entry.getExecutionPeriod().getSemester().toString() + " "
-                                + applicationResources.getString("label.semester.short");
+                                + BundleUtil.getString(Bundle.APPLICATION, "label.semester.short");
             } else {
                 semester = EMPTY_INFO;
             }
@@ -1014,7 +1023,7 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
                 if (executionCourse != null) {
                     final HtmlInlineContainer inlineContainer = new HtmlInlineContainer();
                     inlineContainer.addChild(createExecutionCourseStatisticsLink(
-                            applicationResources.getString("label.statistics"), executionCourse));
+                            BundleUtil.getString(Bundle.APPLICATION, "label.statistics"), executionCourse));
                     final HtmlTableCell cell = row.createCell();
                     cell.setClasses(getStatisticsLinkCellClass());
                     cell.setBody(inlineContainer);
@@ -1030,9 +1039,8 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
         private void generateEnrolmentLastEnrolmentEvaluationTypeCell(HtmlTableRow enrolmentRow, Enrolment enrolment) {
             final EnrolmentEvaluation lastEnrolmentEvaluation = enrolment.getLatestEnrolmentEvaluation();
             if (lastEnrolmentEvaluation != null && lastEnrolmentEvaluation.getEnrolmentEvaluationType() != null) {
-                generateCellWithSpan(enrolmentRow,
-                        enumerationResources.getString(lastEnrolmentEvaluation.getEnrolmentEvaluationType().getAcronym()),
-                        getLastEnrolmentEvaluationTypeCellClass());
+                generateCellWithSpan(enrolmentRow, BundleUtil.getString(Bundle.ENUMERATION, lastEnrolmentEvaluation
+                        .getEnrolmentEvaluationType().getAcronym()), getLastEnrolmentEvaluationTypeCellClass());
             } else {
                 generateCellWithText(enrolmentRow, EMPTY_INFO, getLastEnrolmentEvaluationTypeCellClass());
             }
@@ -1042,7 +1050,7 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
         private void generateEnrolmentEvaluationTypeCell(HtmlTableRow enrolmentRow, Enrolment enrolment) {
             final EnrolmentEvaluationType enrolmentEvaluationType = enrolment.getEnrolmentEvaluationType();
             if (enrolmentEvaluationType != null) {
-                generateCellWithSpan(enrolmentRow, enumerationResources.getString(enrolmentEvaluationType.getAcronym()),
+                generateCellWithSpan(enrolmentRow, BundleUtil.getString(Bundle.ENUMERATION, enrolmentEvaluationType.getAcronym()),
                         getLastEnrolmentEvaluationTypeCellClass());
             } else {
                 generateCellWithText(enrolmentRow, EMPTY_INFO, getLastEnrolmentEvaluationTypeCellClass());
@@ -1077,7 +1085,7 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
         private void generateEnrolmentStateCell(HtmlTableRow enrolmentRow, Enrolment enrolment) {
             generateCellWithText(
                     enrolmentRow,
-                    enrolment.isApproved() ? EMPTY_INFO : enumerationResources.getString(enrolment.getEnrollmentState()
+                    enrolment.isApproved() ? EMPTY_INFO : BundleUtil.getString(Bundle.ENUMERATION, enrolment.getEnrollmentState()
                             .getQualifiedName()), getEnrolmentStateCellClass());
 
         }
@@ -1085,7 +1093,7 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
         private void generateEnrolmentTypeCell(HtmlTableRow enrolmentRow, Enrolment enrolment) {
             generateCellWithText(
                     enrolmentRow,
-                    enrolment.isEnrolmentTypeNormal() ? EMPTY_INFO : enumerationResources.getString(enrolment
+                    enrolment.isEnrolmentTypeNormal() ? EMPTY_INFO : BundleUtil.getString(Bundle.ENUMERATION, enrolment
                             .getEnrolmentTypeName()), getEnrolmentTypeCellClass());
         }
 
@@ -1242,11 +1250,11 @@ public class StudentCurricularPlanRenderer extends InputRenderer {
     }
 
     private void generateHeadersForGradeWeightAndEctsCredits(final HtmlTableRow groupRow) {
-        generateCellWithText(groupRow, applicationResources.getString("label.grade"), getGradeCellClass());
+        generateCellWithText(groupRow, BundleUtil.getString(Bundle.APPLICATION, "label.grade"), getGradeCellClass());
 
-        generateCellWithText(groupRow, applicationResources.getString("label.weight"), getWeightCellClass());
+        generateCellWithText(groupRow, BundleUtil.getString(Bundle.APPLICATION, "label.weight"), getWeightCellClass());
 
-        generateCellWithText(groupRow, applicationResources.getString("label.ects"), getEctsCreditsCellClass());
+        generateCellWithText(groupRow, BundleUtil.getString(Bundle.APPLICATION, "label.ects"), getEctsCreditsCellClass());
 
     }
 
