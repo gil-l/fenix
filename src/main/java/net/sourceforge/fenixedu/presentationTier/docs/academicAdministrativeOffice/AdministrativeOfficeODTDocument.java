@@ -2,7 +2,6 @@ package net.sourceforge.fenixedu.presentationTier.docs.academicAdministrativeOff
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.ResourceBundle;
 
 import net.sourceforge.fenixedu.domain.ExecutionYear;
 import net.sourceforge.fenixedu.domain.Person;
@@ -12,9 +11,11 @@ import net.sourceforge.fenixedu.domain.organizationalStructure.UniversityUnit;
 import net.sourceforge.fenixedu.domain.serviceRequests.documentRequests.DocumentRequest;
 import net.sourceforge.fenixedu.domain.student.Registration;
 import net.sourceforge.fenixedu.domain.student.Student;
+import net.sourceforge.fenixedu.util.Bundle;
 import net.sourceforge.fenixedu.util.StringFormatter;
 
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.oddjet.Template;
 import org.fenixedu.oddjet.exception.DocumentLoadException;
 import org.joda.time.DateTime;
@@ -24,7 +25,7 @@ public class AdministrativeOfficeODTDocument extends Template {
     protected DocumentRequest documentRequest;
 
     public AdministrativeOfficeODTDocument(String templatePath, DocumentRequest documentRequest) throws DocumentLoadException,
-    FileNotFoundException {
+            FileNotFoundException {
         super(getTemplateAsResource(templatePath, documentRequest), documentRequest.getLanguage());
         this.documentRequest = documentRequest;
         setup();
@@ -72,7 +73,7 @@ public class AdministrativeOfficeODTDocument extends Template {
         addParameter("registrationStudentNumber", registration.getNumber());
         addParameter("degreeDescription", registration.getDegreeDescription(executionYear,
                 degreeType.hasExactlyOneCycleType() ? degreeType.getCycleType() : registration.getCycleType(executionYear),
-                getLocale()));
+                        getLocale()));
         addParameter("isRegistered", new Boolean(executionYear.containsDate(new DateTime())));
         addParameter("schoolYear", executionYear.getYear());
 
@@ -90,8 +91,7 @@ public class AdministrativeOfficeODTDocument extends Template {
             final Integer curricularYear = Integer.valueOf(documentRequest.getRegistration().getCurricularYear(executionYear));
 
             registrationCurricularYear =
-                    ResourceBundle.getBundle("resources.EnumerationResources", getLocale()).getString(
-                            curricularYear.toString() + ".ordinal");
+                    BundleUtil.getString(Bundle.ENUMERATION, getLocale(), curricularYear.toString() + ".ordinal");
         }
         addParameter("registrationCurricularYear", registrationCurricularYear);
     }

@@ -2,15 +2,16 @@ package net.sourceforge.fenixedu.presentationTier.docs.academicAdministrativeOff
 
 import java.io.IOException;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import net.sourceforge.fenixedu.domain.Enrolment;
 import net.sourceforge.fenixedu.domain.ExecutionYear;
 import net.sourceforge.fenixedu.domain.serviceRequests.documentRequests.DocumentPurposeType;
 import net.sourceforge.fenixedu.domain.serviceRequests.documentRequests.EnrolmentDeclarationRequest;
 import net.sourceforge.fenixedu.domain.student.Registration;
+import net.sourceforge.fenixedu.util.Bundle;
 
 import org.apache.commons.lang.StringUtils;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 public class EnrollmentDeclarationODTDocument extends DeclarationODTDocument {
 
@@ -49,11 +50,10 @@ public class EnrollmentDeclarationODTDocument extends DeclarationODTDocument {
         if (documentRequest.getDocumentPurposeType() != null) {
             if (documentRequest.getDocumentPurposeType() == DocumentPurposeType.OTHER
                     && !StringUtils.isEmpty(documentRequest.getOtherDocumentPurposeTypeDescription())) {
-                documentPurpose = documentRequest.getOtherDocumentPurposeTypeDescription().toUpperCase();
+                documentPurpose = documentRequest.getOtherDocumentPurposeTypeDescription();
             } else {
                 documentPurpose =
-                        ResourceBundle.getBundle("resources.EnumerationResources", getLocale())
-                                .getString(documentRequest.getDocumentPurposeType().name()).toUpperCase();
+                        BundleUtil.getString(Bundle.ENUMERATION, getLocale(), documentRequest.getDocumentPurposeType().name());
             }
         }
         addParameter("documentPurpose", documentPurpose);

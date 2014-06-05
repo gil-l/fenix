@@ -122,6 +122,11 @@
     </build>
     <dependencies>
         <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>oddjet</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>taglibs</groupId>
             <artifactId>string</artifactId>
             <version>1.0.1</version>

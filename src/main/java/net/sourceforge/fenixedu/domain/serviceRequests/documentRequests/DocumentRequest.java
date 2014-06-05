@@ -241,7 +241,7 @@ public abstract class DocumentRequest extends DocumentRequest_Base implements ID
                 result.append("-");
                 result.append(this.getDescription().replaceAll("[\\s:]", StringUtils.EMPTY));
                 result.append("-");
-                result.append(getLocale().toString());
+                result.append(getLanguage().getLanguage());
                 return result.toString();
             default:
                 return AdministrativeOfficeDocument.AdministrativeOfficeDocumentCreator.create(this).iterator().next()

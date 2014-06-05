@@ -49,7 +49,7 @@ import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.i18n.I18N;
 
 /**
- * 
+ *
  * @author Nuno Nunes & Joana Mota
  */
 public enum DegreeType {
@@ -856,10 +856,10 @@ public enum DegreeType {
         case BOLONHA_ADVANCED_SPECIALIZATION_DIPLOMA:
             return result.toString();
         case BOLONHA_ADVANCED_FORMATION_DIPLOMA:
-            result.append(BundleUtil.getString(Bundle.ACADEMIC, "degree.DegreeType.prefix.one")).append(" ");
+            result.append(BundleUtil.getString(Bundle.ACADEMIC, locale, "degree.DegreeType.prefix.one")).append(" ");
             return result.toString();
         default:
-            final String string = BundleUtil.getString(Bundle.ACADEMIC, "degree.DegreeType.prefix.two");
+            final String string = BundleUtil.getString(Bundle.ACADEMIC, locale, "degree.DegreeType.prefix.two");
             result.append(string).append(string.isEmpty() ? StringUtils.EMPTY : " ");
             return result.toString();
         }
@@ -892,8 +892,8 @@ public enum DegreeType {
                 throw new DomainException("DegreeType.doesnt.have.such.cycle.type");
             }
 
-            return BundleUtil.getString(Bundle.ENUMERATION, qualifiedName() + (isComposite() ? "." + cycleType.name() : StringUtils.EMPTY)
-                    + GRADUATE_TITLE_SUFFIX);
+            return BundleUtil.getString(Bundle.ENUMERATION, qualifiedName()
+                    + (isComposite() ? "." + cycleType.name() : StringUtils.EMPTY) + GRADUATE_TITLE_SUFFIX);
         }
 
         return StringUtils.EMPTY;

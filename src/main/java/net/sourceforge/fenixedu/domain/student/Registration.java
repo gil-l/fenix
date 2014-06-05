@@ -713,8 +713,7 @@ public class Registration extends Registration_Base {
 
     final public String getFinalAverageDescription(final CycleType cycleType) {
         final Integer finalAverage = getFinalAverage(cycleType);
-        return finalAverage == null ? null : BundleUtil.getString(Bundle.ENUMERATION, 
-                finalAverage.toString());
+        return finalAverage == null ? null : BundleUtil.getString(Bundle.ENUMERATION, finalAverage.toString());
     }
 
     final public String getFinalAverageQualified() {
@@ -753,7 +752,7 @@ public class Registration extends Registration_Base {
                 final CurricularCourse enrolmentCurricularCourse = enrolment.getCurricularCourse();
                 if (enrolmentCurricularCourse == curricularCourse
                         || (enrolmentCurricularCourse.getCompetenceCourse() != null && enrolmentCurricularCourse
-                        .getCompetenceCourse() == curricularCourse.getCompetenceCourse())
+                                .getCompetenceCourse() == curricularCourse.getCompetenceCourse())
                         || hasGlobalEquivalence(curricularCourse, enrolmentCurricularCourse)) {
                     enrolments.add(enrolment);
                 }
@@ -1903,11 +1902,11 @@ public class Registration extends Registration_Base {
         final StudentCurricularPlan toAsk =
                 getStudentCurricularPlan(getStartExecutionYear()) == null ? getFirstStudentCurricularPlan() : getStudentCurricularPlan(getStartExecutionYear());
 
-                if (toAsk == null) {
-                    return StringUtils.EMPTY;
-                }
+        if (toAsk == null) {
+            return StringUtils.EMPTY;
+        }
 
-                return toAsk.getPresentationName(getStartExecutionYear());
+        return toAsk.getPresentationName(getStartExecutionYear());
     }
 
     public String getDegreeNameWithDescription() {
@@ -1942,7 +1941,7 @@ public class Registration extends Registration_Base {
         final DegreeType degreeType = degree.getDegreeType();
         if (getDegreeType() != DegreeType.BOLONHA_ADVANCED_FORMATION_DIPLOMA && cycleType != null) {
             res.append(cycleType.getDescription(locale)).append(",");
-            res.append(" ").append(BundleUtil.getString(Bundle.ACADEMIC,"label.of.the.male")).append(" ");
+            res.append(" ").append(BundleUtil.getString(Bundle.ACADEMIC, locale, "label.of.the.male")).append(" ");
         }
 
         if (!isEmptyDegree() && !degreeType.isEmpty()) {
@@ -1952,7 +1951,7 @@ public class Registration extends Registration_Base {
             if (getDegreeType() == DegreeType.BOLONHA_ADVANCED_FORMATION_DIPLOMA && cycleType != null) {
                 res.append(" (").append(cycleType.getDescription(locale)).append(")");
             }
-            res.append(" ").append(BundleUtil.getString(Bundle.ACADEMIC,"label.in")).append(" ");
+            res.append(" ").append(BundleUtil.getString(Bundle.ACADEMIC, locale, "label.in")).append(" ");
         }
 
         res.append(degree.getFilteredName(executionYear, locale).toUpperCase());
@@ -3761,7 +3760,7 @@ public class Registration extends Registration_Base {
                 if (registrationState.getExecutionYear() == executionYear
                         && (registrationState.isActive() || registrationState.getStateType() == RegistrationStateType.TRANSITED)
                         && (previous.getStateType() == RegistrationStateType.EXTERNAL_ABANDON
-                        || previous.getStateType() == RegistrationStateType.INTERRUPTED || previous.getStateType() == RegistrationStateType.FLUNKED)) {
+                                || previous.getStateType() == RegistrationStateType.INTERRUPTED || previous.getStateType() == RegistrationStateType.FLUNKED)) {
                     return true;
                 }
             }
@@ -3856,11 +3855,12 @@ public class Registration extends Registration_Base {
     public void exportValues(StringBuilder result) {
         Formatter formatter = new Formatter(result);
         final Student student = getStudent();
-        formatter.format("%s: %s\n", BundleUtil.getString(Bundle.ACADEMIC,"label.ingression"), getIngression() == null ? " - " : getIngression()
-                .getFullDescription());
-        formatter.format("%s: %d\n", BundleUtil.getString(Bundle.ACADEMIC,"label.studentNumber"), student.getNumber());
-        formatter.format("%s: %s\n", BundleUtil.getString(Bundle.ACADEMIC,"label.Student.Person.name"), student.getPerson().getName());
-        formatter.format("%s: %s\n", BundleUtil.getString(Bundle.ACADEMIC,"label.degree"), getDegree().getPresentationName());
+        formatter.format("%s: %s\n", BundleUtil.getString(Bundle.ACADEMIC, "label.ingression"),
+                getIngression() == null ? " - " : getIngression().getFullDescription());
+        formatter.format("%s: %d\n", BundleUtil.getString(Bundle.ACADEMIC, "label.studentNumber"), student.getNumber());
+        formatter.format("%s: %s\n", BundleUtil.getString(Bundle.ACADEMIC, "label.Student.Person.name"), student.getPerson()
+                .getName());
+        formatter.format("%s: %s\n", BundleUtil.getString(Bundle.ACADEMIC, "label.degree"), getDegree().getPresentationName());
         formatter.close();
     }
 
