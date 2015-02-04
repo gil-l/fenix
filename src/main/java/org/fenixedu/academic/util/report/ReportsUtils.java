@@ -19,6 +19,7 @@
 package org.fenixedu.academic.util.report;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -37,10 +38,10 @@ public class ReportsUtils {
         ReportsUtils.printer = Objects.requireNonNull(printer);
     }
 
-    public static ReportResult generateReport(final String key, final Map<String, Object> parameters,
+    public static ReportResult generateReport(final String key, Locale locale, final Map<String, Object> parameters,
             final Collection<?> dataSource) {
         try {
-            return printer.printReport(key, parameters, dataSource);
+            return printer.printReport(key, locale, parameters, dataSource);
         } catch (Exception e) {
             throw new RuntimeException("Exception while generating report '" + key + "'", e);
         }

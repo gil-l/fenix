@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.servlet.Filter;
@@ -236,6 +237,7 @@ public class ProcessCandidacyPrintAllDocumentsFilter implements Filter {
     private byte[] createAcademicAdminProcessSheet(Person person) {
         @SuppressWarnings("rawtypes")
         HashMap map = new HashMap();
+        final Locale locale = new java.util.Locale("PT", "pt");
 
         try {
             final Student student = person.getStudent();
@@ -288,14 +290,14 @@ public class ProcessCandidacyPrintAllDocumentsFilter implements Filter {
             map.put("cellphoneNumber", person.getDefaultMobilePhoneNumber());
             map.put("telephoneNumber", person.getDefaultPhoneNumber());
             map.put("emailAddress", getMail(person));
-            map.put("currentDate", new java.text.SimpleDateFormat("'Lisboa, 'dd' de 'MMMM' de 'yyyy", new java.util.Locale("PT",
-                    "pt")).format(new java.util.Date()));
+            map.put("currentDate",
+                    new java.text.SimpleDateFormat("'Lisboa, 'dd' de 'MMMM' de 'yyyy", locale).format(new java.util.Date()));
         } catch (NullPointerException e) {
             // nothing; will cause printing of incomplete form
             // better than no form at all
         }
 
-        return ReportsUtils.generateReport(ACADEMIC_ADMIN_SHEET_REPORT_KEY, map, null).getData();
+        return ReportsUtils.generateReport(ACADEMIC_ADMIN_SHEET_REPORT_KEY, locale, map, null).getData();
     }
 
     private Registration findRegistration(final Student student) {
