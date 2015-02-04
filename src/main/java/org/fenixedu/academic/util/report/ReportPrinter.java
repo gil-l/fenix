@@ -19,19 +19,25 @@
 package org.fenixedu.academic.util.report;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 
 public interface ReportPrinter {
 
     public ReportResult printReports(ReportDescription... reports) throws Exception;
 
-    public default ReportResult printReport(String key, Map<String, Object> parameters, Collection<?> dataSource)
+    public default ReportResult printReport(String key, Locale locale, Map<String, Object> parameters, Collection<?> dataSource)
             throws Exception {
         return printReports(new ReportDescription() {
 
             @Override
             public String getKey() {
                 return key;
+            }
+
+            @Override
+            public Locale getLocale() {
+                return locale;
             }
 
             @Override
@@ -49,6 +55,8 @@ public interface ReportPrinter {
     public static interface ReportDescription {
 
         public String getKey();
+
+        public Locale getLocale();
 
         public Map<String, Object> getParameters();
 
