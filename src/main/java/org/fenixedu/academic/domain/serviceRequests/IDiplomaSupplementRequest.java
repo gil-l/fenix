@@ -42,7 +42,7 @@ public interface IDiplomaSupplementRequest extends IDocumentRequest {
 
     public Integer getFinalAverage();
 
-    public String getFinalAverageQualified(final Locale locale);
+    public String getFinalAverageQualified();
 
     public ExecutionYear getConclusionYear();
 

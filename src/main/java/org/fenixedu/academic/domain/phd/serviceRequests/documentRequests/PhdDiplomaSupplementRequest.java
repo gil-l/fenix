@@ -228,7 +228,7 @@ public class PhdDiplomaSupplementRequest extends PhdDiplomaSupplementRequest_Bas
     }
 
     @Override
-    public String getFinalAverageQualified(final Locale locale) {
+    public String getFinalAverageQualified() {
         if (getPhdIndividualProgramProcess().getStudyPlan().isExempted()) {
             return null;
         }

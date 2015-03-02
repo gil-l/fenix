@@ -242,7 +242,7 @@ public class DiplomaSupplementRequest extends DiplomaSupplementRequest_Base impl
     }
 
     @Override
-    public String getFinalAverageQualified(final Locale locale) {
+    public String getFinalAverageQualified() {
         Integer finalAverage = getRegistration().getFinalAverage(getRequestedCycle());
         String qualifiedAverageGrade;
         if (finalAverage <= 13) {
