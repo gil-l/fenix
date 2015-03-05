@@ -35,7 +35,6 @@ import org.fenixedu.academic.domain.DegreeOfficialPublication;
 import org.fenixedu.academic.domain.DegreeSpecializationArea;
 import org.fenixedu.academic.domain.IEnrolment;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.academic.domain.degreeStructure.EctsComparabilityPercentages;
 import org.fenixedu.academic.domain.degreeStructure.EctsComparabilityTable;
@@ -103,10 +102,8 @@ public class DiplomaSupplement extends AdministrativeOfficeDocument {
         if (degreePublication == null) {
             throw new DomainException("error.DiplomaSupplement.degreeOfficialPublicationNotFound");
         }
-        DegreeType degreeType = degreePublication.getDegree().getDegreeType();
-        LocalizedString graduateTitle =
-                BundleUtil.getLocalizedString(Bundle.ENUMERATION, degreeType.getQualifiedName() + ".graduate.title");
 
+        LocalizedString.Builder graduateTitle = new LocalizedString.Builder();
         LocalizedString.Builder degreeDesignation = new LocalizedString.Builder();
         String title;
         for (Locale l : CoreConfiguration.supportedLocales()) {
@@ -116,12 +113,13 @@ public class DiplomaSupplement extends AdministrativeOfficeDocument {
             title = title.replace("Mestre", "Mestrado");
             title = title.replace("Doutor", "Doutoramento");
             title = title.replace("Doctor", "Doctoral Programme");
-            degreeDesignation = degreeDesignation.with(l, title);
+            degreeDesignation.with(l, title);
+            graduateTitle.with(l, documentRequest.getGraduateTitle(l).split(" ")[0]);
         }
 
         LocalizedString.Builder prevailingScientificArea = new LocalizedString.Builder();
         for (Locale l : CoreConfiguration.supportedLocales()) {
-            prevailingScientificArea = prevailingScientificArea.with(l, documentRequest.getPrevailingScientificArea(l));
+            prevailingScientificArea.with(l, documentRequest.getPrevailingScientificArea(l));
         }
 
         final UniversityUnit university = getUniversity(documentRequest.getRequestDate());
@@ -130,26 +128,28 @@ public class DiplomaSupplement extends AdministrativeOfficeDocument {
                         + university.getInstitutionType().getName());
 
         final Unit institutionUnit = Bennu.getInstance().getInstitutionUnit();
-        LocalizedString institutionStatus =
-                BundleUtil.getLocalizedString(Bundle.ENUMERATION, Bennu.getInstance().getInstitutionUnit().getType().getName());
-        institutionStatus =
-                institutionStatus.append(BundleUtil.getLocalizedString(Bundle.ACADEMIC, "label.of.female"), SINGLE_SPACE);
-        institutionStatus = institutionStatus.append(university.getNameI18n().toLocalizedString(), SINGLE_SPACE);
+        LocalizedString.Builder institutionStatus = new LocalizedString.Builder();
+        institutionStatus.append(BundleUtil.getLocalizedString(Bundle.ENUMERATION, Bennu.getInstance().getInstitutionUnit()
+                .getType().getName()));
+        institutionStatus.append(BundleUtil.getLocalizedString(Bundle.ACADEMIC, "label.of.female"), SINGLE_SPACE);
+        institutionStatus.append(university.getNameI18n().toLocalizedString(), SINGLE_SPACE);
 
         LocalizedString languages = BundleUtil.getLocalizedString(Bundle.ENUMERATION, "pt");
-        if (!documentRequest.getRequestedCycle().equals(CycleType.FIRST_CYCLE)) {
+        boolean isFirstCycle = documentRequest.getRequestedCycle().equals(CycleType.FIRST_CYCLE);
+        if (!isFirstCycle) {
             languages =
                     languages.append(BundleUtil.getLocalizedString(Bundle.ACADEMIC, "label.and"), SINGLE_SPACE).append(
                             BundleUtil.getLocalizedString(Bundle.ENUMERATION, "en"), SINGLE_SPACE);
         }
 
-        addParameter("graduateTitle", graduateTitle);
+        addParameter("isFirstCycle", isFirstCycle);
+        addParameter("graduateTitle", graduateTitle.build());
         addParameter("degreeDesignation", degreeDesignation.build());
         addParameter("prevailingScientificArea", prevailingScientificArea.build());
         addParameter("universityName", university.getNameI18n().toLocalizedString());
         addParameter("universityStatus", universityStatus);
         addParameter("institutionName", institutionUnit.getNameI18n().toLocalizedString());
-        addParameter("institutionStatus", institutionStatus);
+        addParameter("institutionStatus", institutionStatus.build());
         addParameter("languages", languages);
 
         // Group 3
@@ -187,7 +187,7 @@ public class DiplomaSupplement extends AdministrativeOfficeDocument {
         if (documentRequest.isRequestForPhd()) {
             PhdDiplomaSupplementRequest phdDocumentRequest = ((PhdDiplomaSupplementRequest) documentRequest);
             for (Locale l : CoreConfiguration.supportedLocales()) {
-                thesisFinalGrade = thesisFinalGrade.with(l, phdDocumentRequest.getThesisFinalGrade(getLocale()));
+                thesisFinalGrade.with(l, phdDocumentRequest.getThesisFinalGrade(getLocale()));
             }
         }
 
@@ -196,16 +196,15 @@ public class DiplomaSupplement extends AdministrativeOfficeDocument {
         int nrSpecAreas = 0;
         if (documentRequest.isRequestForPhd()) {
             officialPublication = degreePublication.getOfficialReference();
-        } else if (!documentRequest.getRequestedCycle().equals(CycleType.FIRST_CYCLE)
-                && degreePublication.getSpecializationAreaSet().size() != 0) {
+        } else if (!isFirstCycle && degreePublication.getSpecializationAreaSet().size() != 0) {
             nrSpecAreas = degreePublication.getSpecializationAreaSet().size();
             boolean first = true;
             for (DegreeSpecializationArea area : degreePublication.getSpecializationAreaSet()) {
                 if (first) {
-                    specAreas = specAreas.append(area.getName().toLocalizedString());
+                    specAreas.append(area.getName().toLocalizedString());
                     first = false;
                 } else {
-                    specAreas = specAreas.append(area.getName().toLocalizedString(), "; ");
+                    specAreas.append(area.getName().toLocalizedString(), "; ");
                 }
             }
             officialPublication = degreePublication.getOfficialReference();
@@ -280,22 +279,24 @@ public class DiplomaSupplement extends AdministrativeOfficeDocument {
                 }
                 activityMap.get(activity.getType()).add(activity);
             }
+            LocalizedString.Builder activityText;
             for (Entry<ExtraCurricularActivityType, List<ExtraCurricularActivity>> entry : activityMap.entrySet()) {
-                LocalizedString activityText = was;
-                activityText = activityText.append(entry.getKey().getName().toLocalizedString(), SINGLE_SPACE);
+                activityText = new LocalizedString.Builder();
+                activityText.append(was);
+                activityText.append(entry.getKey().getName().toLocalizedString(), SINGLE_SPACE);
                 Iterator<ExtraCurricularActivity> it = entry.getValue().iterator();
                 ExtraCurricularActivity activity;
                 while (it.hasNext()) {
                     activity = it.next();
-                    activityText = activityText.append(between, SINGLE_SPACE);
-                    activityText = activityText.append(activity.getStart().toString("MM-yyyy"), SINGLE_SPACE);
-                    activityText = activityText.append(and, SINGLE_SPACE);
-                    activityText = activityText.append(activity.getEnd().toString("MM-yyyy"), SINGLE_SPACE);
+                    activityText.append(between, SINGLE_SPACE);
+                    activityText.append(activity.getStart().toString("MM-yyyy"), SINGLE_SPACE);
+                    activityText.append(and, SINGLE_SPACE);
+                    activityText.append(activity.getEnd().toString("MM-yyyy"), SINGLE_SPACE);
                     if (it.hasNext()) {
                         activityText.append(", ");
                     }
                 }
-                activities.add(activityText);
+                activities.add(activityText.build());
             }
         }
         activitiesTable.put("activity", activities);
@@ -313,7 +314,7 @@ public class DiplomaSupplement extends AdministrativeOfficeDocument {
     private LocalizedString getBirthDate(Person person) {
         LocalizedString.Builder bd = new LocalizedString.Builder();
         for (Locale l : CoreConfiguration.supportedLocales()) {
-            bd = bd.with(l, person.getDateOfBirthYearMonthDay().toString(DD_SLASH_MM_SLASH_YYYY, l));
+            bd.with(l, person.getDateOfBirthYearMonthDay().toString(DD_SLASH_MM_SLASH_YYYY, l));
         }
         return bd.build();
     }
