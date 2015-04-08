@@ -39,7 +39,6 @@ import org.fenixedu.academic.domain.accessControl.UnitGroup;
 import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.degreeStructure.CurricularStage;
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.domain.util.email.UnitBasedSender;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.YearMonthDay;
@@ -253,15 +252,6 @@ public class DepartmentUnit extends DepartmentUnit_Base {
             }
         }
         return departments;
-    }
-
-    @Override
-    public UnitBasedSender getOneUnitBasedSender() {
-        if (!getUnitBasedSenderSet().isEmpty()) {
-            return getUnitBasedSenderSet().iterator().next();
-        } else {
-            return UnitBasedSender.newInstance(this);
-        }
     }
 
     @Override

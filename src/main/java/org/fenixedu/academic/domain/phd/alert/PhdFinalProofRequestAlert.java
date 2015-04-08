@@ -18,15 +18,14 @@
  */
 package org.fenixedu.academic.domain.phd.alert;
 
-import java.util.Collections;
 import java.util.Locale;
 
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
 import org.fenixedu.academic.domain.phd.PhdProgramCalendarUtil;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.messaging.domain.Message;
 import org.joda.time.LocalDate;
 
 import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
@@ -81,8 +80,7 @@ public class PhdFinalProofRequestAlert extends PhdFinalProofRequestAlert_Base {
 
         // TODO: add missing elements (Coordinator, AcademicOffice?)
         new PhdAlertMessage(getProcess(), getProcess().getPerson(), getFormattedSubject(), getFormattedBody());
-        new Message(getSender(), new Recipient(Collections.singletonList(getProcess().getPerson())), buildMailSubject(),
-                buildMailBody());
+        new Message(getSender(), UserGroup.of(getProcess().getPerson().getUser()), buildMailSubject(), buildMailBody());
     }
 
     @Override

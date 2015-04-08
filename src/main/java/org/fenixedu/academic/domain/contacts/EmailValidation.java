@@ -18,12 +18,9 @@
  */
 package org.fenixedu.academic.domain.contacts;
 
-import java.util.Collections;
 import java.util.UUID;
 
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.SystemSender;
-import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.academic.util.MessagingUtils;
 
 import pt.ist.fenixframework.Atomic;
 
@@ -59,11 +56,10 @@ public class EmailValidation extends EmailValidation_Base {
                 String.format(
                         "https://fenix.ist.utl.pt/external/partyContactValidation.do?method=validate&validationOID=%s&token=%s",
                         getExternalId(), token);
-        final SystemSender sender = Bennu.getInstance().getSystemSender();
         final String subject = "Sistema Fénix @ IST : Validação de Email";
         final String body_format =
                 "Caro Utilizador\n Deverá validar o seu email introduzindo o código %s na página de verificação ou \n carregar no seguinte link : \n %s \n Os melhores cumprimentos,\n A equipa Fénix";
         final String body = String.format(body_format, token, URL);
-        new Message(sender, Collections.EMPTY_LIST, Collections.EMPTY_LIST, subject, body, getEmailValue());
+        MessagingUtils.systemMessage(subject, body, getEmailValue());
     }
 }

@@ -19,34 +19,26 @@
 package org.fenixedu.academic.service.services.commons.alumni;
 
 import java.text.MessageFormat;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 import org.fenixedu.academic.domain.Alumni;
 import org.fenixedu.academic.domain.AlumniIdentityCheckRequest;
 import org.fenixedu.academic.domain.AlumniRequestType;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.SystemSender;
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.academic.util.MessagingUtils;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.util.CoreConfiguration;
+import org.fenixedu.messaging.domain.Message;
+import org.fenixedu.messaging.domain.MessagingSystem;
+import org.fenixedu.messaging.domain.Sender;
 
 public class AlumniNotificationService {
 
-    private static void sendEmail(final Collection<Recipient> recipients, final String subject, final String body,
-            final String bccs) {
-        SystemSender systemSender = Bennu.getInstance().getSystemSender();
-        new Message(systemSender, systemSender.getConcreteReplyTos(), recipients, subject, body, bccs);
-    }
-
-    private static List<Recipient> getAlumniRecipients(Alumni alumni) {
-        return Collections.singletonList(Recipient.newInstance(UserGroup.of(alumni.getStudent().getPerson().getUser())));
+    private static Group getAlumniRecipient(Alumni alumni) {
+        return UserGroup.of(alumni.getStudent().getPerson().getUser());
     }
 
     protected static void sendPublicAccessMail(final Alumni alumni, final String alumniEmail) {
@@ -58,7 +50,7 @@ public class AlumniNotificationService {
                 BundleUtil.getString(Bundle.ALUMNI, "alumni.public.registration.url", person.getFirstAndLastName(),
                         getRegisterConclusionURL(alumni));
 
-        sendEmail(Collections.EMPTY_LIST, subject, body, alumniEmail);
+        MessagingUtils.systemMessage(subject, body, alumniEmail);
     }
 
     public static String getRegisterConclusionURL(final Alumni alumni) {
@@ -117,7 +109,7 @@ public class AlumniNotificationService {
                                     getRegisterConclusionURL(request.getAlumni()));
         }
 
-        sendEmail(Collections.EMPTY_LIST, subject, body, request.getContactEmail());
+        MessagingUtils.systemMessage(subject, body, request.getContactEmail());
     }
 
     protected static void sendRegistrationSuccessMail(final Alumni alumni) {
@@ -129,7 +121,8 @@ public class AlumniNotificationService {
                 MessageFormat.format(BundleUtil.getString(Bundle.ALUMNI, "alumni.public.username.login.url"), alumni.getStudent()
                         .getPerson().getFirstAndLastName(), alumni.getLoginUsername());
 
-        sendEmail(getAlumniRecipients(alumni), subject, body, null);
+        Sender systemSender = MessagingSystem.getInstance().getSystemSender();
+        new Message(systemSender, systemSender.getReplyTos(), getAlumniRecipient(alumni), subject, body, null);
     }
 
 }

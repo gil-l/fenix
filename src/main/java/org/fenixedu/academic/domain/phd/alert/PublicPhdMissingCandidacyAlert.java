@@ -24,8 +24,7 @@ import java.util.Set;
 import org.fenixedu.academic.FenixEduAcademicConfiguration;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.phd.candidacy.PhdProgramPublicCandidacyHashCode;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
+import org.fenixedu.messaging.domain.Message;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
@@ -93,7 +92,7 @@ public class PublicPhdMissingCandidacyAlert extends PublicPhdMissingCandidacyAle
 
     @Override
     protected void generateMessage() {
-        new Message(getSender(), null, Collections.<Recipient> emptyList(), buildMailSubject(), buildMailBody(), getEmail());
+        new Message(getSender(), null, Collections.<Group> emptyList(), buildMailSubject(), buildMailBody(), getEmail());
     }
 
     private Set<String> getEmail() {

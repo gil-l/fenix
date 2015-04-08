@@ -40,8 +40,8 @@ import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
 
 import org.fenixedu.academic.FenixEduAcademicConfiguration;
-import org.fenixedu.academic.domain.util.email.Message;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.messaging.domain.Message;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +76,6 @@ public class Email extends Email_Base {
     private Email() {
         super();
         setRootDomainObject(Bennu.getInstance());
-        setRootDomainObjectFromEmailQueue(getRootDomainObject());
     }
 
     public Email(final String fromName, final String fromAddress, final String[] replyTos, final Collection<String> toAddresses,
@@ -105,7 +104,6 @@ public class Email extends Email_Base {
 
     public void delete() {
         setMessage(null);
-        setRootDomainObjectFromEmailQueue(null);
         setRootDomainObject(null);
         super.deleteDomainObject();
     }
@@ -394,7 +392,7 @@ public class Email extends Email_Base {
     @Atomic(mode = TxMode.WRITE)
     public void deliver() {
         if (!hasAnyRecipients() || (getMessage() != null && getMessage().getCreated().plusDays(5).isBeforeNow())) {
-            setRootDomainObjectFromEmailQueue(null);
+
         } else {
             final EmailAddressList toAddresses = getToAddresses();
             final EmailAddressList ccAddresses = getCcAddresses();
@@ -416,10 +414,6 @@ public class Email extends Email_Base {
                 logProblem(e);
                 // abort();
                 retry(toAddresses, ccAddresses, bccAddresses);
-            }
-
-            if (!hasAnyRecipients()) {
-                setRootDomainObjectFromEmailQueue(null);
             }
         }
     }

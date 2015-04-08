@@ -31,10 +31,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.person.RoleType;
-import org.fenixedu.academic.domain.util.email.ExecutionCourseSender;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.MessageDeleteService;
-import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.academic.ui.struts.action.messaging.MessagingApplication.MessagingEmailsApp;
@@ -46,6 +42,8 @@ import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
+import org.fenixedu.messaging.domain.Message;
+import org.fenixedu.messaging.domain.Sender;
 
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
@@ -67,8 +65,7 @@ public class ViewSentEmailsDA extends FenixDispatchAction {
 
         final User userView = Authenticate.getUser();
         final Set<Sender> sendersGroups = new TreeSet<Sender>(Sender.COMPARATOR_BY_FROM_NAME);
-        final TreeSet<ExecutionCourseSender> sendersGroupsCourses =
-                new TreeSet<ExecutionCourseSender>(ExecutionCourseSender.COMPARATOR_BY_EXECUTION_COURSE_SENDER);
+        final TreeSet<Sender> sendersGroupsCourses = new TreeSet<Sender>(Sender.COMPARATOR_BY_EXECUTION_COURSE_SENDER);
         for (final Sender sender : Bennu.getInstance().getUtilEmailSendersSet()) {
             boolean allow = sender.getMembers().isMember(userView);
             boolean isExecutionCourseSender = sender instanceof ExecutionCourseSender;
@@ -105,7 +102,7 @@ public class ViewSentEmailsDA extends FenixDispatchAction {
         final Sender sender = FenixFramework.getDomainObject(senderId);
         final int numberOfMessagesByPage = 40;
         final CollectionPager<Message> pager =
-                new CollectionPager<Message>(sender.getMessagesSet().stream()
+                new CollectionPager<Message>(sender.getMessageSet().stream()
                         .sorted(Message.COMPARATOR_BY_CREATED_DATE_OLDER_LAST).collect(Collectors.toList()),
                         numberOfMessagesByPage);
         request.setAttribute("numberOfPages", getNumberOfPages(pager));

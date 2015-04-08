@@ -43,17 +43,17 @@ import org.fenixedu.academic.domain.documents.GeneratedDocument;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.serviceRequests.documentRequests.AcademicServiceRequestType;
 import org.fenixedu.academic.domain.serviceRequests.documentRequests.DocumentRequest;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.dto.serviceRequests.AcademicServiceRequestBean;
 import org.fenixedu.academic.dto.serviceRequests.AcademicServiceRequestCreateBean;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
+import org.fenixedu.messaging.domain.Message;
+import org.fenixedu.messaging.domain.Sender;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.YearMonthDay;
@@ -310,9 +310,9 @@ abstract public class AcademicServiceRequest extends AcademicServiceRequest_Base
 
         }
 
-        final Sender sender = getAdministrativeOffice().getUnit().getUnitBasedSenderSet().iterator().next();
-        final Recipient recipient = new Recipient(UserGroup.of(getPerson().getUser()));
-        new Message(sender, sender.getReplyTos(), recipient.asCollection(), getDescription(), body, "");
+        final Sender sender = getAdministrativeOffice().getUnit().getOneSender();
+        final Group recipient = UserGroup.of(getPerson().getUser());
+        new Message(sender, sender.getReplyTos(), recipient, getDescription(), body, "");
     }
 
     @Atomic
@@ -643,7 +643,7 @@ abstract public class AcademicServiceRequest extends AcademicServiceRequest_Base
      * Indicates that the document external shipping to rectorate is done using
      * the rectorate batches. The {@link AcademicServiceRequestSituationType#SENT_TO_EXTERNAL_ENTITY} and
      * {@link AcademicServiceRequestSituationType#RECEIVED_FROM_EXTERNAL_ENTITY} states are handled through this system.
-     * 
+     *
      * @return true if managed by batch, false otherwise.
      */
     abstract public boolean isManagedWithRectorateSubmissionBatch();

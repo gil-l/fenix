@@ -24,12 +24,12 @@ import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.ReplyTo;
-import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.messaging.domain.ReplyTo;
+import org.fenixedu.messaging.domain.Sender;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;
@@ -48,17 +48,16 @@ public class PhdIndividualProgramProcessEmail extends PhdIndividualProgramProces
 
     @Override
     protected Collection<? extends ReplyTo> getReplyTos() {
-        return getSender().getReplyTosSet();
+        return getSender().getReplyTos();
     }
 
     @Override
     protected Sender getSender() {
-        return this.getPhdIndividualProgramProcess().getAdministrativeOffice().getUnit().getUnitBasedSenderSet().iterator()
-                .next();
+        return this.getPhdIndividualProgramProcess().getAdministrativeOffice().getUnit().getOneSender();
     }
 
     @Override
-    protected Collection<Recipient> getRecipients() {
+    protected Collection<Group> getRecipients() {
         return null;
     }
 

@@ -140,7 +140,7 @@
 		<slot name="mobilePhone" layout="boolean" key="label.mobile" />
 	</schema>
 
-	<schema name="alumni.gep.remove.recipients" type="org.fenixedu.academic.domain.util.email.EmailBean" bundle="MESSAGING_RESOURCES">
+	<schema name="alumni.gep.remove.recipients" type="org.fenixedu.messaging.domain.EmailBean" bundle="MESSAGING_RESOURCES">
 	    <slot name="recipients" layout="option-select" key="label.receiversGroup">
 	        <property name="providerClass" value="org.fenixedu.academic.ui.renderers.providers.EmailRecipientsProvider" />
 	        <property name="eachSchema" value="alumni.gep.email.recipient.selectItem"/>
@@ -150,11 +150,11 @@
 	    </slot>
 	</schema>
 	
-	<schema name="alumni.gep.email.recipient.selectItem" type="org.fenixedu.academic.domain.util.email.Recipient">
+	<schema name="alumni.gep.email.recipient.selectItem" type="org.fenixedu.messaging.domain.Recipient">
 		<slot name="toName"/>
 	</schema>
 
-	<schema name="alumni.gep.show.recipients" type="org.fenixedu.academic.domain.util.email.Recipient" bundle="MESSAGING_RESOURCES">
+	<schema name="alumni.gep.show.recipients" type="org.fenixedu.messaging.domain.Recipient" bundle="MESSAGING_RESOURCES">
 		<slot name="toName"/>
 	</schema>
 

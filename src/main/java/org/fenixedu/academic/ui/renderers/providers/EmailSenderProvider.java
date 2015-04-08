@@ -18,7 +18,7 @@
  */
 package org.fenixedu.academic.ui.renderers.providers;
 
-import org.fenixedu.academic.domain.util.email.Sender;
+import org.fenixedu.messaging.domain.Sender;
 
 import pt.ist.fenixWebFramework.rendererExtensions.converters.DomainObjectKeyConverter;
 import pt.ist.fenixWebFramework.renderers.DataProvider;

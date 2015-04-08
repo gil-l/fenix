@@ -24,9 +24,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.accessControl.CerimonyInquiryGroup;
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.joda.time.DateTime;
@@ -104,10 +102,6 @@ public class CerimonyInquiry extends CerimonyInquiry_Base implements Comparable<
 
     public boolean isOpen() {
         return getBegin() != null && getBegin().isBeforeNow() && (getEnd() == null || getEnd().isAfterNow());
-    }
-
-    public Recipient createRecipient() {
-        return Recipient.newInstance("Inquiridos: " + getDescription(), CerimonyInquiryGroup.get(this));
     }
 
     @Atomic

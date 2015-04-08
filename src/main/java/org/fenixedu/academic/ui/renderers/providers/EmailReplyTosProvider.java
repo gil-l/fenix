@@ -21,9 +21,10 @@ package org.fenixedu.academic.ui.renderers.providers;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.fenixedu.academic.domain.util.email.EmailBean;
-import org.fenixedu.academic.domain.util.email.ReplyTo;
-import org.fenixedu.academic.domain.util.email.Sender;
+import org.fenixedu.academic.util.MessagingUtils;
+import org.fenixedu.messaging.domain.ReplyTo;
+import org.fenixedu.messaging.domain.Sender;
+import org.fenixedu.messaging.ui.EmailBean;
 
 import pt.ist.fenixWebFramework.renderers.DataProvider;
 import pt.ist.fenixWebFramework.renderers.components.converters.Converter;
@@ -34,9 +35,9 @@ public class EmailReplyTosProvider implements DataProvider {
     public Object provide(final Object source, final Object currentValue) {
         final EmailBean emailBean = (EmailBean) source;
         final Sender sender = emailBean.getSender();
-        final Set<ReplyTo> replyTos = new TreeSet<ReplyTo>(ReplyTo.COMPARATOR_BY_ADDRESS);
+        final Set<ReplyTo> replyTos = new TreeSet<ReplyTo>(MessagingUtils.REPLY_TO_COMPARATOR_BY_ADDRESS);
         if (sender != null) {
-            replyTos.addAll(sender.getConcreteReplyTos());
+            replyTos.addAll(sender.getReplyTos());
         }
         return replyTos;
     }

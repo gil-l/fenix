@@ -69,7 +69,7 @@ public class ErasmusAlert extends ErasmusAlert_Base {
 
     @Override
     protected void generateMessage() {
-        // new Message(getRootDomainObject().getSystemSender(), null,
+        // new Message(MessagingSystem.getInstance().getSystemSender(), null,
         // Collections.EMPTY_LIST, buildMailSubject(), buildMailBody(),
         // getProcess().getPersonalDetails().getEmail());
     }

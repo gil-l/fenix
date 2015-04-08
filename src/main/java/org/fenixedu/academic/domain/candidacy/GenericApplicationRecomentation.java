@@ -21,8 +21,8 @@ package org.fenixedu.academic.domain.candidacy;
 import java.util.Random;
 
 import org.fenixedu.academic.FenixEduAcademicConfiguration;
-import org.fenixedu.academic.domain.util.email.Message;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.academic.util.MessagingUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
@@ -62,7 +62,7 @@ public class GenericApplicationRecomentation extends GenericApplicationRecomenta
                         getGenericApplication().getName(), getGenericApplication().getGenericApplicationPeriod().getTitle()
                                 .getContent(), generateConfirmationLink());
 
-        new Message(getRootDomainObject().getSystemSender(), getEmail(), subject, body);
+        MessagingUtils.systemMessage(subject, body, getEmail());
     }
 
     @Atomic
@@ -75,7 +75,7 @@ public class GenericApplicationRecomentation extends GenericApplicationRecomenta
                         getName(), getGenericApplication().getName(), getGenericApplication().getGenericApplicationPeriod()
                                 .getTitle().getContent());
 
-        new Message(getRootDomainObject().getSystemSender(), getEmail(), subject, body);
+        MessagingUtils.systemMessage(subject, body, getEmail());
     }
 
     private String generateConfirmationLink() {

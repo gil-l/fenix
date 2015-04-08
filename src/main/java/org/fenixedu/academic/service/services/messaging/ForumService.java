@@ -17,7 +17,7 @@
  * along with FenixEdu Academic.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * 
+ *
  */
 package org.fenixedu.academic.service.services.messaging;
 
@@ -31,20 +31,19 @@ import org.fenixedu.academic.domain.messaging.ConversationMessage;
 import org.fenixedu.academic.domain.messaging.ConversationThread;
 import org.fenixedu.academic.domain.messaging.ForumSubscription;
 import org.fenixedu.academic.domain.person.RoleType;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.SystemSender;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.HtmlToTextConverterUtil;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.messaging.domain.Message;
+import org.fenixedu.messaging.domain.MessagingSystem;
+import org.fenixedu.messaging.domain.Sender;
 
 /**
  * @author <a href="mailto:goncalo@ist.utl.pt"> Goncalo Luiz</a><br/>
  *         Created on May 23, 2006, 3:48:23 PM
- * 
+ *
  */
 public abstract class ForumService {
 
@@ -119,8 +118,8 @@ public abstract class ForumService {
     private void sendEmailToPersons(Set<Person> persons, String personsName, String subject, String body) {
         if (!persons.isEmpty()) {
             final Recipient recipient = new Recipient(getString("label.teachers"), UserGroup.of(Person.convertToUsers(persons)));
-            SystemSender systemSender = Bennu.getInstance().getSystemSender();
-            new Message(systemSender, systemSender.getConcreteReplyTos(), recipient.asCollection(), subject, body, "");
+            Sender systemSender = MessagingSystem.getInstance().getSystemSender();
+            new Message(systemSender, systemSender.getReplyTos(), recipient.asCollection(), subject, body, "");
         }
     }
 

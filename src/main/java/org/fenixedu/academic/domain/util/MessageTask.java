@@ -22,8 +22,8 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Sender;
+import org.fenixedu.messaging.domain.Message;
+import org.fenixedu.messaging.domain.Sender;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;

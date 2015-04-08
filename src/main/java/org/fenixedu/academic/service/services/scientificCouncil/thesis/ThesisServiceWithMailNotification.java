@@ -27,15 +27,14 @@ import java.util.Set;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.thesis.Thesis;
 import org.fenixedu.academic.domain.thesis.ThesisEvaluationParticipant;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.PersonSender;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.messaging.domain.Message;
+import org.fenixedu.messaging.domain.Sender;
 
 public abstract class ThesisServiceWithMailNotification {
 
@@ -60,10 +59,10 @@ public abstract class ThesisServiceWithMailNotification {
         return MessageFormat.format(template, args);
     }
 
-    private Set<Recipient> getRecipients(Thesis thesis) {
-        Set<Recipient> recipients = new HashSet<Recipient>();
+    private Set<Group> getRecipients(Thesis thesis) {
+        Set<Group> recipients = new HashSet<Group>();
         for (Person person : getReceivers(thesis)) {
-            recipients.add(Recipient.newInstance(UserGroup.of(person.getUser())));
+            recipients.add(UserGroup.of(person.getUser()));
         }
         return recipients;
     }

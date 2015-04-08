@@ -20,7 +20,7 @@
 --%>
 <%@ page isELIgnored="true"%>
 <%@ page language="java" %>
-<%@page import="org.fenixedu.academic.domain.util.email.Sender"%>
+<%@page import="org.fenixedu.messaging.domain.Sender"%>
 <%@page import="org.fenixedu.academic.domain.person.RoleType"%>
 <%@page import="org.fenixedu.bennu.core.security.Authenticate"%>
 <%@page import="org.fenixedu.bennu.core.domain.User"%>
@@ -43,7 +43,7 @@
 	<html:hidden property="method" value="sendEmail"/>
 
 	<fr:edit id="emailBean" name="emailBean">
-		<fr:schema type="org.fenixedu.academic.domain.util.email.EmailBean" bundle="MESSAGING_RESOURCES">
+		<fr:schema type="org.fenixedu.messaging.domain.EmailBean" bundle="MESSAGING_RESOURCES">
 			<fr:slot name="sender" bundle="MESSAGING_RESOURCES" key="label.fromName" layout="menu-select-postback"
 					validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator">
 		        <fr:property name="providerClass" value="org.fenixedu.academic.ui.renderers.providers.EmailSenderProvider" />
@@ -52,14 +52,14 @@
 			</fr:slot>
     		<fr:slot name="replyTos" layout="option-select" key="label.replyTos">
         		<fr:property name="providerClass" value="org.fenixedu.academic.ui.renderers.providers.EmailReplyTosProvider" />
-        		<fr:property name="eachSchema" value="org.fenixedu.academic.domain.util.email.ReplyTo.selectItem"/>
+        		<fr:property name="eachSchema" value="org.fenixedu.messaging.domain.ReplyTo.selectItem"/>
         		<fr:property name="eachLayout" value="values"/>
         		<fr:property name="classes" value="nobullet noindent"/>
         		<fr:property name="sortBy" value="replyToAddress"/>
     		</fr:slot>
     		<fr:slot name="recipients" layout="option-select" key="label.receiversGroup">
         		<fr:property name="providerClass" value="org.fenixedu.academic.ui.renderers.providers.EmailRecipientsProvider" />
-        		<fr:property name="eachSchema" value="org.fenixedu.academic.domain.util.email.Recipient.selectItem"/>
+        		<fr:property name="eachSchema" value="org.fenixedu.messaging.domain.Recipient.selectItem"/>
         		<fr:property name="eachLayout" value="values"/>
         		<fr:property name="classes" value="nobullet noindent"/>
         		<fr:property name="sortBy" value="toName"/>

@@ -41,9 +41,6 @@ import org.fenixedu.academic.domain.mobility.outbound.OutboundMobilityCandidacyC
 import org.fenixedu.academic.domain.mobility.outbound.OutboundMobilityCandidacyPeriod;
 import org.fenixedu.academic.domain.mobility.outbound.OutboundMobilityCandidacyPeriodConfirmationOption;
 import org.fenixedu.academic.domain.mobility.outbound.OutboundMobilityCandidacySubmission;
-import org.fenixedu.academic.domain.util.email.EmailBean;
-import org.fenixedu.academic.domain.util.email.PersonSender;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.ui.struts.action.academicAdministration.AcademicAdministrationApplication.AcademicAdminCandidaciesApp;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
@@ -57,6 +54,7 @@ import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
+import org.fenixedu.messaging.ui.EmailBean;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixWebFramework.servlets.filters.contentRewrite.GenericChecksumRewriter;

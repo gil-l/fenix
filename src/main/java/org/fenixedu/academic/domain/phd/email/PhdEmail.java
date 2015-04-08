@@ -21,10 +21,10 @@ package org.fenixedu.academic.domain.phd.email;
 import java.util.Collection;
 
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.ReplyTo;
-import org.fenixedu.academic.domain.util.email.Sender;
+import org.fenixedu.bennu.core.groups.Group;
+import org.fenixedu.messaging.domain.Message;
+import org.fenixedu.messaging.domain.ReplyTo;
+import org.fenixedu.messaging.domain.Sender;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;
@@ -90,7 +90,7 @@ public abstract class PhdEmail extends PhdEmail_Base {
 
     protected abstract Sender getSender();
 
-    protected abstract Collection<Recipient> getRecipients();
+    protected abstract Collection<Group> getRecipients();
 
     protected abstract String getBccs();
 

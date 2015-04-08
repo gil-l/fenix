@@ -54,7 +54,7 @@
 		</html:link>
 	</logic:notPresent>
 
-	<fr:view name="message" schema="org.fenixedu.academic.domain.util.email.Message.info">
+	<fr:view name="message" schema="org.fenixedu.messaging.domain.Message.info">
 		<fr:layout name="tabular">
 			<fr:property name="classes" value="tstyle1 thlight thleft thtop"/>
 			<fr:property name="columnClasses" value="width11em,,,"/>

@@ -61,9 +61,6 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.organizationalStructure.UniversityUnit;
 import org.fenixedu.academic.domain.person.IDDocumentType;
-import org.fenixedu.academic.domain.util.email.EmailBean;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.SystemSender;
 import org.fenixedu.academic.dto.person.PersonBean;
 import org.fenixedu.academic.report.candidacy.erasmus.LearningAgreementDocument;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
@@ -76,13 +73,16 @@ import org.fenixedu.academic.util.report.ReportsUtils;
 import org.fenixedu.academic.util.stork.AttributesManagement;
 import org.fenixedu.academic.util.stork.SPUtil;
 import org.fenixedu.academic.util.stork.StorkToPersonBeanTranslation;
-import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.messaging.domain.MessagingSystem;
+import org.fenixedu.messaging.domain.Sender;
+import org.fenixedu.messaging.ui.EmailBean;
 import org.joda.time.LocalDate;
 import org.joda.time.YearMonthDay;
 import org.slf4j.Logger;
@@ -1070,7 +1070,7 @@ public class ErasmusIndividualCandidacyProcessPublicDA extends RefactoredIndivid
 
     public static class StorkAttrStringTestBean implements java.io.Serializable {
         /**
-	 * 
+	 *
 	 */
         private static final long serialVersionUID = 1L;
 
@@ -1267,11 +1267,11 @@ public class ErasmusIndividualCandidacyProcessPublicDA extends RefactoredIndivid
                 BundleUtil.getString(Bundle.CANDIDATE, "error.mobility.report.mail.subject", Unit.getInstitutionAcronym());
         String errorReportBody = sb.toString();
 
-        SystemSender systemSender = Bennu.getInstance().getSystemSender();
         EmailBean emailBean = new EmailBean();
+        Sender systemSender = MessagingSystem.getInstance().getSystemSender();
         emailBean.setSender(systemSender);
-        emailBean.setReplyTos(systemSender.getConcreteReplyTos());
-        emailBean.setRecipients(Collections.<Recipient> emptyList());
+        emailBean.setReplyTos(systemSender.getReplyTos());
+        emailBean.setRecipients(Collections.<Group> emptyList());
         emailBean.setSubject(errorReportSubject);
         emailBean.setMessage(errorReportBody);
         emailBean.setBccs(errorReportAddress);

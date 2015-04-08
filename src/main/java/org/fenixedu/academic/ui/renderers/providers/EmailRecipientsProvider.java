@@ -21,9 +21,9 @@ package org.fenixedu.academic.ui.renderers.providers;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.fenixedu.academic.domain.util.email.EmailBean;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.Sender;
+import org.fenixedu.bennu.core.groups.Group;
+import org.fenixedu.messaging.domain.Sender;
+import org.fenixedu.messaging.ui.EmailBean;
 
 import pt.ist.fenixWebFramework.renderers.DataProvider;
 import pt.ist.fenixWebFramework.renderers.components.converters.Converter;
@@ -34,10 +34,10 @@ public class EmailRecipientsProvider implements DataProvider {
     public Object provide(final Object source, final Object currentValue) {
         final EmailBean emailBean = (EmailBean) source;
         final Sender sender = emailBean.getSender();
-        final Set<Recipient> recipients = new TreeSet<Recipient>(Recipient.COMPARATOR_BY_NAME);
+        final Set<Group> recipients = new TreeSet<Group>(Group.COMPARATOR_BY_NAME);
         recipients.addAll(emailBean.getRecipients());
         if (sender != null) {
-            recipients.addAll(sender.getRecipientsSet());
+            recipients.addAll(sender.getRecipients());
         }
         return recipients;
     }

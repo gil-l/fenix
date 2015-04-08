@@ -59,9 +59,6 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.exceptions.FieldIsRequiredException;
 import org.fenixedu.academic.domain.organizationalStructure.ScientificCouncilUnit;
 import org.fenixedu.academic.domain.student.Student;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.dto.degreeAdministrativeOffice.gradeSubmission.MarkSheetEnrolmentEvaluationBean;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.predicate.ThesisPredicates;
@@ -72,6 +69,7 @@ import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.signals.DomainObjectEvent;
 import org.fenixedu.bennu.signals.Signal;
+import org.fenixedu.messaging.domain.Sender;
 import org.joda.time.DateTime;
 import org.joda.time.YearMonthDay;
 

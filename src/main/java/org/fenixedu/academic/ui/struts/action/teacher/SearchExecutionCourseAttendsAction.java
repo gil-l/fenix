@@ -39,18 +39,16 @@ import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.Shift;
 import org.fenixedu.academic.domain.accessControl.SearchDegreeStudentsGroup;
-import org.fenixedu.academic.domain.util.email.CoordinatorSender;
-import org.fenixedu.academic.domain.util.email.ExecutionCourseSender;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.dto.teacher.executionCourse.SearchExecutionCourseAttendsBean;
 import org.fenixedu.academic.dto.teacher.executionCourse.SearchExecutionCourseAttendsBean.StudentAttendsStateType;
 import org.fenixedu.academic.ui.struts.action.coordinator.DegreeCoordinatorIndex;
 import org.fenixedu.academic.ui.struts.action.messaging.EmailsDA;
 import org.fenixedu.academic.ui.struts.action.teacher.executionCourse.ExecutionCourseBaseAction;
+import org.fenixedu.academic.util.MessagingUtils;
 import org.fenixedu.academic.util.WorkingStudentSelectionType;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.struts.annotations.Mapping;
+import org.fenixedu.messaging.domain.Sender;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixframework.FenixFramework;
@@ -179,7 +177,7 @@ public class SearchExecutionCourseAttendsAction extends ExecutionCourseBaseActio
             executionCourse = bean.getExecutionCourse();
             studentsGroup = bean.getAttendsGroup();
             label = bean.getLabel();
-            sender = ExecutionCourseSender.newInstance(executionCourse);
+            sender = MessagingUtils.sender(executionCourse);
         } else {
             SearchDegreeStudentsGroup degreeStudentsGroup =
                     SearchDegreeStudentsGroup.parse((String) getFromRequestOrForm(request, (DynaActionForm) form, "searchGroup"));
@@ -187,7 +185,7 @@ public class SearchExecutionCourseAttendsAction extends ExecutionCourseBaseActio
             String executionDegreeId = (String) getFromRequestOrForm(request, (DynaActionForm) form, "executionDegreeId");
             studentsGroup = degreeStudentsGroup.getUserGroup();
             ExecutionDegree executionDegree = FenixFramework.getDomainObject(executionDegreeId);
-            sender = CoordinatorSender.newInstance(executionDegree.getDegree());
+            sender = MessagingUtils.sender(executionDegree.getDegree());
         }
 
         Recipient recipient = Recipient.newInstance(label, studentsGroup);

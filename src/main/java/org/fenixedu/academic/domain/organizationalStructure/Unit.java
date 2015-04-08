@@ -40,13 +40,14 @@ import org.fenixedu.academic.domain.NonAffiliatedTeacher;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.domain.util.email.UnitBasedSender;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.academic.util.MessagingUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.StringNormalizer;
+import org.fenixedu.messaging.domain.Sender;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.YearMonthDay;
 
@@ -518,11 +519,13 @@ public class Unit extends Unit_Base {
     /*
      * @See UnitMailSenderAction
      */
-    public UnitBasedSender getOneUnitBasedSender() {
-        if (!getUnitBasedSenderSet().isEmpty()) {
-            return getUnitBasedSenderSet().iterator().next();
+    public Sender getOneSender() {
+        if (!getSenderSet().isEmpty()) {
+            return getSenderSet().iterator().next();
         } else {
-            return UnitBasedSender.newInstance(this);
+            Sender sender = MessagingUtils.sender(this);
+            addSender(sender);
+            return sender;
         }
     }
 
@@ -861,7 +864,7 @@ public class Unit extends Unit_Base {
 
     /**
      * Used by messaging system
-     * 
+     *
      * @return Groups to used as recipients
      */
     public List<Group> getGroups() {

@@ -18,9 +18,8 @@
  */
 package org.fenixedu.academic.domain.candidacy;
 
-import org.fenixedu.academic.domain.util.email.Message;
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.academic.util.MessagingUtils;
 import org.fenixedu.bennu.core.groups.NobodyGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 
@@ -54,7 +53,7 @@ public class GenericApplicationLetterOfRecomentation extends GenericApplicationL
                 BundleUtil.getString(Bundle.CANDIDATE, "label.application.recomentation.upload.notification.email.body",
                         getRecomentation().getName(), getRecomentation().getInstitution());
 
-        new Message(Bennu.getInstance().getSystemSender(), getRecomentation().getGenericApplication().getEmail(), subject, body);
+        MessagingUtils.systemMessage(subject, body, getRecomentation().getGenericApplication().getEmail());
     }
 
 }

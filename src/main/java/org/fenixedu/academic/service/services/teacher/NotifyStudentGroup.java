@@ -27,14 +27,13 @@ import org.fenixedu.academic.domain.Attends;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.ProjectSubmission;
-import org.fenixedu.academic.domain.util.email.ExecutionCourseSender;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.predicate.RolePredicates;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.academic.util.MessagingUtils;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.messaging.domain.Message;
+import org.fenixedu.messaging.domain.Sender;
 
 import pt.ist.fenixframework.Atomic;
 
@@ -53,9 +52,9 @@ public class NotifyStudentGroup {
         final String groupName =
                 BundleUtil.getString(Bundle.GLOBAL, "label.group", new String[] { submission.getStudentGroup().getGroupNumber()
                         .toString() });
-        Sender sender = ExecutionCourseSender.newInstance(course);
+        Sender sender = MessagingUtils.sender(course);
         Recipient recipient = new Recipient(groupName, UserGroup.of(Person.convertToUsers(recievers)));
-        new Message(sender, sender.getConcreteReplyTos(), recipient.asCollection(), submission.getProject().getName(),
+        new Message(sender, sender.getReplyTos(), recipient.asCollection(), submission.getProject().getName(),
                 submission.getTeacherObservation(), "");
     }
 }

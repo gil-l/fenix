@@ -31,14 +31,13 @@ import org.fenixedu.academic.domain.phd.InternalPhdParticipant;
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
 import org.fenixedu.academic.domain.phd.PhdParticipant;
 import org.fenixedu.academic.domain.phd.alert.AlertService.AlertMessage;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.ReplyTo;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.messaging.domain.Message;
+import org.fenixedu.messaging.domain.ReplyTo;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
 
@@ -173,8 +172,8 @@ public class PhdPublicPresentationSeminarAlert extends PhdPublicPresentationSemi
             if (guiding.isInternal()) {
                 generateMessage(UserGroup.of(((InternalPhdParticipant) guiding).getPerson().getUser()));
             } else {
-                new Message(getSender(), Collections.<ReplyTo> emptyList(), Collections.<Recipient> emptyList(),
-                        buildMailSubject(), buildMailBody(), Collections.singleton(guiding.getEmail()));
+                new Message(getSender(), Collections.<ReplyTo> emptyList(), Collections.<Group> emptyList(), buildMailSubject(),
+                        buildMailBody(), Collections.singleton(guiding.getEmail()));
             }
         }
     }

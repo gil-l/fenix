@@ -19,7 +19,6 @@
 package org.fenixedu.academic.domain.phd.candidacy.feedbackRequest;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,11 +43,9 @@ import org.fenixedu.academic.domain.phd.access.PhdExternalOperationBean;
 import org.fenixedu.academic.domain.phd.access.PhdProcessAccessType;
 import org.fenixedu.academic.domain.phd.alert.AlertService;
 import org.fenixedu.academic.domain.phd.alert.AlertService.AlertMessage;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.SystemSender;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.academic.util.MessagingUtils;
 import org.fenixedu.academic.util.phd.PhdProperties;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
@@ -318,7 +315,7 @@ public class PhdCandidacyFeedbackRequestProcess extends PhdCandidacyFeedbackRequ
                     bean.getMailBody() + "\n\n"
                             + getAccessInformation(process.getIndividualProgramProcess(), element.getParticipant()) + "\n\n";
 
-            email(element.getEmail(), bean.getMailSubject(), body);
+            MessagingUtils.systemMessage(bean.getMailSubject(), body, element.getEmail());
         }
 
         private String getAccessInformation(PhdIndividualProgramProcess process, PhdParticipant participant) {
@@ -339,11 +336,6 @@ public class PhdCandidacyFeedbackRequestProcess extends PhdCandidacyFeedbackRequ
             }
 
             throw new DomainException("error.PhdThesisProcess.unexpected.participant.type");
-        }
-
-        private void email(String email, String subject, String body) {
-            final SystemSender sender = Bennu.getInstance().getSystemSender();
-            new Message(sender, sender.getConcreteReplyTos(), null, null, null, subject, body, Collections.singleton(email));
         }
     }
 

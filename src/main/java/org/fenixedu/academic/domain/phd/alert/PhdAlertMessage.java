@@ -27,12 +27,11 @@ import java.util.Set;
 
 import org.fenixedu.academic.domain.DomainObjectUtil;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.UnitBasedSender;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.messaging.domain.Message;
+import org.fenixedu.messaging.domain.Sender;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;
@@ -170,17 +169,12 @@ public class PhdAlertMessage extends PhdAlertMessage_Base {
         return result;
     }
 
-    protected UnitBasedSender getSender() {
-        AdministrativeOffice administrativeOffice = this.getProcess().getAdministrativeOffice();
-        return administrativeOffice.getUnit().getUnitBasedSenderSet().iterator().next();
-    }
-
     public List<Message> getEmailsWithMatchWithThisMessage() {
         List<Message> result = new ArrayList<Message>();
 
-        UnitBasedSender sender = getSender();
+        Sender sender = getProcess().getAdministrativeOffice().getUnit().getOneSender();;
 
-        Collection<Message> messages = sender.getMessagesSet();
+        Collection<Message> messages = sender.getMessageSet();
 
         for (Message message : messages) {
             if (getSubject().getContent().contentEquals(message.getSubject())) {

@@ -32,15 +32,14 @@ import org.fenixedu.academic.domain.phd.InternalPhdParticipant;
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
 import org.fenixedu.academic.domain.phd.PhdParticipant;
 import org.fenixedu.academic.domain.phd.PhdProgram;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.ReplyTo;
-import org.fenixedu.academic.domain.util.email.UnitBasedSender;
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.academic.util.MessagingUtils;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.messaging.domain.Message;
+import org.fenixedu.messaging.domain.ReplyTo;
+import org.fenixedu.messaging.domain.Sender;
 import org.joda.time.LocalDate;
 
 import pt.ist.fenixframework.DomainObject;
@@ -148,9 +147,8 @@ public class AlertService {
                 toNotify.add(((InternalPhdParticipant) guiding).getPerson());
             } else {
                 guiding.ensureExternalAccess();
-                new Message(Bennu.getInstance().getSystemSender(), Collections.<ReplyTo> emptyList(),
-                        Collections.<Recipient> emptyList(), getSubjectPrefixed(process, subjectKey), getBodyText(process,
-                                bodyKey), Collections.singleton(guiding.getEmail()));
+                MessagingUtils.systemMessage(getSubjectPrefixed(process, subjectKey), getBodyText(process, bodyKey),
+                        guiding.getEmail());
             }
         }
 
@@ -173,9 +171,8 @@ public class AlertService {
                 toNotify.add(((InternalPhdParticipant) guiding).getPerson());
             } else {
                 guiding.ensureExternalAccess();
-                new Message(Bennu.getInstance().getSystemSender(), Collections.<ReplyTo> emptyList(),
-                        Collections.<Recipient> emptyList(), getSubjectPrefixed(process, subjectMessage), getBodyText(process,
-                                bodyMessage), Collections.singleton(guiding.getEmail()));
+                MessagingUtils.systemMessage(getSubjectPrefixed(process, subjectMessage), getBodyText(process, bodyMessage),
+                        guiding.getEmail());
             }
         }
 
@@ -276,8 +273,8 @@ public class AlertService {
                 toNotify.add(((InternalPhdParticipant) participant).getPerson());
             } else {
                 Unit unit = process.getAdministrativeOffice().getUnit();
-                UnitBasedSender sender = unit.getUnitBasedSenderSet().iterator().next();
-                new Message(sender, Collections.<ReplyTo> emptyList(), Collections.<Recipient> emptyList(), getSubjectPrefixed(
+                Sender sender = unit.getOneSender();
+                new Message(sender, Collections.<ReplyTo> emptyList(), Collections.<Group> emptyList(), getSubjectPrefixed(
                         process, subject), getBodyText(process, body), Collections.singleton(participant.getEmail()));
             }
         }

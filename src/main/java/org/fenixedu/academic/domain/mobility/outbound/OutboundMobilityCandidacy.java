@@ -20,13 +20,11 @@ package org.fenixedu.academic.domain.mobility.outbound;
 
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.SystemSender;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.messaging.domain.MessagingSystem;
 
 import pt.ist.fenixframework.Atomic;
 
@@ -99,15 +97,11 @@ public class OutboundMobilityCandidacy extends OutboundMobilityCandidacy_Base im
     }
 
     public void deleteWithNotification() {
-        final SystemSender sender = getRootDomainObject().getSystemSender();
-        if (sender != null) {
-            final Registration registration = getOutboundMobilityCandidacySubmission().getRegistration();
-            final Recipient recipient = new Recipient(UserGroup.of(registration.getPerson().getUser()));
-            new Message(sender, recipient, BundleUtil.getString(Bundle.STUDENT, "label.email.deleted.contest.subject"),
-                    BundleUtil.getString(Bundle.STUDENT, "label.email.deleted.contest.body",
-                            getOutboundMobilityCandidacyContest().getMobilityAgreement().getUniversityUnit()
-                                    .getPresentationName()));
-        }
+        final Registration registration = getOutboundMobilityCandidacySubmission().getRegistration();
+        final Recipient recipient = new Recipient(UserGroup.of(registration.getPerson().getUser()));
+        new Message(MessagingSystem.getInstance().getSystemSender(), recipient, BundleUtil.getString(Bundle.STUDENT,
+                "label.email.deleted.contest.subject"), BundleUtil.getString(Bundle.STUDENT, "label.email.deleted.contest.body",
+                getOutboundMobilityCandidacyContest().getMobilityAgreement().getUniversityUnit().getPresentationName()));
         delete();
     }
 

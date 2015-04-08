@@ -105,6 +105,7 @@ import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.core.util.CoreConfiguration;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.commons.i18n.LocalizedString.Builder;
+import org.fenixedu.messaging.domain.MessagingSystem;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.Months;
@@ -225,9 +226,9 @@ public class Person extends Person_Base {
 
     /**
      * Creates a new Person, associated to the given {@link UserProfile}.
-     * 
+     *
      * Note that this constructor does NOT create a {@link User}.
-     * 
+     *
      * @param profile
      *            The profile to associate with the created person.
      */
@@ -243,9 +244,9 @@ public class Person extends Person_Base {
     /**
      * Creates a new Person and its correspondent {@link UserProfile}, using the data provided
      * in the parameter bean.
-     * 
+     *
      * Note that this constructor does NOT create a {@link User}.
-     * 
+     *
      * @param personBean
      *            The bean containing information about the person to be created.
      */
@@ -257,9 +258,9 @@ public class Person extends Person_Base {
      * Creates a new Person and its correspondent {@link UserProfile}, using the data provided
      * in the parameter bean. It also allows the caller to specify whether the email is to be automatically validated by the
      * system.
-     * 
+     *
      * Note that this constructor does NOT create a {@link User}.
-     * 
+     *
      * @param personBean
      *            The bean containing information about the person to be created.
      * @param validateEmail
@@ -285,7 +286,7 @@ public class Person extends Person_Base {
     /**
      * Creates a new Person and its correspondent {@link UserProfile} and {@link User}, using the data provided in the personal
      * details.
-     * 
+     *
      * @param candidacyPersonalDetails
      *            The personal details containing information about the person to be created.
      */
@@ -439,10 +440,10 @@ public class Person extends Person_Base {
     }
 
     /**
-     * 
+     *
      * IMPORTANT: This method is evil and should NOT be used! You are NOT God!
-     * 
-     * 
+     *
+     *
      * @return true if the person have been deleted, false otherwise
      */
     @Override
@@ -1579,7 +1580,7 @@ public class Person extends Person_Base {
     }
 
     public boolean isOptOutAvailable() {
-        Group optOutGroup = Bennu.getInstance().getSystemSender().getOptOutGroup();
+        Group optOutGroup = MessagingSystem.getInstance().getSystemSender().getOptOutGroup();
         return optOutGroup.isMember(this.getUser());
     }
 
