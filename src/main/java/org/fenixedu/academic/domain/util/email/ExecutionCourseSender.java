@@ -27,6 +27,7 @@ import org.fenixedu.academic.domain.accessControl.TeacherGroup;
 import org.fenixedu.academic.domain.accessControl.TeacherResponsibleOfExecutionCourseGroup;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import pt.ist.fenixframework.Atomic;
@@ -72,9 +73,12 @@ public class ExecutionCourseSender extends ExecutionCourseSender_Base {
                         "label.org.fenixedu.academic.domain.accessControl.ExecutionCourseResponsibleTeachersGroupWithName",
                         new String[] { executionCourse.getNome() });
         // fixed recipients
-        addRecipients(new Recipient(labelECTeachers, TeacherGroup.get(executionCourse)));
-        addRecipients(new Recipient(labelECStudents, StudentGroup.get(executionCourse)));
-        addRecipients(new Recipient(labelECResponsibleTeachers, TeacherResponsibleOfExecutionCourseGroup.get(executionCourse)));
+        addRecipients(DynamicGroup.get(labelECTeachers).mutator().changeGroup(TeacherGroup.get(executionCourse))
+                .toPersistentGroup());
+        addRecipients(DynamicGroup.get(labelECStudents).mutator().changeGroup(StudentGroup.get(executionCourse))
+                .toPersistentGroup());
+        addRecipients(DynamicGroup.get(labelECResponsibleTeachers).mutator()
+                .changeGroup(TeacherResponsibleOfExecutionCourseGroup.get(executionCourse)).toPersistentGroup());
         setFromName(createFromName());
     }
 

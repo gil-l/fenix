@@ -32,7 +32,6 @@ import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
 import org.fenixedu.academic.domain.phd.PhdParticipant;
 import org.fenixedu.academic.domain.phd.alert.AlertService.AlertMessage;
 import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.domain.util.email.ReplyTo;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.MultiLanguageString;
@@ -172,8 +171,8 @@ public class PhdPublicPresentationSeminarAlert extends PhdPublicPresentationSemi
             if (guiding.isInternal()) {
                 generateMessage(UserGroup.of(((InternalPhdParticipant) guiding).getPerson().getUser()));
             } else {
-                new Message(getSender(), Collections.<ReplyTo> emptyList(), Collections.<Recipient> emptyList(),
-                        buildMailSubject(), buildMailBody(), Collections.singleton(guiding.getEmail()));
+                new Message(getSender(), Collections.<ReplyTo> emptyList(), Collections.<Group> emptyList(), buildMailSubject(),
+                        buildMailBody(), Collections.singleton(guiding.getEmail()));
             }
         }
     }
@@ -181,7 +180,7 @@ public class PhdPublicPresentationSeminarAlert extends PhdPublicPresentationSemi
     private void generateMessage(Group group) {
         Set<Person> members = FluentIterable.from(group.getMembers()).transform(User::getPerson).toSet();
         new PhdAlertMessage(getProcess(), members, getFormattedSubject(), getFormattedBody());
-        new Message(getSender(), new Recipient("", group), buildMailSubject(), buildMailBody());
+        new Message(getSender(), group, buildMailSubject(), buildMailBody());
     }
 
     @Override

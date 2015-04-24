@@ -118,7 +118,7 @@
     </slot>
     <slot name="recipients" layout="option-select" key="label.receiversGroup">
         <property name="providerClass" value="org.fenixedu.academic.ui.renderers.providers.EmailRecipientsProvider" />
-        <property name="eachSchema" value="org.fenixedu.academic.domain.util.email.Recipient.selectItem"/>
+        <property name="eachSchema" value="alumni.gep.email.recipient.selectItem"/>
         <property name="eachLayout" value="values"/>
         <property name="classes" value="nobullet noindent"/>
         <property name="sortBy" value="toName"/>
@@ -139,10 +139,9 @@
 	<slot name="replyToAddress"/>
 </schema>
 
-<schema name="org.fenixedu.academic.domain.util.email.Recipient.selectItem" type="org.fenixedu.academic.domain.util.email.Recipient">
-	<slot name="toName"/>
-</schema>
-
+	<schema name="alumni.gep.email.recipient.selectItem" type="org.fenixedu.bennu.core.domain.groups.PersistentGroup">
+		<slot name="presentationName"/>
+	</schema>
 <schema name="org.fenixedu.academic.domain.util.email.Sender.list" type="org.fenixedu.academic.domain.util.email.Sender" bundle="MESSAGING_RESOURCES">
 	<slot name="fromName" bundle="MESSAGING_RESOURCES" key="label.email.queue"/>
 </schema>

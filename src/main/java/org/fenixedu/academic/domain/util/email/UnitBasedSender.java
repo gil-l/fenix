@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.fenixedu.academic.domain.accessControl.UnitGroup;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
+import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
 import org.fenixedu.bennu.core.groups.Group;
 
 import pt.ist.fenixframework.Atomic;
@@ -74,18 +75,18 @@ public class UnitBasedSender extends UnitBasedSender_Base {
 
     @Atomic
     @Override
-    public void addRecipients(final Recipient recipients) {
+    public void addRecipients(final PersistentGroup recipients) {
         super.addRecipients(recipients);
     }
 
     @Atomic
     @Override
-    public void removeRecipients(final Recipient recipients) {
+    public void removeRecipients(final PersistentGroup recipients) {
         super.removeRecipients(recipients);
     }
 
     protected void createRecipient(final Group group) {
-        addRecipients(new Recipient(null, group));
+        addRecipients(group.toPersistentGroup());
     }
 
     @Atomic

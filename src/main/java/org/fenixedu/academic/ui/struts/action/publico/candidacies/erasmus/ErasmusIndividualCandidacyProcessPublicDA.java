@@ -59,7 +59,6 @@ import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.organizationalStructure.UniversityUnit;
 import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.academic.domain.util.email.EmailBean;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.domain.util.email.SystemSender;
 import org.fenixedu.academic.dto.person.PersonBean;
 import org.fenixedu.academic.report.candidacy.erasmus.LearningAgreementDocument;
@@ -71,6 +70,7 @@ import org.fenixedu.academic.ui.struts.action.publico.candidacies.RefactoredIndi
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.report.ReportsUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
@@ -897,7 +897,7 @@ public class ErasmusIndividualCandidacyProcessPublicDA extends RefactoredIndivid
 
     public static class StorkAttrStringTestBean implements java.io.Serializable {
         /**
-	 * 
+	 *
 	 */
         private static final long serialVersionUID = 1L;
 
@@ -1098,7 +1098,7 @@ public class ErasmusIndividualCandidacyProcessPublicDA extends RefactoredIndivid
         EmailBean emailBean = new EmailBean();
         emailBean.setSender(systemSender);
         emailBean.setReplyTos(systemSender.getConcreteReplyTos());
-        emailBean.setRecipients(Collections.<Recipient> emptyList());
+        emailBean.setRecipients(Collections.<PersistentGroup> emptyList());
         emailBean.setSubject(errorReportSubject);
         emailBean.setMessage(errorReportBody);
         emailBean.setBccs(errorReportAddress);

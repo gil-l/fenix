@@ -39,11 +39,12 @@ import org.fenixedu.academic.domain.StudentGroup;
 import org.fenixedu.academic.domain.student.StudentStatuteType;
 import org.fenixedu.academic.domain.student.registrationStates.RegistrationState;
 import org.fenixedu.academic.domain.util.email.ExecutionCourseSender;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.ui.struts.action.teacher.ManageExecutionCourseDA;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.WorkingStudentSelectionType;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
+import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.spreadsheet.SheetData;
@@ -300,8 +301,8 @@ public class AttendsSearchController extends ExecutionCourseController {
                     .getUser());
         }
 
-        ArrayList<Recipient> recipients = new ArrayList<Recipient>();
-        recipients.add(Recipient.newInstance(label, UserGroup.of(users)));
+        ArrayList<PersistentGroup> recipients = new ArrayList<PersistentGroup>();
+        recipients.add(DynamicGroup.get(label).mutator().changeGroup(UserGroup.of(users)).toPersistentGroup());
         String sendEmailUrl =
                 UriBuilder
                         .fromUri("/messaging/emails.do")

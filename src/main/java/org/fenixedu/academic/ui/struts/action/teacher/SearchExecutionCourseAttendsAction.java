@@ -42,7 +42,6 @@ import org.fenixedu.academic.domain.Shift;
 import org.fenixedu.academic.domain.accessControl.SearchDegreeStudentsGroup;
 import org.fenixedu.academic.domain.util.email.CoordinatorSender;
 import org.fenixedu.academic.domain.util.email.ExecutionCourseSender;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.dto.teacher.executionCourse.SearchExecutionCourseAttendsBean;
 import org.fenixedu.academic.ui.struts.action.coordinator.DegreeCoordinatorIndex;
@@ -50,6 +49,7 @@ import org.fenixedu.academic.ui.struts.action.messaging.EmailsDA;
 import org.fenixedu.academic.ui.struts.action.teacher.executionCourse.ExecutionCourseBaseAction;
 import org.fenixedu.academic.util.CollectionPager;
 import org.fenixedu.academic.util.WorkingStudentSelectionType;
+import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 
@@ -190,8 +190,8 @@ public class SearchExecutionCourseAttendsAction extends ExecutionCourseBaseActio
             sender = CoordinatorSender.newInstance(executionDegree.getDegree());
         }
 
-        Recipient recipient = Recipient.newInstance(label, studentsGroup);
-        return EmailsDA.sendEmail(request, sender, recipient);
+        return EmailsDA.sendEmail(request, sender, DynamicGroup.get(label).mutator().changeGroup(studentsGroup)
+                .toPersistentGroup());
     }
 
     public ActionForward search(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {

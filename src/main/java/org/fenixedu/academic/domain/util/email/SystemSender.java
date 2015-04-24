@@ -41,22 +41,20 @@ public class SystemSender extends SystemSender_Base {
         return String.format("%s (%s)", Unit.getInstitutionAcronym(), "Sistema Fénix");
     }
 
-    public Recipient getRoleRecipient(RoleType roleType) {
+    public Group getRoleRecipient(RoleType roleType) {
         final Group roleGroup = roleType.actualGroup();
-        for (Recipient recipient : getRecipientsSet()) {
-            final Group members = recipient.getMembers();
-            if (roleGroup.equals(members)) {
-                return recipient;
+        for (PersistentGroup recipient : getRecipientsSet()) {
+            if (roleGroup.equals(recipient)) {
+                return recipient.toGroup();
             }
         }
-        return createRoleRecipient(roleGroup);
+        createRoleRecipient(roleGroup);
+        return roleGroup;
     }
 
     @Atomic(mode = TxMode.WRITE)
-    private Recipient createRoleRecipient(Group roleGroup) {
-        final Recipient recipient = new Recipient(roleGroup);
-        addRecipients(recipient);
-        return recipient;
+    private void createRoleRecipient(Group roleGroup) {
+        addRecipients(roleGroup.toPersistentGroup());
     }
 
     public Group getOptOutGroup() {

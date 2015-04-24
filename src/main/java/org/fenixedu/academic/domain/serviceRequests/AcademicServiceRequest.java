@@ -44,7 +44,6 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.serviceRequests.documentRequests.AcademicServiceRequestType;
 import org.fenixedu.academic.domain.serviceRequests.documentRequests.DocumentRequest;
 import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.dto.serviceRequests.AcademicServiceRequestBean;
 import org.fenixedu.academic.dto.serviceRequests.AcademicServiceRequestCreateBean;
@@ -311,8 +310,8 @@ abstract public class AcademicServiceRequest extends AcademicServiceRequest_Base
         }
 
         final Sender sender = getAdministrativeOffice().getUnit().getUnitBasedSenderSet().iterator().next();
-        final Recipient recipient = new Recipient(UserGroup.of(getPerson().getUser()));
-        new Message(sender, sender.getReplyTosSet(), recipient.asCollection(), getDescription(), body, "");
+        new Message(sender, sender.getReplyTosSet(), Collections.singletonList(UserGroup.of(getPerson().getUser())),
+                getDescription(), body, "");
     }
 
     @Atomic
@@ -643,7 +642,7 @@ abstract public class AcademicServiceRequest extends AcademicServiceRequest_Base
      * Indicates that the document external shipping to rectorate is done using
      * the rectorate batches. The {@link AcademicServiceRequestSituationType#SENT_TO_EXTERNAL_ENTITY} and
      * {@link AcademicServiceRequestSituationType#RECEIVED_FROM_EXTERNAL_ENTITY} states are handled through this system.
-     * 
+     *
      * @return true if managed by batch, false otherwise.
      */
     abstract public boolean isManagedWithRectorateSubmissionBatch();

@@ -32,6 +32,7 @@ import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.security.Authenticate;
 
@@ -73,12 +74,8 @@ public class Sender extends Sender_Base {
         for (final Message message : getMessagesSet()) {
             message.delete();
         }
-        for (final Recipient recipient : getRecipientsSet()) {
-            if (recipient.getSendersSet().size() == 1) {
-                recipient.delete();
-            } else {
-                removeRecipients(recipient);
-            }
+        for (final PersistentGroup recipient : getRecipientsSet()) {
+            removeRecipients(recipient);
         }
         for (ReplyTo replyTo : getReplyTosSet()) {
             removeReplyTos(replyTo);

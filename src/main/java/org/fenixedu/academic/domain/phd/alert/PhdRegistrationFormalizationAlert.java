@@ -27,7 +27,6 @@ import org.fenixedu.academic.domain.accessControl.academicAdministration.Academi
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
 import org.fenixedu.academic.domain.phd.PhdProgramCalendarUtil;
 import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.bennu.core.domain.User;
@@ -91,7 +90,7 @@ public class PhdRegistrationFormalizationAlert extends PhdRegistrationFormalizat
         Set<Person> members = FluentIterable.from(group.getMembers()).transform(User::getPerson).toSet();
         new PhdAlertMessage(getProcess(), members, getFormattedSubject(), getFormattedBody());
 
-        new Message(getSender(), new Recipient(group), buildMailSubject(), buildMailBody());
+        new Message(getSender(), group, buildMailSubject(), buildMailBody());
 
     }
 

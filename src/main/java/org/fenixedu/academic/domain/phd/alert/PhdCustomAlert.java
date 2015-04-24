@@ -26,7 +26,6 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
 import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.bennu.core.domain.User;
@@ -116,8 +115,8 @@ public class PhdCustomAlert extends PhdCustomAlert_Base {
     @Override
     public String getDescription() {
         return MessageFormat.format(BundleUtil.getString(Bundle.PHD, "message.phd.alert.custom.description"),
-                getTargetAccessGroup().getPresentationName(), getWhenToFire().toString("dd/MM/yyyy"),
-                getFormattedSubject(), getFormattedBody());
+                getTargetAccessGroup().getPresentationName(), getWhenToFire().toString("dd/MM/yyyy"), getFormattedSubject(),
+                getFormattedBody());
     }
 
     @Override
@@ -132,7 +131,7 @@ public class PhdCustomAlert extends PhdCustomAlert_Base {
         }
 
         if (isToSendMail()) {
-            final Recipient recipient = new Recipient(getTargetAccessGroup());
+            final Group recipient = getTargetAccessGroup();
             new Message(getSender(), recipient, buildMailSubject(), buildMailBody());
 
         }

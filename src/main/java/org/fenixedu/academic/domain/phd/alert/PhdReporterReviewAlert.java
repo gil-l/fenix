@@ -29,10 +29,11 @@ import org.fenixedu.academic.domain.phd.PhdProgramProcessDocument;
 import org.fenixedu.academic.domain.phd.alert.AlertService.AlertMessage;
 import org.fenixedu.academic.domain.phd.thesis.activities.PhdThesisActivity;
 import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.domain.util.email.ReplyTo;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.bennu.core.groups.Group;
+import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
@@ -122,10 +123,10 @@ public class PhdReporterReviewAlert extends PhdReporterReviewAlert_Base {
             InternalPhdParticipant internalParticipant = (InternalPhdParticipant) participant;
             new PhdAlertMessage(getProcess(), internalParticipant.getPerson(), getFormattedSubject(), buildBody(getProcess(),
                     participant));
-            new Message(getSender(), new Recipient(Collections.singleton(internalParticipant.getPerson())), buildMailSubject(),
-                    buildMailBody());
+            new Message(getSender(), UserGroup.of(Collections.singleton(internalParticipant.getPerson().getUser())),
+                    buildMailSubject(), buildMailBody());
         } else {
-            new Message(getSender(), Collections.<ReplyTo> emptyList(), Collections.<Recipient> emptyList(), buildMailSubject(),
+            new Message(getSender(), Collections.<ReplyTo> emptyList(), Collections.<Group> emptyList(), buildMailSubject(),
                     buildMailBody(), Collections.singleton(participant.getEmail()));
         }
 

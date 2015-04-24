@@ -21,10 +21,10 @@ package org.fenixedu.academic.domain.mobility.outbound;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.domain.util.email.SystemSender;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 
@@ -102,7 +102,7 @@ public class OutboundMobilityCandidacy extends OutboundMobilityCandidacy_Base im
         final SystemSender sender = getRootDomainObject().getSystemSender();
         if (sender != null) {
             final Registration registration = getOutboundMobilityCandidacySubmission().getRegistration();
-            final Recipient recipient = new Recipient(UserGroup.of(registration.getPerson().getUser()));
+            final Group recipient = UserGroup.of(registration.getPerson().getUser());
             new Message(sender, recipient, BundleUtil.getString(Bundle.STUDENT, "label.email.deleted.contest.subject"),
                     BundleUtil.getString(Bundle.STUDENT, "label.email.deleted.contest.body",
                             getOutboundMobilityCandidacyContest().getMobilityAgreement().getUniversityUnit()

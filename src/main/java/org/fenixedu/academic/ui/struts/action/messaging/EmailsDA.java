@@ -32,12 +32,12 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.util.email.EmailBean;
 import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.academic.ui.struts.action.commons.FenixActionForward;
 import org.fenixedu.academic.ui.struts.action.messaging.MessagingApplication.MessagingEmailsApp;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
@@ -90,10 +90,10 @@ public class EmailsDA extends FenixDispatchAction {
                 emailBean.setSender(sender);
                 String[] recipientsParameter = request.getParameterValues("recipient");
                 if (recipientsParameter != null) {
-                    List<Recipient> recipients =
+                    List<PersistentGroup> recipients =
                             Stream.of(recipientsParameter)
-                                    .map(recipientExternalId -> (Recipient) FenixFramework.getDomainObject(recipientExternalId))
-                                    .collect(Collectors.toList());
+                                    .map(recipientExternalId -> (PersistentGroup) FenixFramework
+                                            .getDomainObject(recipientExternalId)).collect(Collectors.toList());
                     emailBean.setRecipients(recipients);
                 }
             }
@@ -121,7 +121,7 @@ public class EmailsDA extends FenixDispatchAction {
                 + message.getExternalId(), true));
     }
 
-    public static ActionForward sendEmail(HttpServletRequest request, Sender sender, Recipient... recipient) {
+    public static ActionForward sendEmail(HttpServletRequest request, Sender sender, PersistentGroup... recipient) {
         EmailBean emailBean = new EmailBean();
         if (recipient != null) {
             emailBean.setRecipients(Arrays.asList(recipient));

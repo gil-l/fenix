@@ -42,7 +42,6 @@ import org.fenixedu.academic.domain.alumni.AlumniReportFileBean;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.util.email.EmailBean;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.dto.alumni.AlumniInfoNotUpdatedBean;
 import org.fenixedu.academic.dto.alumni.AlumniMailSendToBean;
@@ -50,6 +49,7 @@ import org.fenixedu.academic.dto.alumni.AlumniSearchBean;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.academic.ui.struts.action.publicRelationsOffice.PublicRelationsApplication.PublicRelationsAlumniApp;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
@@ -170,9 +170,8 @@ public class AlumniInformationAction extends FenixDispatchAction {
             HttpServletResponse response) throws Exception {
         final Set<Sender> availableSenders = Sender.getAvailableSenders();
         Sender gepSender = getGEPSender(availableSenders);
-        List<Recipient> recipients = new ArrayList<Recipient>();
-        recipients.addAll(gepSender.getRecipientsSet());
-        Collections.sort(recipients, new BeanComparator("toName"));
+        List<PersistentGroup> recipients = new ArrayList<PersistentGroup>(gepSender.getRecipientsSet());
+        Collections.sort(recipients, new BeanComparator("presentationName"));
         Collections.reverse(recipients);
         request.setAttribute("recipients", recipients);
         return mapping.findForward("manageRecipients");

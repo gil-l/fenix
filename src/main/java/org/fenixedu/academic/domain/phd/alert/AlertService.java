@@ -33,7 +33,6 @@ import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
 import org.fenixedu.academic.domain.phd.PhdParticipant;
 import org.fenixedu.academic.domain.phd.PhdProgram;
 import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.domain.util.email.ReplyTo;
 import org.fenixedu.academic.domain.util.email.UnitBasedSender;
 import org.fenixedu.academic.util.Bundle;
@@ -149,8 +148,8 @@ public class AlertService {
             } else {
                 guiding.ensureExternalAccess();
                 new Message(Bennu.getInstance().getSystemSender(), Collections.<ReplyTo> emptyList(),
-                        Collections.<Recipient> emptyList(), getSubjectPrefixed(process, subjectKey), getBodyText(process,
-                                bodyKey), Collections.singleton(guiding.getEmail()));
+                        Collections.<Group> emptyList(), getSubjectPrefixed(process, subjectKey), getBodyText(process, bodyKey),
+                        Collections.singleton(guiding.getEmail()));
             }
         }
 
@@ -174,7 +173,7 @@ public class AlertService {
             } else {
                 guiding.ensureExternalAccess();
                 new Message(Bennu.getInstance().getSystemSender(), Collections.<ReplyTo> emptyList(),
-                        Collections.<Recipient> emptyList(), getSubjectPrefixed(process, subjectMessage), getBodyText(process,
+                        Collections.<Group> emptyList(), getSubjectPrefixed(process, subjectMessage), getBodyText(process,
                                 bodyMessage), Collections.singleton(guiding.getEmail()));
             }
         }
@@ -277,7 +276,7 @@ public class AlertService {
             } else {
                 Unit unit = process.getAdministrativeOffice().getUnit();
                 UnitBasedSender sender = unit.getUnitBasedSenderSet().iterator().next();
-                new Message(sender, Collections.<ReplyTo> emptyList(), Collections.<Recipient> emptyList(), getSubjectPrefixed(
+                new Message(sender, Collections.<ReplyTo> emptyList(), Collections.<Group> emptyList(), getSubjectPrefixed(
                         process, subject), getBodyText(process, body), Collections.singleton(participant.getEmail()));
             }
         }

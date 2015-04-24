@@ -59,10 +59,10 @@
     		</fr:slot>
     		<fr:slot name="recipients" layout="option-select" key="label.receiversGroup">
         		<fr:property name="providerClass" value="org.fenixedu.academic.ui.renderers.providers.EmailRecipientsProvider" />
-        		<fr:property name="eachSchema" value="org.fenixedu.academic.domain.util.email.Recipient.selectItem"/>
+        		<fr:property name="eachSchema" value="alumni.gep.email.recipient.selectItem"/>
         		<fr:property name="eachLayout" value="values"/>
         		<fr:property name="classes" value="nobullet noindent"/>
-        		<fr:property name="sortBy" value="toName"/>
+        		<fr:property name="sortBy" value="presentationName"/>
     		</fr:slot>
 			<fr:slot name="bccs" bundle="MESSAGING_RESOURCES" key="label.receiversOfCopy">
 				<fr:property name="size" value="50" />

@@ -43,11 +43,11 @@ import org.fenixedu.academic.domain.mobility.outbound.OutboundMobilityCandidacyP
 import org.fenixedu.academic.domain.mobility.outbound.OutboundMobilityCandidacySubmission;
 import org.fenixedu.academic.domain.util.email.EmailBean;
 import org.fenixedu.academic.domain.util.email.PersonSender;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.ui.struts.action.academicAdministration.AcademicAdministrationApplication.AcademicAdminCandidaciesApp;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.UnionGroup;
 import org.fenixedu.bennu.core.groups.UserGroup;
@@ -57,10 +57,10 @@ import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
+import org.fenixedu.commons.spreadsheet.Spreadsheet;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixWebFramework.servlets.filters.contentRewrite.GenericChecksumRewriter;
-import org.fenixedu.commons.spreadsheet.Spreadsheet;
 
 @StrutsFunctionality(app = AcademicAdminCandidaciesApp.class, path = "outbound-mobility", titleKey = "label.mobility.outbound",
         accessGroup = "academic(MANAGE_MOBILITY_OUTBOUND)")
@@ -451,9 +451,9 @@ public class OutboundMobilityCandidacyDA extends FenixDispatchAction {
                         mobilityGroup.getDescription(), period.getExecutionInterval().getName());
         final Group group = UnionGroup.of(getCandidateGroups(mobilityGroup, period));
 
-        final Recipient recipient = Recipient.newInstance(toGroupName, group);
         final EmailBean bean = new EmailBean();
-        bean.setRecipients(Collections.singletonList(recipient));
+        bean.setRecipients(Collections.singletonList(DynamicGroup.get(toGroupName).mutator().changeGroup(group)
+                .toPersistentGroup()));
 
         final Person person = AccessControl.getPerson();
         if (person != null) {

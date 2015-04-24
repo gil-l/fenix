@@ -25,10 +25,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.contacts.EmailAddress;
 import org.fenixedu.academic.domain.util.Email;
 import org.fenixedu.academic.domain.util.EmailAddressList;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
+import org.fenixedu.bennu.core.groups.Group;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;
@@ -61,49 +65,49 @@ public class Message extends Message_Base {
         this(sender, sender.getReplyTosSet(), null, subject, body, to);
     }
 
-    public Message(final Sender sender, final Collection<? extends ReplyTo> replyTos, final Collection<Recipient> tos,
-            final Collection<Recipient> ccs, final Collection<Recipient> recipientsBccs, final String subject, final String body,
+    public Message(final Sender sender, final Collection<? extends ReplyTo> replyTos, final Collection<Group> tos,
+            final Collection<Group> ccs, final Collection<Group> recipientsBccs, final String subject, final String body,
             final Set<String> bccs) {
         this(sender, replyTos, recipientsBccs, subject, body, bccs);
         if (tos != null) {
-            for (final Recipient recipient : tos) {
-                addTos(recipient);
+            for (final Group recipient : tos) {
+                addTos(recipient.toPersistentGroup());
             }
         }
         if (ccs != null) {
-            for (final Recipient recipient : ccs) {
-                addCcs(recipient);
+            for (final Group recipient : ccs) {
+                addCcs(recipient.toPersistentGroup());
             }
         }
     }
 
-    public Message(final Sender sender, final Collection<? extends ReplyTo> replyTos, final Collection<Recipient> tos,
-            final Collection<Recipient> ccs, final Collection<Recipient> recipientsBccs, final String subject, final String body,
+    public Message(final Sender sender, final Collection<? extends ReplyTo> replyTos, final Collection<Group> tos,
+            final Collection<Group> ccs, final Collection<Group> recipientsBccs, final String subject, final String body,
             final Set<String> bccs, final String htmlBody) {
         this(sender, replyTos, recipientsBccs, subject, body, bccs);
         if (tos != null) {
-            for (final Recipient recipient : tos) {
-                addTos(recipient);
+            for (final Group recipient : tos) {
+                addTos(recipient.toPersistentGroup());
             }
         }
         if (ccs != null) {
-            for (final Recipient recipient : ccs) {
-                addCcs(recipient);
+            for (final Group recipient : ccs) {
+                addCcs(recipient.toPersistentGroup());
             }
         }
     }
 
-    public Message(final Sender sender, final Recipient recipient, final String subject, final String body) {
+    public Message(final Sender sender, final Group recipient, final String subject, final String body) {
         this(sender, sender.getConcreteReplyTos(), Collections.singleton(recipient), subject, body, new EmailAddressList(
                 Collections.EMPTY_LIST).toString());
     }
 
-    public Message(final Sender sender, final Collection<? extends ReplyTo> replyTos, final Collection<Recipient> recipients,
+    public Message(final Sender sender, final Collection<? extends ReplyTo> replyTos, final Collection<Group> recipients,
             final String subject, final String body, final Set<String> bccs) {
         this(sender, replyTos, recipients, subject, body, new EmailAddressList(bccs).toString());
     }
 
-    public Message(final Sender sender, final Collection<? extends ReplyTo> replyTos, final Collection<Recipient> recipients,
+    public Message(final Sender sender, final Collection<? extends ReplyTo> replyTos, final Collection<Group> recipients,
             final String subject, final String body, final String bccs) {
         super();
         final Bennu rootDomainObject = Bennu.getInstance();
@@ -116,8 +120,8 @@ public class Message extends Message_Base {
             }
         }
         if (recipients != null) {
-            for (final Recipient recipient : recipients) {
-                addRecipients(recipient);
+            for (final Group recipient : recipients) {
+                addRecipients(recipient.toPersistentGroup());
             }
         }
         setSubject(subject);
@@ -128,7 +132,7 @@ public class Message extends Message_Base {
         setCreated(new DateTime());
     }
 
-    public Message(final Sender sender, final Collection<? extends ReplyTo> replyTos, final Collection<Recipient> recipients,
+    public Message(final Sender sender, final Collection<? extends ReplyTo> replyTos, final Collection<Group> recipients,
             final String subject, final String body, final String bccs, final String htmlBody) {
         super();
         final Bennu rootDomainObject = Bennu.getInstance();
@@ -141,8 +145,8 @@ public class Message extends Message_Base {
             }
         }
         if (recipients != null) {
-            for (final Recipient recipient : recipients) {
-                addRecipients(recipient);
+            for (final Group recipient : recipients) {
+                addRecipients(recipient.toPersistentGroup());
             }
         }
         setSubject(subject);
@@ -161,13 +165,13 @@ public class Message extends Message_Base {
     }
 
     public void delete() {
-        for (final Recipient recipient : getRecipientsSet()) {
+        for (final PersistentGroup recipient : getRecipientsSet()) {
             removeRecipients(recipient);
         }
-        for (final Recipient recipient : getTosSet()) {
+        for (final PersistentGroup recipient : getTosSet()) {
             removeTos(recipient);
         }
-        for (final Recipient recipient : getCcsSet()) {
+        for (final PersistentGroup recipient : getCcsSet()) {
             removeCcs(recipient);
         }
         for (final ReplyTo replyTo : getReplyTosSet()) {
@@ -204,36 +208,36 @@ public class Message extends Message_Base {
         return recipients2Text(getCcsSet());
     }
 
-    protected static String recipients2Text(final Set<Recipient> recipients) {
+    protected static String recipients2Text(final Set<PersistentGroup> recipients) {
         final StringBuilder stringBuilder = new StringBuilder();
         recipients2Text(stringBuilder, recipients);
         return stringBuilder.toString();
     }
 
-    protected static void recipients2Text(final StringBuilder stringBuilder, final Set<Recipient> recipients) {
-        for (final Recipient recipient : recipients) {
+    protected static void recipients2Text(final StringBuilder stringBuilder, final Set<PersistentGroup> recipients) {
+        for (final PersistentGroup recipient : recipients) {
             if (stringBuilder.length() > 0) {
                 stringBuilder.append("\n");
             }
-            stringBuilder.append(recipient.getToName());
+            stringBuilder.append(recipient.getPresentationName());
         }
     }
 
     public String getRecipientsGroupMembersInText() {
         StringBuilder builder = new StringBuilder();
 
-        Collection<Recipient> recipients = getRecipientsSet();
-        for (Recipient recipient : recipients) {
-            builder.append(recipient.getMembersEmailInText());
+        Collection<PersistentGroup> recipients = getRecipientsSet();
+        for (PersistentGroup recipient : recipients) {
+            builder.append(getMembersEmailInText(recipient));
         }
 
         return builder.toString();
     }
 
-    protected static Set<String> getRecipientAddresses(Set<Recipient> recipients) {
+    protected static Set<String> getRecipientAddresses(Set<PersistentGroup> recipients) {
         final Set<String> emailAddresses = new HashSet<String>();
-        for (final Recipient recipient : recipients) {
-            recipient.addDestinationEmailAddresses(emailAddresses);
+        for (final PersistentGroup recipient : recipients) {
+            addDestinationEmailAddresses(recipient, emailAddresses);
         }
         return emailAddresses;
     }
@@ -248,10 +252,39 @@ public class Message extends Message_Base {
                 }
             }
         }
-        for (final Recipient recipient : getRecipientsSet()) {
-            recipient.addDestinationEmailAddresses(emailAddresses);
+        for (final PersistentGroup recipient : getRecipientsSet()) {
+            addDestinationEmailAddresses(recipient, emailAddresses);
         }
         return emailAddresses;
+    }
+
+    private static String getMembersEmailInText(PersistentGroup recipient) {
+        if (recipient == null) {
+            return "";
+        }
+
+        StringBuilder builder = new StringBuilder();
+
+        Set<User> elements = recipient.getMembers();
+
+        for (User user : elements) {
+            builder.append(user.getPerson().getName()).append(" (").append(user.getPerson().getEmailForSendingEmails())
+                    .append(")").append("\n");
+        }
+
+        return builder.toString();
+    }
+
+    private static void addDestinationEmailAddresses(PersistentGroup recipient, final Set<String> emailAddresses) {
+        for (final User user : recipient.getMembers()) {
+            final EmailAddress emailAddress = user.getPerson().getEmailAddressForSendingEmails();
+            if (emailAddress != null) {
+                final String value = emailAddress.getValue();
+                if (value != null && !value.isEmpty()) {
+                    emailAddresses.add(value);
+                }
+            }
+        }
     }
 
     protected String[] getReplyToAddresses(final Person person) {
@@ -306,11 +339,11 @@ public class Message extends Message_Base {
     }
 
     public int getPossibleRecipientsCount() {
-        return (int) getRecipientsSet().stream().flatMap(r -> r.getMembers().getMembers().stream()).distinct().count();
+        return (int) getRecipientsSet().stream().flatMap(g -> g.getMembers().stream()).distinct().count();
     }
 
     public int getRecipientsWithEmailCount() {
-        return (int) getRecipientsSet().stream().flatMap(r -> r.getMembers().getMembers().stream()).distinct()
+        return (int) getRecipientsSet().stream().flatMap(g -> g.getMembers().stream()).distinct()
                 .filter(u -> u.getPerson().getEmailAddressForSendingEmails() != null).count();
     }
 

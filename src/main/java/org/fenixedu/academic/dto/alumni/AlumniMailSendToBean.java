@@ -25,7 +25,6 @@ import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.accessControl.StudentsConcludedInExecutionYearGroup;
 import org.fenixedu.academic.domain.degree.DegreeType;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.NobodyGroup;
@@ -77,6 +76,6 @@ public class AlumniMailSendToBean implements Serializable {
         for (Degree degree : getDegrees()) {
             group = group.or(StudentsConcludedInExecutionYearGroup.get(degree, getEndExecutionYear()));
         }
-        sender.addRecipients(Recipient.newInstance(group));
+        sender.addRecipients(group.toPersistentGroup());
     }
 }

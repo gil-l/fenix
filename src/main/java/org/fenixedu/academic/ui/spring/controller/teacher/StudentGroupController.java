@@ -36,9 +36,11 @@ import org.fenixedu.academic.domain.Shift;
 import org.fenixedu.academic.domain.StudentGroup;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.util.email.ExecutionCourseSender;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.ui.struts.action.teacher.ManageExecutionCourseDA;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
+import org.fenixedu.bennu.core.groups.DynamicGroup;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,11 +167,11 @@ public class StudentGroupController extends ExecutionCourseController {
                 studentGroup.getGrouping().getName() + "-" + BundleUtil.getString(Bundle.APPLICATION, "label.group")
                         + studentGroup.getGroupNumber();
 
-        ArrayList<Recipient> recipients = new ArrayList<Recipient>();
-        recipients.add(Recipient.newInstance(
-                label,
+        Group userGroup =
                 UserGroup.of(studentGroup.getAttendsSet().stream().map(Attends::getRegistration).map(Registration::getPerson)
-                        .map(Person::getUser).collect(Collectors.toSet()))));
+                        .map(Person::getUser).collect(Collectors.toSet()));
+        ArrayList<PersistentGroup> recipients = new ArrayList<PersistentGroup>();
+        recipients.add(DynamicGroup.get(label).mutator().changeGroup(userGroup).toPersistentGroup());
         String sendEmailUrl =
                 UriBuilder
                         .fromUri("/messaging/emails.do")

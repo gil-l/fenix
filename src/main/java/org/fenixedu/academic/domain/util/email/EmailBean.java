@@ -23,10 +23,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.EMail;
+import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 
@@ -35,7 +37,7 @@ import pt.ist.fenixframework.Atomic;
 public class EmailBean implements Serializable {
 
     private Sender sender;
-    private Set<Recipient> recipients;
+    private Set<PersistentGroup> recipients;
     private String tos, ccs, bccs;
     private String subject, message, htmlMessage;
     private Set<ReplyTo> replyTos;
@@ -60,22 +62,22 @@ public class EmailBean implements Serializable {
         this.sender = sender;
     }
 
-    public List<Recipient> getRecipients() {
-        final List<Recipient> result = new ArrayList<Recipient>();
+    public List<PersistentGroup> getRecipients() {
+        final List<PersistentGroup> result = new ArrayList<PersistentGroup>();
         if (recipients != null) {
-            for (final Recipient recipient : recipients) {
+            for (final PersistentGroup recipient : recipients) {
                 result.add(recipient);
             }
         }
         return result;
     }
 
-    public void setRecipients(List<Recipient> recipients) {
+    public void setRecipients(List<PersistentGroup> recipients) {
         if (recipients == null) {
             this.recipients = null;
         } else {
-            this.recipients = new HashSet<Recipient>();
-            for (final Recipient recipient : recipients) {
+            this.recipients = new HashSet<PersistentGroup>();
+            for (final PersistentGroup recipient : recipients) {
                 this.recipients.add(recipient);
             }
         }
@@ -197,21 +199,22 @@ public class EmailBean implements Serializable {
             message.append(BundleUtil.getString(Bundle.APPLICATION, "message.email.footer.prefix"));
             message.append(getSender().getFromName());
             message.append(BundleUtil.getString(Bundle.APPLICATION, "message.email.footer.prefix.suffix"));
-            for (final Recipient recipient : getRecipients()) {
+            for (final PersistentGroup recipient : getRecipients()) {
                 message.append("\n\t");
-                message.append(recipient.getToName());
+                message.append(recipient.getPresentationName());
             }
             message.append("\n");
         }
 
         final String bccs = getBccs() == null ? null : getBccs().replace(" ", "");
         final String htmlMessage = getHtmlMessage();
-        return new Message(getSender(), getReplyTos(), getRecipients(), getSubject(), message.toString(), bccs, htmlMessage);
+        return new Message(getSender(), getReplyTos(), getRecipients().stream().map(g -> g.toGroup())
+                .collect(Collectors.toList()), getSubject(), message.toString(), bccs, htmlMessage);
     }
 
     @Atomic
     public void removeRecipients() {
-        for (Recipient recipient : getRecipients()) {
+        for (PersistentGroup recipient : getRecipients()) {
             getSender().removeRecipients(recipient);
         }
         setRecipients(null);

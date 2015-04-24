@@ -30,9 +30,6 @@ import org.fenixedu.bennu.core.groups.Group;
 import pt.ist.fenixframework.Atomic;
 
 public class CoordinatorSender extends CoordinatorSender_Base {
-    private Recipient createRecipient(Group group) {
-        return new Recipient(null, group);
-    }
 
     public CoordinatorSender(Degree degree) {
         super();
@@ -44,13 +41,13 @@ public class CoordinatorSender extends CoordinatorSender_Base {
         Group teachers = TeacherGroup.get(degree);
         Group students = StudentGroup.get(degree, null);
         for (CycleType cycleType : degree.getDegreeType().getCycleTypes()) {
-            addRecipients(createRecipient(StudentGroup.get(degree, cycleType)));
+            addRecipients(StudentGroup.get(degree, cycleType).toPersistentGroup());
         }
-        addRecipients(createRecipient(current));
-        addRecipients(createRecipient(teachers));
-        addRecipients(createRecipient(students));
-        addRecipients(createRecipient(RoleType.TEACHER.actualGroup()));
-        addRecipients(createRecipient(StudentGroup.get()));
+        addRecipients(current.toPersistentGroup());
+        addRecipients(teachers.toPersistentGroup());
+        addRecipients(students.toPersistentGroup());
+        addRecipients(RoleType.TEACHER.actualGroup().toPersistentGroup());
+        addRecipients(StudentGroup.get().toPersistentGroup());
         setFromName(createFromName());
     }
 

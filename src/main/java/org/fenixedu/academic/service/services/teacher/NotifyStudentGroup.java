@@ -20,6 +20,7 @@ package org.fenixedu.academic.service.services.teacher;
 
 import static org.fenixedu.academic.predicate.AccessControl.check;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,10 +30,10 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.ProjectSubmission;
 import org.fenixedu.academic.domain.util.email.ExecutionCourseSender;
 import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.predicate.RolePredicates;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 
@@ -54,8 +55,10 @@ public class NotifyStudentGroup {
                 BundleUtil.getString(Bundle.GLOBAL, "label.group", new String[] { submission.getStudentGroup().getGroupNumber()
                         .toString() });
         Sender sender = ExecutionCourseSender.newInstance(course);
-        Recipient recipient = new Recipient(groupName, UserGroup.of(Person.convertToUsers(recievers)));
-        new Message(sender, sender.getConcreteReplyTos(), recipient.asCollection(), submission.getProject().getName(),
-                submission.getTeacherObservation(), "");
+
+        DynamicGroup recipient =
+                DynamicGroup.get(groupName).mutator().changeGroup(UserGroup.of(Person.convertToUsers(recievers)));
+        new Message(sender, sender.getConcreteReplyTos(), Collections.singletonList(recipient),
+                submission.getProject().getName(), submission.getTeacherObservation(), "");
     }
 }

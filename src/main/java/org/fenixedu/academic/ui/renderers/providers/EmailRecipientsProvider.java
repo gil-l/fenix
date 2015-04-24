@@ -18,12 +18,14 @@
  */
 package org.fenixedu.academic.ui.renderers.providers;
 
+import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.fenixedu.academic.domain.DomainObjectUtil;
 import org.fenixedu.academic.domain.util.email.EmailBean;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.domain.util.email.Sender;
+import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
 
 import pt.ist.fenixWebFramework.renderers.DataProvider;
 import pt.ist.fenixWebFramework.renderers.components.converters.Converter;
@@ -34,7 +36,13 @@ public class EmailRecipientsProvider implements DataProvider {
     public Object provide(final Object source, final Object currentValue) {
         final EmailBean emailBean = (EmailBean) source;
         final Sender sender = emailBean.getSender();
-        final Set<Recipient> recipients = new TreeSet<Recipient>(Recipient.COMPARATOR_BY_NAME);
+        final Set<PersistentGroup> recipients = new TreeSet<PersistentGroup>(new Comparator<PersistentGroup>() {
+            @Override
+            public int compare(PersistentGroup r1, PersistentGroup r2) {
+                final int c = r1.getPresentationName().compareTo(r2.getPresentationName());
+                return c == 0 ? DomainObjectUtil.COMPARATOR_BY_ID.compare(r1, r2) : c;
+            }
+        });
         recipients.addAll(emailBean.getRecipients());
         if (sender != null) {
             recipients.addAll(sender.getRecipientsSet());

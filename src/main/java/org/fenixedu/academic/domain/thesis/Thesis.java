@@ -61,7 +61,6 @@ import org.fenixedu.academic.domain.exceptions.FieldIsRequiredException;
 import org.fenixedu.academic.domain.organizationalStructure.ScientificCouncilUnit;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.dto.degreeAdministrativeOffice.gradeSubmission.MarkSheetEnrolmentEvaluationBean;
 import org.fenixedu.academic.predicate.AccessControl;
@@ -70,6 +69,7 @@ import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.EvaluationType;
 import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.signals.DomainObjectEvent;
@@ -658,8 +658,9 @@ public class Thesis extends Thesis_Base {
         Set<Person> orientationPersons = getOrientationPersons();
         persons.addAll(orientationPersons);
 
-        final Recipient recipient =
-                new Recipient("Membros da tese " + getTitle().toString(), UserGroup.of(Person.convertToUsers(persons)));
+        DynamicGroup recipient =
+                DynamicGroup.get("Membros da tese " + getTitle().toString()).mutator()
+                        .changeGroup(UserGroup.of(Person.convertToUsers(persons)));
         final String studentNumber = getStudent().getNumber().toString();
         final String title = getFinalFullTitle().getContent();
         final String subject = getMessage("message.thesis.reject.submission.email.subject", studentNumber);
@@ -668,7 +669,7 @@ public class Thesis extends Thesis_Base {
         //
         final Sender sender = ScientificCouncilUnit.getScientificCouncilUnit().getUnitBasedSenderSet().iterator().next();
 
-        new Message(sender, sender.getConcreteReplyTos(), recipient.asCollection(), subject, body, "");
+        new Message(sender, sender.getConcreteReplyTos(), Collections.singletonList(recipient), subject, body, "");
     }
 
     protected String getMessage(final String key, final Object... args) {

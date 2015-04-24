@@ -146,16 +146,12 @@
 	        <property name="eachSchema" value="alumni.gep.email.recipient.selectItem"/>
 	        <property name="eachLayout" value="values"/>
 	        <property name="classes" value="nobullet noindent"/>
-	        <property name="sortBy" value="toName=desc"/>
+	        <property name="sortBy" value="presentationName=desc"/>
 	    </slot>
 	</schema>
 	
-	<schema name="alumni.gep.email.recipient.selectItem" type="org.fenixedu.academic.domain.util.email.Recipient">
-		<slot name="toName"/>
-	</schema>
-
-	<schema name="alumni.gep.show.recipients" type="org.fenixedu.academic.domain.util.email.Recipient" bundle="MESSAGING_RESOURCES">
-		<slot name="toName"/>
+	<schema name="alumni.gep.email.recipient.selectItem" type="org.fenixedu.bennu.core.domain.groups.PersistentGroup">
+		<slot name="presentationName"/>
 	</schema>
 
 	<schema name="alumni.gep.email.recipient.create" type="org.fenixedu.academic.dto.alumni.AlumniMailSendToBean" bundle="GEP_RESOURCES">
