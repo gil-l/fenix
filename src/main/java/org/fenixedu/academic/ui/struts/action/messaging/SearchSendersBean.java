@@ -22,9 +22,9 @@ import java.io.Serializable;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.commons.StringNormalizer;
+import org.fenixedu.messaging.domain.Sender;
 
 public class SearchSendersBean implements Serializable {
 

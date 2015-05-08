@@ -41,6 +41,9 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections.comparators.ReverseComparator;
 import org.apache.commons.lang.StringUtils;
+import org.fenixedu.academic.domain.accessControl.StudentGroup;
+import org.fenixedu.academic.domain.accessControl.TeacherGroup;
+import org.fenixedu.academic.domain.accessControl.TeacherResponsibleOfExecutionCourseGroup;
 import org.fenixedu.academic.domain.curriculum.CurricularCourseType;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.degreeStructure.BibliographicReferences;
@@ -55,6 +58,7 @@ import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.domain.student.WeeklyWorkLoad;
 import org.fenixedu.academic.domain.studentCurriculum.Dismissal;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicInterval;
+import org.fenixedu.academic.domain.util.MessagingUtil;
 import org.fenixedu.academic.dto.GenericPair;
 import org.fenixedu.academic.dto.teacher.executionCourse.SearchExecutionCourseAttendsBean;
 import org.fenixedu.academic.predicate.AccessControl;
@@ -67,10 +71,12 @@ import org.fenixedu.academic.util.DateFormatUtil;
 import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.academic.util.ProposalState;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.StringNormalizer;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.commons.i18n.LocalizedString;
+import org.fenixedu.messaging.domain.Sender;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeFieldType;
@@ -211,6 +217,43 @@ public class ExecutionCourse extends ExecutionCourse_Base {
             }
         }
         return null;
+    }
+
+    @Override
+    public Sender getSender() {
+        Sender s = super.getSender();
+        if (s == null) {
+
+            String fromName;
+            String courseName = getName();
+            fromName = String.format("%s: %s", getDegreePresentationString(), courseName);
+            if (getExecutionPeriod() != null && getExecutionPeriod().getQualifiedName() != null) {
+                fromName += ", " + getExecutionPeriod().getQualifiedName().replace('/', '-');
+            }
+            s = MessagingUtil.createInstitutionalSender(fromName, TeacherGroup.get(this));
+            s.addReplyTo(this.getEmail());
+
+            final String labelECTeachers =
+                    BundleUtil.getString(Bundle.SITE,
+                            "label.org.fenixedu.academic.domain.accessControl.ExecutionCourseTeachersGroupWithName",
+                            new String[] { courseName });
+            final String labelECStudents =
+                    BundleUtil.getString(Bundle.SITE,
+                            "label.org.fenixedu.academic.domain.accessControl.ExecutionCourseStudentsGroupWithName",
+                            new String[] { courseName });
+            final String labelECResponsibleTeachers =
+                    BundleUtil.getString(Bundle.SITE,
+                            "label.org.fenixedu.academic.domain.accessControl.ExecutionCourseResponsibleTeachersGroupWithName",
+                            new String[] { courseName });
+            // fixed recipients
+            s.addRecipient(DynamicGroup.get(labelECTeachers).mutator().changeGroup(TeacherGroup.get(this)));
+            s.addRecipient(DynamicGroup.get(labelECStudents).mutator().changeGroup(StudentGroup.get(this)));
+            s.addRecipient(DynamicGroup.get(labelECResponsibleTeachers).mutator()
+                    .changeGroup(TeacherResponsibleOfExecutionCourseGroup.get(this)));
+            setSender(s);
+        }
+        return s;
+
     }
 
     public boolean existsGroupingExecutionCourse(ExportGrouping groupPropertiesExecutionCourse) {
@@ -381,8 +424,9 @@ public class ExecutionCourse extends ExecutionCourse_Base {
     // Delete Method
     public void delete() {
         DomainException.throwWhenDeleteBlocked(getDeletionBlockers());
-        if (getSender() != null) {
-            getSender().getRecipientsSet().clear();
+
+        if (super.getSender() != null) {
+            getSender().getRecipients().clear();
             setSender(null);
         }
 
@@ -2177,10 +2221,6 @@ public class ExecutionCourse extends ExecutionCourse_Base {
             }
         }
         return null;
-    }
-
-    public boolean isHasSender() {
-        return getSender() != null;
     }
 
     /*

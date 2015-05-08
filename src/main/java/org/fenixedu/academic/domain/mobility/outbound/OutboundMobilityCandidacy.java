@@ -20,13 +20,14 @@ package org.fenixedu.academic.domain.mobility.outbound;
 
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.SystemSender;
+import org.fenixedu.academic.domain.util.MessagingUtil;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.messaging.domain.MessagingSystem;
+import org.fenixedu.messaging.domain.Sender;
 
 import pt.ist.fenixframework.Atomic;
 
@@ -99,14 +100,14 @@ public class OutboundMobilityCandidacy extends OutboundMobilityCandidacy_Base im
     }
 
     public void deleteWithNotification() {
-        final SystemSender sender = getRootDomainObject().getSystemSender();
+        final Sender sender = MessagingSystem.systemSender();
         if (sender != null) {
             final Registration registration = getOutboundMobilityCandidacySubmission().getRegistration();
             final Group recipient = UserGroup.of(registration.getPerson().getUser());
-            new Message(sender, recipient, BundleUtil.getString(Bundle.STUDENT, "label.email.deleted.contest.subject"),
+            MessagingUtil.sendSystemMessage(BundleUtil.getString(Bundle.STUDENT, "label.email.deleted.contest.subject"),
                     BundleUtil.getString(Bundle.STUDENT, "label.email.deleted.contest.body",
                             getOutboundMobilityCandidacyContest().getMobilityAgreement().getUniversityUnit()
-                                    .getPresentationName()));
+                                    .getPresentationName()), recipient);
         }
         delete();
     }

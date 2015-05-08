@@ -44,13 +44,12 @@ import org.fenixedu.academic.domain.phd.access.PhdExternalOperationBean;
 import org.fenixedu.academic.domain.phd.access.PhdProcessAccessType;
 import org.fenixedu.academic.domain.phd.alert.AlertService;
 import org.fenixedu.academic.domain.phd.alert.AlertService.AlertMessage;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.SystemSender;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.phd.PhdProperties;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.messaging.domain.MessagingSystem;
+import org.fenixedu.messaging.domain.Sender;
 import org.joda.time.DateTime;
 
 public class PhdCandidacyFeedbackRequestProcess extends PhdCandidacyFeedbackRequestProcess_Base {
@@ -342,8 +341,8 @@ public class PhdCandidacyFeedbackRequestProcess extends PhdCandidacyFeedbackRequ
         }
 
         private void email(String email, String subject, String body) {
-            final SystemSender sender = Bennu.getInstance().getSystemSender();
-            new Message(sender, sender.getConcreteReplyTos(), null, null, null, subject, body, Collections.singleton(email));
+            final Sender sender = MessagingSystem.systemSender();
+            new Message(sender, sender.getReplyTos(), null, null, null, subject, body, Collections.singleton(email));
         }
     }
 

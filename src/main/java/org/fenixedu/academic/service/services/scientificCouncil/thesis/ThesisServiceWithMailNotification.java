@@ -27,9 +27,7 @@ import java.util.Set;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.thesis.Thesis;
 import org.fenixedu.academic.domain.thesis.ThesisEvaluationParticipant;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.PersonSender;
-import org.fenixedu.academic.domain.util.email.Sender;
+import org.fenixedu.academic.domain.util.MessagingUtil;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.groups.Group;
@@ -47,8 +45,9 @@ public abstract class ThesisServiceWithMailNotification {
     abstract void process(Thesis thesis);
 
     private void sendEmail(Thesis thesis) {
-        Sender sender = PersonSender.newInstance(AccessControl.getPerson());
-        new Message(sender, null, getRecipients(thesis), getSubject(thesis), getMessage(thesis), "");
+        Set<Group> recipients = getRecipients(thesis);
+        MessagingUtil.sendNoReplyMessage(AccessControl.getPerson().getSender(), getSubject(thesis), getMessage(thesis),
+                recipients.toArray(new Group[recipients.size()]));
     }
 
     protected String getMessage(String key, Object... args) {

@@ -24,10 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
-import org.fenixedu.academic.domain.util.email.CoordinatorSender;
-import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.ui.struts.action.base.FenixAction;
 import org.fenixedu.academic.ui.struts.action.messaging.EmailsDA;
 import org.fenixedu.bennu.struts.annotations.Mapping;
@@ -54,8 +51,6 @@ public class SendEmail extends FenixAction {
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
             HttpServletResponse response) {
-        Degree degree = getDegreeCurricularPlan(request).getDegree();
-        Sender sender = CoordinatorSender.newInstance(degree);
-        return EmailsDA.sendEmail(request, sender);
+        return EmailsDA.sendEmail(request, getDegreeCurricularPlan(request).getDegree().getSender());
     }
 }

@@ -28,8 +28,8 @@ import org.fenixedu.academic.domain.accessControl.CerimonyInquiryGroup;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
 import org.fenixedu.bennu.core.groups.DynamicGroup;
+import org.fenixedu.bennu.core.groups.Group;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;
@@ -107,9 +107,8 @@ public class CerimonyInquiry extends CerimonyInquiry_Base implements Comparable<
         return getBegin() != null && getBegin().isBeforeNow() && (getEnd() == null || getEnd().isAfterNow());
     }
 
-    public PersistentGroup createRecipient() {
-        return DynamicGroup.get("Inquiridos: " + getDescription()).mutator().changeGroup(CerimonyInquiryGroup.get(this))
-                .toPersistentGroup();
+    public Group createRecipient() {
+        return DynamicGroup.get("Inquiridos: " + getDescription()).mutator().changeGroup(CerimonyInquiryGroup.get(this));
     }
 
     @Atomic

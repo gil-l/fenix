@@ -37,19 +37,19 @@ import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.ExternalCurricularCourse;
 import org.fenixedu.academic.domain.NonAffiliatedTeacher;
+import org.fenixedu.academic.domain.accessControl.UnitGroup;
 import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.domain.util.email.UnitBasedSender;
+import org.fenixedu.academic.domain.util.MessagingUtil;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.StringNormalizer;
+import org.fenixedu.messaging.domain.Sender;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.YearMonthDay;
-
-import pt.ist.fenixframework.Atomic;
 
 public class Unit extends Unit_Base {
 
@@ -511,16 +511,14 @@ public class Unit extends Unit_Base {
         return (Collection<Unit>) getParentParties(AccountabilityTypeEnum.ORGANIZATIONAL_STRUCTURE, Unit.class);
     }
 
-    @Atomic
-    /*
-     * @See UnitMailSenderAction
-     */
-    public UnitBasedSender getOneUnitBasedSender() {
-        if (!getUnitBasedSenderSet().isEmpty()) {
-            return getUnitBasedSenderSet().iterator().next();
-        } else {
-            return UnitBasedSender.newInstance(this);
+    @Override
+    public Sender getSender() {
+        Sender s = super.getSender();
+        if (s == null) {
+            s = MessagingUtil.createInstitutionalSender(getName(), UnitGroup.recursiveWorkers(this));
+            setSender(s);
         }
+        return s;
     }
 
     public int getUnitDepth() {
@@ -845,7 +843,7 @@ public class Unit extends Unit_Base {
 
     /**
      * Used by messaging system
-     * 
+     *
      * @return Groups to used as recipients
      */
     public List<Group> getGroups() {

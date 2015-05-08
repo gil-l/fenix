@@ -28,10 +28,8 @@ import org.fenixedu.academic.domain.AlumniIdentityCheckRequest;
 import org.fenixedu.academic.domain.AlumniRequestType;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.SystemSender;
+import org.fenixedu.academic.domain.util.MessagingUtil;
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
@@ -40,8 +38,8 @@ import org.fenixedu.bennu.core.util.CoreConfiguration;
 public class AlumniNotificationService {
 
     private static void sendEmail(final Collection<Group> recipients, final String subject, final String body, final String bccs) {
-        SystemSender systemSender = Bennu.getInstance().getSystemSender();
-        new Message(systemSender, systemSender.getConcreteReplyTos(), recipients, subject, body, bccs);
+        MessagingUtil.sendSystemMessage(subject, body, Collections.singleton(bccs),
+                recipients.toArray(new Group[recipients.size()]));
     }
 
     private static List<Group> getAlumniRecipients(Alumni alumni) {

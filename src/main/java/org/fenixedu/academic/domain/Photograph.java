@@ -26,8 +26,7 @@ import org.fenixedu.academic.domain.photograph.AspectRatio;
 import org.fenixedu.academic.domain.photograph.Picture;
 import org.fenixedu.academic.domain.photograph.PictureMode;
 import org.fenixedu.academic.domain.photograph.PictureOriginal;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.SystemSender;
+import org.fenixedu.academic.domain.util.MessagingUtil;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.ContentType;
@@ -43,8 +42,6 @@ import org.joda.time.DateTime;
 import pt.ist.fenixframework.Atomic;
 
 import com.google.common.io.ByteStreams;
-
-import edu.emory.mathcs.backport.java.util.Collections;
 
 public class Photograph extends Photograph_Base implements Comparable<Photograph> {
 
@@ -107,10 +104,8 @@ public class Photograph extends Photograph_Base implements Comparable<Photograph
                 if (person != null) {
                     setRejector(person);
                 }
-                SystemSender systemSender = getRootDomainObject().getSystemSender();
-                new Message(systemSender, systemSender.getConcreteReplyTos(), Collections.singletonList(UserGroup.of(getPerson()
-                        .getUser())), BundleUtil.getString(Bundle.PERSONAL, REJECTION_MAIL_SUBJECT_KEY), BundleUtil.getString(
-                        Bundle.PERSONAL, REJECTION_MAIL_BODY_KEY), "");
+                MessagingUtil.sendSystemMessage(BundleUtil.getString(Bundle.PERSONAL, REJECTION_MAIL_SUBJECT_KEY),
+                        BundleUtil.getString(Bundle.PERSONAL, REJECTION_MAIL_BODY_KEY), UserGroup.of(getPerson().getUser()));
 
             }
             if (state == PhotoState.APPROVED) {

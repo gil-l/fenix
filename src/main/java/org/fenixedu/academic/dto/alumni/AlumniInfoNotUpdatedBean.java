@@ -21,8 +21,8 @@ package org.fenixedu.academic.dto.alumni;
 import java.io.Serializable;
 
 import org.fenixedu.academic.domain.accessControl.NotUpdatedAlumniInfoForSpecificDaysGroup;
-import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.bennu.core.groups.Group;
+import org.fenixedu.messaging.domain.Sender;
 
 import pt.ist.fenixframework.Atomic;
 
@@ -79,6 +79,6 @@ public class AlumniInfoNotUpdatedBean implements Serializable {
         Group recipientsGroup =
                 NotUpdatedAlumniInfoForSpecificDaysGroup.get(getDaysNotUpdated(), getProfessionalInfo(), getFormationInfo(),
                         getPersonalDataInfo());
-        sender.addRecipients(recipientsGroup.toPersistentGroup());
+        sender.addRecipient(recipientsGroup);
     }
 }

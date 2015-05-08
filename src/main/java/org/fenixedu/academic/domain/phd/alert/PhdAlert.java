@@ -18,11 +18,10 @@
  */
 package org.fenixedu.academic.domain.phd.alert;
 
-import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
-import org.fenixedu.academic.domain.util.email.UnitBasedSender;
 import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.messaging.domain.Sender;
 
 abstract public class PhdAlert extends PhdAlert_Base {
 
@@ -94,9 +93,8 @@ abstract public class PhdAlert extends PhdAlert_Base {
         return getActive().booleanValue();
     }
 
-    protected UnitBasedSender getSender() {
-        AdministrativeOffice administrativeOffice = this.getProcess().getAdministrativeOffice();
-        return administrativeOffice.getUnit().getUnitBasedSenderSet().iterator().next();
+    protected Sender getSender() {
+        return getProcess().getAdministrativeOffice().getUnit().getSender();
     }
 
 }

@@ -38,8 +38,6 @@ import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.domain.util.email.ExecutionCourseSender;
-import org.fenixedu.academic.domain.util.email.Message;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.predicate.ResourceAllocationRolePredicates;
 import org.fenixedu.academic.util.Bundle;
@@ -48,6 +46,7 @@ import org.fenixedu.academic.util.WeekDay;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.messaging.domain.Sender;
 import org.joda.time.Duration;
 
 import pt.ist.fenixframework.Atomic;
@@ -514,12 +513,12 @@ public class Shift extends Shift_Base {
                 getExecutionCourse().getNome(), getExecutionCourse().getDegreePresentationString());
         registration.removeShifts(this);
 
-        ExecutionCourseSender sender = ExecutionCourseSender.newInstance(executionCourse);
+        Sender sender = executionCourse.getSender();
         final String subject = BundleUtil.getString(Bundle.APPLICATION, "label.shift.remove.subject");
         final String body = BundleUtil.getString(Bundle.APPLICATION, "label.shift.remove.body", getNome());
 
-        new Message(sender, sender.getConcreteReplyTos(), Collections.singletonList(UserGroup.of(registration.getPerson()
-                .getUser())), subject, body, "");
+        new Message(sender, sender.getReplyTos(), Collections.singletonList(UserGroup.of(registration.getPerson().getUser())),
+                subject, body, "");
     }
 
     public boolean hasAnyStudentsInAssociatedStudentGroups() {

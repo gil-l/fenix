@@ -38,6 +38,9 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections.comparators.ReverseComparator;
 import org.apache.commons.lang.StringUtils;
+import org.fenixedu.academic.domain.accessControl.CoordinatorGroup;
+import org.fenixedu.academic.domain.accessControl.StudentGroup;
+import org.fenixedu.academic.domain.accessControl.TeacherGroup;
 import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.curricularPeriod.CurricularPeriod;
 import org.fenixedu.academic.domain.degree.DegreeType;
@@ -53,12 +56,14 @@ import org.fenixedu.academic.domain.thesis.Thesis;
 import org.fenixedu.academic.domain.thesis.ThesisState;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicInterval;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicPeriod;
+import org.fenixedu.academic.domain.util.MessagingUtil;
 import org.fenixedu.academic.predicate.AcademicPredicates;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.messaging.domain.Sender;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.DateTime;
 
@@ -289,11 +294,7 @@ public class Degree extends Degree_Base implements Comparable<Degree> {
             ;
         }
 
-        // checkDeletion assures that site is deletable
-        if (getSender() != null) {
-            setSender(null);
-        }
-
+        setSender(null);
         setUnit(null);
         setPhdProgram(null);
         setRootDomainObject(null);
@@ -302,6 +303,26 @@ public class Degree extends Degree_Base implements Comparable<Degree> {
 
     public GradeScale getGradeScaleChain() {
         return super.getGradeScale();
+    }
+
+    @Override
+    public Sender getSender() {
+        Sender s = super.getSender();
+        if (s == null) {
+            s =
+                    MessagingUtil.createInstitutionalSender(String.format("%s: %s", getSigla(), "Coordenação"),
+                            CoordinatorGroup.get(this));
+            s.addRecipient(CoordinatorGroup.get(this));
+            s.addRecipient(TeacherGroup.get(this));
+            s.addRecipient(StudentGroup.get(this, null));
+            for (CycleType cycleType : getDegreeType().getCycleTypes()) {
+                s.addRecipient(StudentGroup.get(this, cycleType));
+            }
+            s.addRecipient(RoleType.TEACHER.actualGroup());
+            s.addRecipient(StudentGroup.get());
+            setSender(s);
+        }
+        return s;
     }
 
     public DegreeCurricularPlan createDegreeCurricularPlan(String name, GradeScale gradeScale, Person creator,
@@ -934,9 +955,9 @@ public class Degree extends Degree_Base implements Comparable<Degree> {
 
     /**
      * @deprecated Degree should not answer duration questions.
-     * 
+     *
      *             For more accurate results use {@link org.fenixedu.academic.domain.DegreeCurricularPlan#getDurationInYears()}
-     * 
+     *
      */
     @Deprecated
     public List<Integer> buildFullCurricularYearList() {

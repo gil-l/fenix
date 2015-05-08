@@ -3289,45 +3289,6 @@ valueType org.fenixedu.academic.domain.degreeStructure.CycleTypes as CycleTypes 
         EmailAddressList failedAddresses;
     }
 
-    class util.email.Message  {
-        String subject;
-        String body;
-        String htmlBody;
-        DateTime created;
-        DateTime sent;
-        String bccs;
-    }
-
-    class util.email.ReplyTo  {
-    }
-    
-    class util.email.ConcreteReplyTo extends util.email.ReplyTo {
-        String replyToAddress;
-    }
-
-    class util.email.PersonReplyTo extends util.email.ReplyTo { }
-    
-    class util.email.ExecutionCourseReplyTo extends util.email.ReplyTo { }
-    
-    class util.email.CurrentUserReplyTo extends util.email.ReplyTo { }
-    
-    class util.email.Sender  {
-        String fromName;
-        String fromAddress;
-    }
-
-    class util.email.UnitBasedSender extends util.email.Sender {}
-    
-    class util.email.DepartmentMemberBasedSender extends util.email.UnitBasedSender {}
-
-    class util.email.ExecutionCourseSender extends util.email.Sender { }
-
-    class util.email.CoordinatorSender extends util.email.Sender {}
-    
-    class util.email.PersonSender extends util.email.Sender {}
-
-    class util.email.SystemSender extends util.email.Sender {}
-
     class messaging.ConversationMessage {
         DateTime creationDate;
         MultiLanguageString body;
@@ -7009,17 +6970,22 @@ relation ExecutionCourseSummary {
 
 relation ExecutionCourseSender {
     ExecutionCourse playsRole course;
-    util.email.ExecutionCourseSender playsRole sender;
+    .org.fenixedu.messaging.domain.Sender playsRole sender;
 }
 
 relation CoordinatorSender {
     Degree playsRole degree;
-    util.email.CoordinatorSender playsRole sender;
+    .org.fenixedu.messaging.domain.Sender playsRole sender;
 }
 
 relation PersonSender {
     Person playsRole person;
-    util.email.PersonSender playsRole sender;
+    .org.fenixedu.messaging.domain.Sender playsRole sender;
+}
+
+relation UnitSender {
+    organizationalStructure.Unit playsRole unit;
+    .org.fenixedu.messaging.domain.Sender playsRole sender;
 }
 
 relation ExecutionDegreeCampus {
@@ -10441,120 +10407,9 @@ relation RootDomainObjectResidenceManagementUnitHack {
     .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObjectForResidenceUnit;
 }
 
-relation RootDomainObjectUtilEmailMessage {
-    .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
-    util.email.Message playsRole utilEmailMessages {
-        multiplicity *;
-    }
-}
-
-relation RootDomainObjectUtilEmailSender {
-    .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
-    util.email.Sender playsRole utilEmailSenders {
-        multiplicity *;
-    }
-}
-
-relation RootDomainObjectSystemSender {
-    .org.fenixedu.bennu.core.domain.Bennu playsRole systemRootDomainObject;
-    util.email.SystemSender playsRole systemSender;
-}
-
 relation SystemSenderOptOutGroup {
-    protected .org.fenixedu.bennu.core.domain.groups.PersistentGroup playsRole optOutPersistentGroup;
-    util.email.SystemSender playsRole systemSender;
-}
-
-relation UtilEmailSenderUtilEmailMessage {
-    util.email.Sender playsRole sender;
-    util.email.Message playsRole messages {
-        multiplicity *;
-    }
-}
-
-relation UtilEmailUtilEmailMessage {
-    util.Email playsRole emails {
-        multiplicity *;
-    }
-    util.email.Message playsRole message;
-}
-
-relation MessageRecipientTo {
-    util.email.Message playsRole messagesTos {
-        multiplicity *;
-    }
-    .org.fenixedu.bennu.core.domain.groups.PersistentGroup playsRole tos {
-        multiplicity *;
-    }
-}
-
-relation MessageRecipientCc {
-    util.email.Message playsRole messagesCcs {
-        multiplicity *;
-    }
-    .org.fenixedu.bennu.core.domain.groups.PersistentGroup  playsRole ccs {
-        multiplicity *;
-    }
-}
-
-relation MessageRecipientBcc {
-    util.email.Message playsRole messages {
-        multiplicity *;
-    }
-    .org.fenixedu.bennu.core.domain.groups.PersistentGroup playsRole recipients {
-        multiplicity *;
-    }
-}
-
-relation RootDomainObjectUtilEmailReplyTo {
-    .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
-    util.email.ReplyTo playsRole replyTos {
-        multiplicity *;
-    }
-}
-
-relation UtilEmailSenderUtilEmailReplyTo {
-    util.email.Sender playsRole sender;
-    util.email.ReplyTo playsRole replyTos {
-        multiplicity *;
-    }
-}
-
-relation UtilEmailReplyToUtilEmailMessage {
-    util.email.ReplyTo playsRole replyTos {
-        multiplicity *;
-    }
-    util.email.Message playsRole messages {
-        multiplicity *;
-    }
-}
-
-relation PersonUtilEmailMessage {
-    Person playsRole person;
-    util.email.Message playsRole messages {
-        multiplicity *;
-    }
-}
-
-relation SenderPersistentGroupRecipients {
-    util.email.Sender playsRole senders {
-        multiplicity *;
-    }
-    .org.fenixedu.bennu.core.domain.groups.PersistentGroup playsRole recipients {
-        multiplicity *;
-    }
-}
-
-relation PersonUtilEmailReplyTo {
-    Person playsRole person;
-    util.email.PersonReplyTo playsRole replyTo;
-}
-
-relation RootDomainObjectPendingUtilEmailMessage {
-    .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObjectFromPendingRelation;
-    util.email.Message playsRole pendingUtilEmailMessages {
-        multiplicity *;
-    }
+    .org.fenixedu.bennu.core.domain.groups.PersistentGroup playsRole optOutPersistentGroup;
+    .org.fenixedu.messaging.domain.MessagingSystem playsRole messagingSystem;
 }
 
 relation PartialRegimeInstallmentExecutionSemester {
@@ -10576,13 +10431,6 @@ relation RootDomainObjectUnitCostCenterCode {
 relation UnitUnitCostCenterCode {
     organizationalStructure.Unit playsRole unit;
     organizationalStructure.UnitCostCenterCode playsRole unitCostCenterCode;
-}
-
-relation UnitUnitBasedSender {
-    organizationalStructure.Unit playsRole unit;
-    util.email.UnitBasedSender playsRole unitBasedSender {
-        multiplicity *;
-    }
 }
 
 relation QueueJobPerson {
@@ -12008,15 +11856,6 @@ relation FilePermittedGroup {
 	}
 	protected .org.fenixedu.bennu.core.domain.groups.PersistentGroup playsRole accessGroup {
 		multiplicity 0..1;
-	}
-}
-
-relation SenderMembers {
-	protected util.email.Sender playsRole senderAsMembers {
-		multiplicity *;
-	}
-	protected .org.fenixedu.bennu.core.domain.groups.PersistentGroup playsRole membersGroup {
-		multiplicity 1..1;
 	}
 }
 

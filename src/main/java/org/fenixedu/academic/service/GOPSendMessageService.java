@@ -31,12 +31,11 @@ import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.WrittenTest;
 import org.fenixedu.academic.domain.person.RoleType;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.messaging.domain.MessagingSystem;
+import org.fenixedu.messaging.domain.Sender;
 import org.fenixedu.spaces.core.service.NotificationService;
 import org.fenixedu.spaces.domain.Space;
 import org.fenixedu.spaces.domain.occupation.Occupation;
@@ -61,7 +60,7 @@ public class GOPSendMessageService implements NotificationService {
             GOP_SENDER = initGOPSender();
             if (GOP_SENDER == null) {
                 logger.warn("WARN: GOPSender couldn't be found, using SystemSender ...");
-                GOP_SENDER = Bennu.getInstance().getSystemSender();
+                GOP_SENDER = MessagingSystem.getInstance().getSystemSender();
             }
         }
         return GOP_SENDER;
@@ -208,7 +207,7 @@ public class GOPSendMessageService implements NotificationService {
     public boolean sendEmail(String emails, String subject, String body) {
         if (!Strings.isNullOrEmpty(emails)) {
             final Sender sender = getGOPSender();
-            new Message(sender, sender.getConcreteReplyTos(), null, subject, body, emails);
+            new Message(sender, sender.getReplyTos(), null, subject, body, emails);
             return true;
         }
         return false;

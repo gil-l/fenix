@@ -27,11 +27,8 @@ import java.util.Set;
 
 import org.fenixedu.academic.domain.DomainObjectUtil;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.UnitBasedSender;
 import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
@@ -164,27 +161,6 @@ public class PhdAlertMessage extends PhdAlertMessage_Base {
         for (PhdAlert phdAlert : alerts) {
             if (getSubject().getContent().contentEquals(phdAlert.getFormattedSubject().getContent())) {
                 result.add(phdAlert);
-            }
-        }
-
-        return result;
-    }
-
-    protected UnitBasedSender getSender() {
-        AdministrativeOffice administrativeOffice = this.getProcess().getAdministrativeOffice();
-        return administrativeOffice.getUnit().getUnitBasedSenderSet().iterator().next();
-    }
-
-    public List<Message> getEmailsWithMatchWithThisMessage() {
-        List<Message> result = new ArrayList<Message>();
-
-        UnitBasedSender sender = getSender();
-
-        Collection<Message> messages = sender.getMessagesSet();
-
-        for (Message message : messages) {
-            if (getSubject().getContent().contentEquals(message.getSubject())) {
-                result.add(message);
             }
         }
 

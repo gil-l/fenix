@@ -27,17 +27,16 @@ import org.fenixedu.academic.domain.Installation;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Shift;
 import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.domain.util.email.ConcreteReplyTo;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.predicate.RolePredicates;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.messaging.domain.MessagingSystem;
+import org.fenixedu.messaging.domain.ReplyTo;
+import org.fenixedu.messaging.domain.Sender;
 
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
@@ -89,10 +88,9 @@ public class ChangeStudentsShift {
 
         DynamicGroup recipient =
                 DynamicGroup.get(groupName).mutator().changeGroup(UserGroup.of(Person.convertToUsers(recievers)));
-        Sender sender = Bennu.getInstance().getSystemSender();
+        Sender sender = MessagingSystem.getInstance().getSystemSender();
         String gopEmailAddress = Installation.getInstance().getInstituitionalEmailAddress("gop");
-        new Message(sender, new ConcreteReplyTo(gopEmailAddress).asCollection(), Collections.singletonList(recipient), subject,
-                message, "");
+        new Message(sender, ReplyTo.concrete(gopEmailAddress), Collections.singletonList(recipient), subject, message, "");
     }
 
     private static String getString(final String key, final String... args) {
