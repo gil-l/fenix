@@ -60,6 +60,7 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.exceptions.FieldIsRequiredException;
 import org.fenixedu.academic.domain.organizationalStructure.ScientificCouncilUnit;
 import org.fenixedu.academic.domain.student.Student;
+import org.fenixedu.academic.domain.util.MessagingUtil;
 import org.fenixedu.academic.dto.degreeAdministrativeOffice.gradeSubmission.MarkSheetEnrolmentEvaluationBean;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.predicate.ThesisPredicates;
@@ -72,7 +73,6 @@ import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.signals.DomainObjectEvent;
 import org.fenixedu.bennu.signals.Signal;
-import org.fenixedu.messaging.domain.Sender;
 import org.joda.time.DateTime;
 import org.joda.time.YearMonthDay;
 
@@ -664,11 +664,8 @@ public class Thesis extends Thesis_Base {
         final String title = getFinalFullTitle().getContent();
         final String subject = getMessage("message.thesis.reject.submission.email.subject", studentNumber);
         final String body = getMessage("message.thesis.reject.submission.email.body", studentNumber, title, rejectionComment);
-
-        //
-        final Sender sender = ScientificCouncilUnit.getScientificCouncilUnit().getSender();
-
-        new Message(sender, sender.getReplyTos(), Collections.singletonList(recipient), subject, body, "");
+        MessagingUtil.sendReplyToSenderMessage(ScientificCouncilUnit.getScientificCouncilUnit().getSender(), subject, body,
+                recipient);
     }
 
     protected String getMessage(final String key, final Object... args) {

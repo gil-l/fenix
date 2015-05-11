@@ -18,8 +18,6 @@
  */
 package org.fenixedu.academic.domain.candidacy;
 
-import java.util.Collections;
-
 import org.fenixedu.academic.domain.util.MessagingUtil;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.groups.NobodyGroup;
@@ -55,8 +53,7 @@ public class GenericApplicationLetterOfRecomentation extends GenericApplicationL
                 BundleUtil.getString(Bundle.CANDIDATE, "label.application.recomentation.upload.notification.email.body",
                         getRecomentation().getName(), getRecomentation().getInstitution());
 
-        MessagingUtil.sendSystemMessage(subject, body,
-                Collections.singleton(getRecomentation().getGenericApplication().getEmail()));
+        MessagingUtil.sendSystemMessage(subject, body, getRecomentation().getGenericApplication().getEmail());
     }
 
 }

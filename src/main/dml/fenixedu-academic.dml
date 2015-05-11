@@ -224,13 +224,6 @@ valueType org.fenixedu.academic.domain.CurricularYearList as CurricularYearList 
     internalizeWith internalize();
 }
 
-valueType org.fenixedu.academic.domain.util.EmailAddressList as EmailAddressList {
-    externalizeWith {
-        String toString();
-    }
-}
-
-
 valueType org.fenixedu.academic.util.CurricularCourseExecutionScope as CurricularCourseExecutionScope {
     externalizeWith {
         Integer getType();
@@ -3279,15 +3272,6 @@ valueType org.fenixedu.academic.domain.degreeStructure.CycleTypes as CycleTypes 
 
         class transactions.ReimbursementTransaction extends transactions.Transaction {
         }
-
-    class util.Email  {
-        EmailAddressList bccAddresses;
-        EmailAddressList ccAddresses;
-        EmailAddressList replyTos;
-        EmailAddressList toAddresses;
-        EmailAddressList confirmedAddresses;
-        EmailAddressList failedAddresses;
-    }
 
     class messaging.ConversationMessage {
         DateTime creationDate;
@@ -10408,8 +10392,13 @@ relation RootDomainObjectResidenceManagementUnitHack {
 }
 
 relation SystemSenderOptOutGroup {
-    .org.fenixedu.bennu.core.domain.groups.PersistentGroup playsRole optOutPersistentGroup;
-    .org.fenixedu.messaging.domain.MessagingSystem playsRole messagingSystem;
+    .org.fenixedu.bennu.core.domain.groups.PersistentDynamicGroup playsRole optOutPersistentGroup {
+        multiplicity 1..1;
+    }
+    
+    .org.fenixedu.messaging.domain.MessagingSystem playsRole messagingSystem {
+        multiplicity 1..1;
+    }
 }
 
 relation PartialRegimeInstallmentExecutionSemester {
@@ -10819,13 +10808,6 @@ relation PersonCerimonyInquiryPerson {
 relation CerimonyInquiryAnswerCerimonyInquiryPerson {
 	alumni.CerimonyInquiryAnswer playsRole cerimonyInquiryAnswer;
 	alumni.CerimonyInquiryPerson playsRole cerimonyInquiryPerson {
-		multiplicity *;
-	}
-}
-
-relation RootDomainObjectEmailQueue {
-	.org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObjectFromEmailQueue;
-	util.Email playsRole emailQueue {
 		multiplicity *;
 	}
 }

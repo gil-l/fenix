@@ -20,7 +20,6 @@ package org.fenixedu.academic.domain.candidacyProcess.mobility;
 
 import java.text.MessageFormat;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
@@ -274,7 +273,7 @@ public enum MobilityEmailTemplateType {
     }
 
     protected void sendEmail(final String subject, final String body, final String email) {
-        MessagingUtil.sendSystemMessage(subject, body, Collections.singleton(email));
+        MessagingUtil.sendSystemMessage(subject, body, email);
     }
 
     abstract public void sendEmailFor(final MobilityEmailTemplate mobilityEmailTemplate,

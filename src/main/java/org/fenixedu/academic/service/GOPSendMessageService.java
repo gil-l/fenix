@@ -31,6 +31,7 @@ import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.WrittenTest;
 import org.fenixedu.academic.domain.person.RoleType;
+import org.fenixedu.academic.domain.util.MessagingUtil;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
@@ -103,9 +104,7 @@ public class GOPSendMessageService implements NotificationService {
         final String body =
                 BundleUtil.getString(Bundle.APPLICATION, "email.request.room.body", test.getDescription(), coursesString, date,
                         time, degreesString, endTime);
-        for (String email : getGOPEmail(degrees)) {
-            new Message(getGOPSender(), email, subject, body);
-        }
+        MessagingUtil.sendReplyToSenderMessage(getGOPSender(), subject, body, getGOPEmail(degrees));
         test.setRequestRoomSentDate(new DateTime());
     }
 
@@ -142,9 +141,7 @@ public class GOPSendMessageService implements NotificationService {
                 BundleUtil.getString(Bundle.APPLICATION, "email.request.room.body.edit", test.getDescription(), coursesString,
                         degreesString, test.getRequestRoomSentDateString(), oldDate, oldStartTime, oldEndTime, date, startTime,
                         endTime);
-        for (String email : getGOPEmail(degrees)) {
-            new Message(getGOPSender(), email, subject, body);
-        }
+        MessagingUtil.sendReplyToSenderMessage(getGOPSender(), subject, body, getGOPEmail(degrees));
         test.setRequestRoomSentDate(new DateTime());
     }
 
@@ -206,8 +203,7 @@ public class GOPSendMessageService implements NotificationService {
     @Override
     public boolean sendEmail(String emails, String subject, String body) {
         if (!Strings.isNullOrEmpty(emails)) {
-            final Sender sender = getGOPSender();
-            new Message(sender, sender.getReplyTos(), null, subject, body, emails);
+            MessagingUtil.sendReplyToSenderMessage(getGOPSender(), subject, body, emails);
             return true;
         }
         return false;

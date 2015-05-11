@@ -38,8 +38,7 @@ import org.fenixedu.bennu.core.util.CoreConfiguration;
 public class AlumniNotificationService {
 
     private static void sendEmail(final Collection<Group> recipients, final String subject, final String body, final String bccs) {
-        MessagingUtil.sendSystemMessage(subject, body, Collections.singleton(bccs),
-                recipients.toArray(new Group[recipients.size()]));
+        MessagingUtil.sendSystemMessage(subject, body, bccs, recipients.toArray(new Group[recipients.size()]));
     }
 
     private static List<Group> getAlumniRecipients(Alumni alumni) {

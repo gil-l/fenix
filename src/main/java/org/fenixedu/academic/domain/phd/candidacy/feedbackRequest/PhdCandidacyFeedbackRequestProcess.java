@@ -19,7 +19,6 @@
 package org.fenixedu.academic.domain.phd.candidacy.feedbackRequest;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,12 +43,11 @@ import org.fenixedu.academic.domain.phd.access.PhdExternalOperationBean;
 import org.fenixedu.academic.domain.phd.access.PhdProcessAccessType;
 import org.fenixedu.academic.domain.phd.alert.AlertService;
 import org.fenixedu.academic.domain.phd.alert.AlertService.AlertMessage;
+import org.fenixedu.academic.domain.util.MessagingUtil;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.phd.PhdProperties;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
-import org.fenixedu.messaging.domain.MessagingSystem;
-import org.fenixedu.messaging.domain.Sender;
 import org.joda.time.DateTime;
 
 public class PhdCandidacyFeedbackRequestProcess extends PhdCandidacyFeedbackRequestProcess_Base {
@@ -317,7 +315,7 @@ public class PhdCandidacyFeedbackRequestProcess extends PhdCandidacyFeedbackRequ
                     bean.getMailBody() + "\n\n"
                             + getAccessInformation(process.getIndividualProgramProcess(), element.getParticipant()) + "\n\n";
 
-            email(element.getEmail(), bean.getMailSubject(), body);
+            MessagingUtil.sendSystemMessage(bean.getMailSubject(), body, element.getEmail());
         }
 
         private String getAccessInformation(PhdIndividualProgramProcess process, PhdParticipant participant) {
@@ -340,10 +338,6 @@ public class PhdCandidacyFeedbackRequestProcess extends PhdCandidacyFeedbackRequ
             throw new DomainException("error.PhdThesisProcess.unexpected.participant.type");
         }
 
-        private void email(String email, String subject, String body) {
-            final Sender sender = MessagingSystem.systemSender();
-            new Message(sender, sender.getReplyTos(), null, null, null, subject, body, Collections.singleton(email));
-        }
     }
 
     static public class DeleteCandidacyFeedbackRequestElement extends PhdActivity {

@@ -23,10 +23,10 @@ import static org.fenixedu.academic.predicate.AccessControl.check;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.fenixedu.academic.domain.Installation;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Shift;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.domain.util.MessagingUtil;
 import org.fenixedu.academic.predicate.RolePredicates;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.util.Bundle;
@@ -34,13 +34,9 @@ import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
-import org.fenixedu.messaging.domain.MessagingSystem;
-import org.fenixedu.messaging.domain.ReplyTo;
-import org.fenixedu.messaging.domain.Sender;
 
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
-import edu.emory.mathcs.backport.java.util.Collections;
 
 public class ChangeStudentsShift {
 
@@ -88,9 +84,7 @@ public class ChangeStudentsShift {
 
         DynamicGroup recipient =
                 DynamicGroup.get(groupName).mutator().changeGroup(UserGroup.of(Person.convertToUsers(recievers)));
-        Sender sender = MessagingSystem.getInstance().getSystemSender();
-        String gopEmailAddress = Installation.getInstance().getInstituitionalEmailAddress("gop");
-        new Message(sender, ReplyTo.concrete(gopEmailAddress), Collections.singletonList(recipient), subject, message, "");
+        MessagingUtil.sendReplyToGopMessage(subject, message, recipient);
     }
 
     private static String getString(final String key, final String... args) {

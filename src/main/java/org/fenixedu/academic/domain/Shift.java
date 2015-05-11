@@ -38,6 +38,7 @@ import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.domain.util.MessagingUtil;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.predicate.ResourceAllocationRolePredicates;
 import org.fenixedu.academic.util.Bundle;
@@ -516,9 +517,7 @@ public class Shift extends Shift_Base {
         Sender sender = executionCourse.getSender();
         final String subject = BundleUtil.getString(Bundle.APPLICATION, "label.shift.remove.subject");
         final String body = BundleUtil.getString(Bundle.APPLICATION, "label.shift.remove.body", getNome());
-
-        new Message(sender, sender.getReplyTos(), Collections.singletonList(UserGroup.of(registration.getPerson().getUser())),
-                subject, body, "");
+        MessagingUtil.sendReplyToSenderMessage(sender, subject, body, UserGroup.of(registration.getPerson().getUser()));
     }
 
     public boolean hasAnyStudentsInAssociatedStudentGroups() {

@@ -20,7 +20,6 @@ package org.fenixedu.academic.service.services.teacher;
 
 import static org.fenixedu.academic.predicate.AccessControl.check;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,6 +27,7 @@ import org.fenixedu.academic.domain.Attends;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.ProjectSubmission;
+import org.fenixedu.academic.domain.util.MessagingUtil;
 import org.fenixedu.academic.predicate.RolePredicates;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.groups.DynamicGroup;
@@ -56,7 +56,7 @@ public class NotifyStudentGroup {
 
         DynamicGroup recipient =
                 DynamicGroup.get(groupName).mutator().changeGroup(UserGroup.of(Person.convertToUsers(recievers)));
-        new Message(sender, sender.getReplyTos(), Collections.singletonList(recipient), submission.getProject().getName(),
-                submission.getTeacherObservation(), "");
+        MessagingUtil.sendReplyToSenderMessage(sender, submission.getProject().getName(), submission.getTeacherObservation(),
+                recipient);
     }
 }

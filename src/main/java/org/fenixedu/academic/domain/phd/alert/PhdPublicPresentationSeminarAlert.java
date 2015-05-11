@@ -18,7 +18,6 @@
  */
 package org.fenixedu.academic.domain.phd.alert;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
@@ -31,13 +30,13 @@ import org.fenixedu.academic.domain.phd.InternalPhdParticipant;
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
 import org.fenixedu.academic.domain.phd.PhdParticipant;
 import org.fenixedu.academic.domain.phd.alert.AlertService.AlertMessage;
+import org.fenixedu.academic.domain.util.MessagingUtil;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
-import org.fenixedu.messaging.domain.ReplyTo;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
 
@@ -170,8 +169,7 @@ public class PhdPublicPresentationSeminarAlert extends PhdPublicPresentationSemi
             if (guiding.isInternal()) {
                 generateMessage(UserGroup.of(((InternalPhdParticipant) guiding).getPerson().getUser()));
             } else {
-                new Message(getSender(), Collections.<ReplyTo> emptyList(), Collections.<Group> emptyList(), buildMailSubject(),
-                        buildMailBody(), Collections.singleton(guiding.getEmail()));
+                MessagingUtil.sendNoReplyMessage(getSender(), buildMailSubject(), buildMailBody(), guiding.getEmail());
             }
         }
     }
@@ -179,7 +177,7 @@ public class PhdPublicPresentationSeminarAlert extends PhdPublicPresentationSemi
     private void generateMessage(Group group) {
         Set<Person> members = FluentIterable.from(group.getMembers()).transform(User::getPerson).toSet();
         new PhdAlertMessage(getProcess(), members, getFormattedSubject(), getFormattedBody());
-        new Message(getSender(), group, buildMailSubject(), buildMailBody());
+        MessagingUtil.sendReplyToSenderMessage(getSender(), buildMailSubject(), buildMailBody(), group);
     }
 
     @Override

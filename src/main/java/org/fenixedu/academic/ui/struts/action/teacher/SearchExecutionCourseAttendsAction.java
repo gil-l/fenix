@@ -188,8 +188,7 @@ public class SearchExecutionCourseAttendsAction extends ExecutionCourseBaseActio
             sender = executionDegree.getDegree().getSender();
         }
 
-        return EmailsDA.sendEmail(request, sender, DynamicGroup.get(label).mutator().changeGroup(studentsGroup)
-                .toPersistentGroup());
+        return EmailsDA.sendEmail(request, sender, DynamicGroup.get(label).mutator().changeGroup(studentsGroup));
     }
 
     public ActionForward search(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {

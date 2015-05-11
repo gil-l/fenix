@@ -115,8 +115,7 @@ public class SendMailMarkSheetDispatchAction extends MarkSheetDispatchAction {
         Group teachersGroup = TeachersWithMarkSheetsToConfirmGroup.get(bean.getExecutionPeriod(), bean.getDegreeCurricularPlan());
         String message = getResources(request, "ACADEMIC_OFFICE_RESOURCES").getMessage("label.markSheets.to.confirm.send.mail");
         Sender sender = bean.getDegree().getAdministrativeOffice().getUnit().getSender();
-        return EmailsDA.sendEmail(request, sender, DynamicGroup.get(message).mutator().changeGroup(teachersGroup)
-                .toPersistentGroup());
+        return EmailsDA.sendEmail(request, sender, DynamicGroup.get(message).mutator().changeGroup(teachersGroup));
     }
 
     public ActionForward prepareGradesToSubmitSendMail(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
@@ -125,7 +124,6 @@ public class SendMailMarkSheetDispatchAction extends MarkSheetDispatchAction {
         Group teachersGroup = TeachersWithGradesToSubmitGroup.get(bean.getExecutionPeriod(), bean.getDegreeCurricularPlan());
         String message = getResources(request, "ACADEMIC_OFFICE_RESOURCES").getMessage("label.grades.to.submit.send.mail");
         Sender sender = AdministrativeOffice.readDegreeAdministrativeOffice().getUnit().getSender();
-        return EmailsDA.sendEmail(request, sender, DynamicGroup.get(message).mutator().changeGroup(teachersGroup)
-                .toPersistentGroup());
+        return EmailsDA.sendEmail(request, sender, DynamicGroup.get(message).mutator().changeGroup(teachersGroup));
     }
 }

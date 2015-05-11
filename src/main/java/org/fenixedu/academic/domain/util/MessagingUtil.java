@@ -34,11 +34,15 @@ public class MessagingUtil {
         return sendNoReplyMessage(MessagingSystem.getInstance().getSystemSender(), subject, body, bccs);
     }
 
+    public static Message sendSystemMessage(String subject, String body, String bccs) {
+        return sendNoReplyMessage(MessagingSystem.getInstance().getSystemSender(), subject, body, bccs);
+    }
+
     public static Message sendSystemMessage(String subject, String body, Group... bccs) {
         return sendNoReplyMessage(MessagingSystem.getInstance().getSystemSender(), subject, body, bccs);
     }
 
-    public static Message sendSystemMessage(String subject, String body, Set<String> bccs, Group... recipients) {
+    public static Message sendSystemMessage(String subject, String body, String bccs, Group... recipients) {
         return sendNoReplyMessage(MessagingSystem.getInstance().getSystemSender(), subject, body, bccs, recipients);
     }
 
@@ -48,7 +52,7 @@ public class MessagingUtil {
         return builder.send();
     }
 
-    public static Message sendNoReplyMessage(Sender sender, String subject, String body, Set<String> bccs, Group... recipients) {
+    public static Message sendNoReplyMessage(Sender sender, String subject, String body, String bccs, Group... recipients) {
         MessageBuilder builder = new MessageBuilder(sender, subject, body);
         builder.bcc(bccs);
         builder.bcc(recipients);
@@ -58,6 +62,40 @@ public class MessagingUtil {
     public static Message sendNoReplyMessage(Sender sender, String subject, String body, Group... bccs) {
         MessageBuilder builder = new MessageBuilder(sender, subject, body);
         builder.bcc(bccs);
+        return builder.send();
+    }
+
+    public static Message sendNoReplyMessage(Sender sender, String subject, String body, String bccs) {
+        MessageBuilder builder = new MessageBuilder(sender, subject, body);
+        builder.bcc(bccs);
+        return builder.send();
+    }
+
+    public static Message sendReplyToSenderMessage(Sender sender, String subject, String body, Set<String> bccs) {
+        MessageBuilder builder = new MessageBuilder(sender, subject, body);
+        builder.replyTo(sender.getReplyTos());
+        builder.bcc(bccs);
+        return builder.send();
+    }
+
+    public static Message sendReplyToSenderMessage(Sender sender, String subject, String body, String bccs) {
+        MessageBuilder builder = new MessageBuilder(sender, subject, body);
+        builder.replyTo(sender.getReplyTos());
+        builder.bcc(bccs);
+        return builder.send();
+    }
+
+    public static Message sendReplyToSenderMessage(Sender sender, String subject, String body, Group... recipients) {
+        MessageBuilder builder = new MessageBuilder(sender, subject, body);
+        builder.replyTo(sender.getReplyTos());
+        builder.bcc(recipients);
+        return builder.send();
+    }
+
+    public static Message sendReplyToGopMessage(String subject, String message, Group recipient) {
+        MessageBuilder builder = new MessageBuilder(MessagingSystem.getInstance().getSystemSender(), subject, message);
+        builder.bcc(recipient);
+        builder.replyTo(Installation.getInstance().getInstituitionalEmailAddress("gop"));
         return builder.send();
     }
 

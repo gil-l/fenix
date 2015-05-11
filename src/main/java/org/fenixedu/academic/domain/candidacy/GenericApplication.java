@@ -18,7 +18,6 @@
  */
 package org.fenixedu.academic.domain.candidacy;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
 
@@ -80,7 +79,7 @@ public class GenericApplication extends GenericApplication_Base {
                 BundleUtil.getString(Bundle.CANDIDATE, "label.application.email.body", getApplicationNumber(),
                         generateConfirmationLink(), getGenericApplicationPeriod().getTitle().getContent(),
                         Unit.getInstitutionAcronym());
-        MessagingUtil.sendSystemMessage(subject, body, Collections.singleton(getEmail()));
+        MessagingUtil.sendSystemMessage(subject, body, getEmail());
     }
 
     private String generateConfirmationLink() {

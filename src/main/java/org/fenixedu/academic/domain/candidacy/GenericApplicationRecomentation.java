@@ -21,10 +21,10 @@ package org.fenixedu.academic.domain.candidacy;
 import java.util.Random;
 
 import org.fenixedu.academic.FenixEduAcademicConfiguration;
+import org.fenixedu.academic.domain.util.MessagingUtil;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
-import org.fenixedu.messaging.domain.MessagingSystem;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;
@@ -61,8 +61,7 @@ public class GenericApplicationRecomentation extends GenericApplicationRecomenta
                 BundleUtil.getString(Bundle.CANDIDATE, "label.application.recomentation.email.body", getTitle(), getName(),
                         getGenericApplication().getName(), getGenericApplication().getGenericApplicationPeriod().getTitle()
                                 .getContent(), generateConfirmationLink());
-
-        new Message(MessagingSystem.getInstance().getSystemSender(), getEmail(), subject, body);
+        MessagingUtil.sendSystemMessage(subject, body, getEmail());
     }
 
     @Atomic
@@ -74,8 +73,7 @@ public class GenericApplicationRecomentation extends GenericApplicationRecomenta
                 BundleUtil.getString(Bundle.CANDIDATE, "label.application.recomentation.email.delete.body", getTitle(),
                         getName(), getGenericApplication().getName(), getGenericApplication().getGenericApplicationPeriod()
                                 .getTitle().getContent());
-
-        new Message(MessagingSystem.getInstance().getSystemSender(), getEmail(), subject, body);
+        MessagingUtil.sendSystemMessage(subject, body, getEmail());
     }
 
     private String generateConfirmationLink() {

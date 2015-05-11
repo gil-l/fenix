@@ -19,7 +19,6 @@
 package org.fenixedu.academic.domain.phd.alert;
 
 import java.text.MessageFormat;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -144,7 +143,7 @@ public class AlertService {
             } else {
                 guiding.ensureExternalAccess();
                 MessagingUtil.sendSystemMessage(getSubjectPrefixed(process, subjectKey), getBodyText(process, bodyKey),
-                        Collections.singleton(guiding.getEmail()));
+                        guiding.getEmail());
             }
         }
 
@@ -168,7 +167,7 @@ public class AlertService {
             } else {
                 guiding.ensureExternalAccess();
                 MessagingUtil.sendSystemMessage(getSubjectPrefixed(process, subjectMessage), getBodyText(process, bodyMessage),
-                        Collections.singleton(guiding.getEmail()));
+                        guiding.getEmail());
             }
         }
 
@@ -269,8 +268,7 @@ public class AlertService {
                 toNotify.add(((InternalPhdParticipant) participant).getPerson());
             } else {
                 MessagingUtil.sendNoReplyMessage(process.getAdministrativeOffice().getUnit().getSender(),
-                        getSubjectPrefixed(process, subject), getBodyText(process, body),
-                        Collections.singleton(participant.getEmail()));
+                        getSubjectPrefixed(process, subject), getBodyText(process, body), participant.getEmail());
             }
         }
 

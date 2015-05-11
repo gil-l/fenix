@@ -18,9 +18,8 @@
  */
 package org.fenixedu.academic.domain.phd.email;
 
-import java.util.Collections;
-
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.util.MessagingUtil;
 import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.messaging.domain.Sender;
 import org.joda.time.DateTime;
@@ -63,9 +62,8 @@ public abstract class PhdEmail extends PhdEmail_Base {
 
     @Override
     protected void generateMessage() {
-        Sender sender = getSender();
-        new Message(sender, sender.getReplyTos(), Collections.emptyList(), getSubject().getContent(MultiLanguageString.pt),
-                getBody().getContent(MultiLanguageString.pt), getBccs());
+        MessagingUtil.sendReplyToSenderMessage(getSender(), getSubject().getContent(MultiLanguageString.pt), getBody()
+                .getContent(MultiLanguageString.pt), getBccs());
     }
 
     @Override

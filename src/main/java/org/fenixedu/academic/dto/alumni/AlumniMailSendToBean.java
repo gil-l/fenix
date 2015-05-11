@@ -76,6 +76,6 @@ public class AlumniMailSendToBean implements Serializable {
         for (Degree degree : getDegrees()) {
             group = group.or(StudentsConcludedInExecutionYearGroup.get(degree, getEndExecutionYear()));
         }
-        sender.addRecipients(group.toPersistentGroup());
+        sender.addRecipient(group);
     }
 }

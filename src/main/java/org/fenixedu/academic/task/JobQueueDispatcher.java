@@ -31,10 +31,10 @@ import org.fenixedu.academic.domain.QueueJobResult;
 import org.fenixedu.academic.domain.QueueJobResultFile;
 import org.fenixedu.academic.domain.QueueJobWithFile;
 import org.fenixedu.academic.domain.person.RoleType;
+import org.fenixedu.academic.domain.util.MessagingUtil;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;
-import org.fenixedu.messaging.domain.MessagingSystem;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;
@@ -101,8 +101,7 @@ public class JobQueueDispatcher extends CronTask {
             emails.add(job.getPerson().getInstitutionalOrDefaultEmailAddressValue());
             String subject = "Pedido de " + job.getDescription() + " concluido";
             String body = "O seu pedido de " + job.getDescription() + " já se encontra disponível no sistema Fénix.";
-            new Message(MessagingSystem.getInstance().getSystemSender(), job.getPerson().getEmailForSendingEmails(), subject,
-                    body);
+            MessagingUtil.sendSystemMessage(subject, body, job.getPerson().getEmailForSendingEmails());
         }
     }
 
@@ -119,8 +118,7 @@ public class JobQueueDispatcher extends CronTask {
                     "Viva\n\n" + "O trabalho com o externalId de " + job.getExternalId() + " falhou mais de 3 vezes.\n\n"
                             + "Request Time : " + job.getRequestDate() + "\n" + "Start Time : " + job.getJobStartTime() + "\n"
                             + "User : " + getQueueJobResponsibleName(job) + "\n" + "\n\n Error Stack Trace:\n" + sw.toString();
-            new Message(MessagingSystem.getInstance().getSystemSender(), MessagingSystem.getInstance().getSystemSender()
-                    .getRoleRecipient(RoleType.MANAGER), subject, body);
+            MessagingUtil.sendSystemMessage(subject, body, RoleType.MANAGER.actualGroup());
         }
     }
 }

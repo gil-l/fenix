@@ -21,12 +21,10 @@ package org.fenixedu.academic.domain;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import org.fenixedu.academic.domain.util.MessagingUtil;
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.messaging.domain.MessagingSystem;
-import org.fenixedu.messaging.domain.Sender;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;
@@ -41,8 +39,7 @@ abstract public class PublicCandidacyHashCode extends PublicCandidacyHashCode_Ba
 
     @Atomic
     public void sendEmail(final String fromSubject, final String body) {
-        Sender systemSender = MessagingSystem.systemSender();
-        new Message(systemSender, systemSender.getReplyTos(), Collections.EMPTY_LIST, fromSubject, body, getEmail());
+        MessagingUtil.sendSystemMessage(fromSubject, body, getEmail());
     }
 
     public boolean isFromDegreeOffice() {

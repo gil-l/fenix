@@ -22,7 +22,6 @@ import java.io.Serializable;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.commons.StringNormalizer;
 import org.fenixedu.messaging.domain.Sender;
 
@@ -52,7 +51,7 @@ public class SearchSendersBean implements Serializable {
     public Set<Sender> getResult() {
         final Set<Sender> result = new TreeSet<Sender>(Sender.COMPARATOR_BY_FROM_NAME);
         if (searchString != null && !searchString.trim().isEmpty()) {
-            for (final Sender sender : Bennu.getInstance().getUtilEmailSendersSet()) {
+            for (final Sender sender : Sender.getAvailableSenders()) {
                 if (match(sender.getFromName())) {
                     result.add(sender);
                 }

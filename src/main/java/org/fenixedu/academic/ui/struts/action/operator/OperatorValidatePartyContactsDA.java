@@ -20,7 +20,6 @@ package org.fenixedu.academic.ui.struts.action.operator;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -108,7 +107,7 @@ public class OperatorValidatePartyContactsDA extends FenixDispatchAction {
         }
         final String sendingEmail = person.getEmailForSendingEmails();
         if (!StringUtils.isEmpty(sendingEmail)) {
-            MessagingUtil.sendSystemMessage(subject, body, Collections.singleton(sendingEmail));
+            MessagingUtil.sendSystemMessage(subject, body, sendingEmail);
         }
     }
 

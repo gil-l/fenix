@@ -18,15 +18,12 @@
  */
 package org.fenixedu.academic.domain.phd.individualProcess.activities;
 
-import java.util.Collections;
-
 import org.fenixedu.academic.domain.caseHandling.Activity;
 import org.fenixedu.academic.domain.caseHandling.PreConditionNotValidException;
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
 import org.fenixedu.academic.domain.phd.log.PhdLog;
+import org.fenixedu.academic.domain.util.MessagingUtil;
 import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.messaging.domain.MessagingSystem;
-import org.fenixedu.messaging.domain.Sender;
 
 public abstract class PhdIndividualProgramProcessActivity extends Activity<PhdIndividualProgramProcess> {
 
@@ -43,8 +40,7 @@ public abstract class PhdIndividualProgramProcessActivity extends Activity<PhdIn
     }
 
     protected void email(String email, String subject, String body) {
-        final Sender sender = MessagingSystem.systemSender();
-        new Message(sender, sender.getReplyTos(), null, null, null, subject, body, Collections.singleton(email));
+        MessagingUtil.sendSystemMessage(subject, body, email);
     }
 
     abstract protected void activityPreConditions(final PhdIndividualProgramProcess process, final User userView);

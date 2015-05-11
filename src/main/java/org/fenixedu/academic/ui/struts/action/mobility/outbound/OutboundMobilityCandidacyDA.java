@@ -451,8 +451,7 @@ public class OutboundMobilityCandidacyDA extends FenixDispatchAction {
         final Group group = UnionGroup.of(getCandidateGroups(mobilityGroup, period));
 
         final EmailBean bean = new EmailBean();
-        bean.setRecipients(Collections.singletonList(DynamicGroup.get(toGroupName).mutator().changeGroup(group)
-                .toPersistentGroup()));
+        bean.setRecipients(Collections.singletonList(DynamicGroup.get(toGroupName).mutator().changeGroup(group)));
 
         final Person person = AccessControl.getPerson();
         if (person != null) {
