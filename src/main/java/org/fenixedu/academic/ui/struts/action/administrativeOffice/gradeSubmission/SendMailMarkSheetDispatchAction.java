@@ -39,7 +39,6 @@ import org.fenixedu.academic.dto.degreeAdministrativeOffice.gradeSubmission.Grad
 import org.fenixedu.academic.dto.degreeAdministrativeOffice.gradeSubmission.MarkSheetSendMailBean;
 import org.fenixedu.academic.dto.degreeAdministrativeOffice.gradeSubmission.MarkSheetToConfirmSendMailBean;
 import org.fenixedu.academic.ui.struts.action.messaging.EmailsDA;
-import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
@@ -113,17 +112,15 @@ public class SendMailMarkSheetDispatchAction extends MarkSheetDispatchAction {
             HttpServletRequest request, HttpServletResponse response) {
         MarkSheetSendMailBean bean = (MarkSheetSendMailBean) RenderUtils.getViewState("sendMailBean").getMetaObject().getObject();
         Group teachersGroup = TeachersWithMarkSheetsToConfirmGroup.get(bean.getExecutionPeriod(), bean.getDegreeCurricularPlan());
-        String message = getResources(request, "ACADEMIC_OFFICE_RESOURCES").getMessage("label.markSheets.to.confirm.send.mail");
         Sender sender = bean.getDegree().getAdministrativeOffice().getUnit().getSender();
-        return EmailsDA.sendEmail(request, sender, DynamicGroup.get(message).mutator().changeGroup(teachersGroup));
+        return EmailsDA.sendEmail(request, sender, teachersGroup);
     }
 
     public ActionForward prepareGradesToSubmitSendMail(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
             HttpServletResponse response) {
         MarkSheetSendMailBean bean = (MarkSheetSendMailBean) RenderUtils.getViewState("sendMailBean").getMetaObject().getObject();
         Group teachersGroup = TeachersWithGradesToSubmitGroup.get(bean.getExecutionPeriod(), bean.getDegreeCurricularPlan());
-        String message = getResources(request, "ACADEMIC_OFFICE_RESOURCES").getMessage("label.grades.to.submit.send.mail");
         Sender sender = AdministrativeOffice.readDegreeAdministrativeOffice().getUnit().getSender();
-        return EmailsDA.sendEmail(request, sender, DynamicGroup.get(message).mutator().changeGroup(teachersGroup));
+        return EmailsDA.sendEmail(request, sender, teachersGroup);
     }
 }

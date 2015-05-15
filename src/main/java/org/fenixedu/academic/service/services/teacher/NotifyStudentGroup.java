@@ -30,7 +30,7 @@ import org.fenixedu.academic.domain.ProjectSubmission;
 import org.fenixedu.academic.domain.util.MessagingUtil;
 import org.fenixedu.academic.predicate.RolePredicates;
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.bennu.core.groups.DynamicGroup;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.messaging.domain.Sender;
@@ -54,8 +54,8 @@ public class NotifyStudentGroup {
                         .toString() });
         Sender sender = course.getSender();
 
-        DynamicGroup recipient =
-                DynamicGroup.get(groupName).mutator().changeGroup(UserGroup.of(Person.convertToUsers(recievers)));
+        Group recipient = UserGroup.of(Person.convertToUsers(recievers));
+        recipient.setCustomName(groupName); //FIXME
         MessagingUtil.sendReplyToSenderMessage(sender, submission.getProject().getName(), submission.getTeacherObservation(),
                 recipient);
     }

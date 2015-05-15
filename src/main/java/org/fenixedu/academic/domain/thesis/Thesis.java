@@ -68,7 +68,7 @@ import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.EvaluationType;
 import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.bennu.core.groups.DynamicGroup;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.signals.DomainObjectEvent;
@@ -657,9 +657,10 @@ public class Thesis extends Thesis_Base {
         Set<Person> orientationPersons = getOrientationPersons();
         persons.addAll(orientationPersons);
 
-        DynamicGroup recipient =
-                DynamicGroup.get("Membros da tese " + getTitle().toString()).mutator()
-                        .changeGroup(UserGroup.of(Person.convertToUsers(persons)));
+        String customName = "Membros da tese " + getTitle().toString();
+
+        Group recipient = UserGroup.of(Person.convertToUsers(persons));
+        recipient.setCustomName(customName); //FIXME
         final String studentNumber = getStudent().getNumber().toString();
         final String title = getFinalFullTitle().getContent();
         final String subject = getMessage("message.thesis.reject.submission.email.subject", studentNumber);

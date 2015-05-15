@@ -36,6 +36,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.accessControl.CerimonyInquiryGroup;
 import org.fenixedu.academic.domain.alumni.CerimonyInquiry;
 import org.fenixedu.academic.domain.alumni.CerimonyInquiryAnswer;
 import org.fenixedu.academic.domain.alumni.CerimonyInquiryPerson;
@@ -200,7 +201,7 @@ public class AlumniCerimonyDA extends FenixDispatchAction {
             HttpServletResponse response) throws Exception {
         final CerimonyInquiry cerimonyInquiry = getDomainObject(request, "cerimonyInquiryId");
         final Sender sender = getPublicRelationsSender();
-        final Group recipient = cerimonyInquiry.createRecipient();
+        final Group recipient = CerimonyInquiryGroup.get(cerimonyInquiry);
         return EmailsDA.sendEmail(request, sender, recipient);
     }
 

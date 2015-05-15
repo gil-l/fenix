@@ -71,7 +71,6 @@ import org.fenixedu.academic.util.DateFormatUtil;
 import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.academic.util.ProposalState;
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.StringNormalizer;
 import org.fenixedu.commons.i18n.I18N;
@@ -223,33 +222,15 @@ public class ExecutionCourse extends ExecutionCourse_Base {
     public Sender getSender() {
         Sender s = super.getSender();
         if (s == null) {
-
-            String fromName;
-            String courseName = getName();
-            fromName = String.format("%s: %s", getDegreePresentationString(), courseName);
+            String fromName = String.format("%s: %s", getDegreePresentationString(), getName());
             if (getExecutionPeriod() != null && getExecutionPeriod().getQualifiedName() != null) {
                 fromName += ", " + getExecutionPeriod().getQualifiedName().replace('/', '-');
             }
             s = MessagingUtil.createInstitutionalSender(fromName, TeacherGroup.get(this));
             s.addReplyTo(this.getEmail());
-
-            final String labelECTeachers =
-                    BundleUtil.getString(Bundle.SITE,
-                            "label.org.fenixedu.academic.domain.accessControl.ExecutionCourseTeachersGroupWithName",
-                            new String[] { courseName });
-            final String labelECStudents =
-                    BundleUtil.getString(Bundle.SITE,
-                            "label.org.fenixedu.academic.domain.accessControl.ExecutionCourseStudentsGroupWithName",
-                            new String[] { courseName });
-            final String labelECResponsibleTeachers =
-                    BundleUtil.getString(Bundle.SITE,
-                            "label.org.fenixedu.academic.domain.accessControl.ExecutionCourseResponsibleTeachersGroupWithName",
-                            new String[] { courseName });
-            // fixed recipients
-            s.addRecipient(DynamicGroup.get(labelECTeachers).mutator().changeGroup(TeacherGroup.get(this)));
-            s.addRecipient(DynamicGroup.get(labelECStudents).mutator().changeGroup(StudentGroup.get(this)));
-            s.addRecipient(DynamicGroup.get(labelECResponsibleTeachers).mutator()
-                    .changeGroup(TeacherResponsibleOfExecutionCourseGroup.get(this)));
+            s.addRecipient(TeacherGroup.get(this));
+            s.addRecipient(StudentGroup.get(this));
+            s.addRecipient(TeacherResponsibleOfExecutionCourseGroup.get(this));
             setSender(s);
         }
         return s;

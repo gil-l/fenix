@@ -31,7 +31,7 @@ import org.fenixedu.academic.predicate.RolePredicates;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.groups.DynamicGroup;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 
@@ -82,8 +82,8 @@ public class ChangeStudentsShift {
 
         final String message = messagePrefix + messagePosfix;
 
-        DynamicGroup recipient =
-                DynamicGroup.get(groupName).mutator().changeGroup(UserGroup.of(Person.convertToUsers(recievers)));
+        Group recipient = UserGroup.of(Person.convertToUsers(recievers));
+        recipient.setCustomName(groupName); //FIXME
         MessagingUtil.sendReplyToGopMessage(subject, message, recipient);
     }
 

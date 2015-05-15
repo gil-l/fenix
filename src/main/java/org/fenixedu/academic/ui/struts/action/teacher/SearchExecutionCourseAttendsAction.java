@@ -46,7 +46,6 @@ import org.fenixedu.academic.ui.struts.action.messaging.EmailsDA;
 import org.fenixedu.academic.ui.struts.action.teacher.executionCourse.ExecutionCourseBaseAction;
 import org.fenixedu.academic.util.CollectionPager;
 import org.fenixedu.academic.util.WorkingStudentSelectionType;
-import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.messaging.domain.Sender;
@@ -187,8 +186,8 @@ public class SearchExecutionCourseAttendsAction extends ExecutionCourseBaseActio
             ExecutionDegree executionDegree = FenixFramework.getDomainObject(executionDegreeId);
             sender = executionDegree.getDegree().getSender();
         }
-
-        return EmailsDA.sendEmail(request, sender, DynamicGroup.get(label).mutator().changeGroup(studentsGroup));
+        studentsGroup.setCustomName(label); //FIXME
+        return EmailsDA.sendEmail(request, sender, studentsGroup);
     }
 
     public ActionForward search(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {

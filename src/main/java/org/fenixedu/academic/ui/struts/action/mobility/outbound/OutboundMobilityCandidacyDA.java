@@ -45,7 +45,6 @@ import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.ui.struts.action.academicAdministration.AcademicAdministrationApplication.AcademicAdminCandidaciesApp;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.UnionGroup;
 import org.fenixedu.bennu.core.groups.UserGroup;
@@ -451,7 +450,8 @@ public class OutboundMobilityCandidacyDA extends FenixDispatchAction {
         final Group group = UnionGroup.of(getCandidateGroups(mobilityGroup, period));
 
         final EmailBean bean = new EmailBean();
-        bean.setRecipients(Collections.singletonList(DynamicGroup.get(toGroupName).mutator().changeGroup(group)));
+        group.setCustomName(toGroupName); //FIXME
+        bean.setRecipients(Collections.singletonList(group));
 
         final Person person = AccessControl.getPerson();
         if (person != null) {
