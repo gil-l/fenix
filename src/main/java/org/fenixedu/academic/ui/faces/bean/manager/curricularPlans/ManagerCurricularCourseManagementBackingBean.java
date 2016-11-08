@@ -31,14 +31,8 @@ import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.GradeScale;
-import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.dto.commons.CurricularCourseByExecutionSemesterBean;
-import org.fenixedu.academic.predicate.IllegalDataAccessException;
-import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
-import org.fenixedu.academic.service.services.manager.CreateOldCurricularCourse;
-import org.fenixedu.academic.service.services.manager.EditOldCurricularCourse;
 import org.fenixedu.academic.ui.faces.bean.bolonhaManager.curricularPlans.CurricularCourseManagementBackingBean;
-import org.fenixedu.academic.ui.struts.action.exceptions.FenixActionException;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 
@@ -74,9 +68,8 @@ public class ManagerCurricularCourseManagementBackingBean extends CurricularCour
 
     public ManagerCurricularCourseManagementBackingBean() {
         if (getCurricularCourse() != null && getExecutionYear() != null) {
-            curricularCourseSemesterBean =
-                    new CurricularCourseByExecutionSemesterBean(getCurricularCourse(),
-                            ExecutionSemester.readBySemesterAndExecutionYear(2, getExecutionYear().getYear()));
+            curricularCourseSemesterBean = new CurricularCourseByExecutionSemesterBean(getCurricularCourse(),
+                    ExecutionSemester.readBySemesterAndExecutionYear(2, getExecutionYear().getYear()));
         }
     }
 
@@ -215,51 +208,6 @@ public class ManagerCurricularCourseManagementBackingBean extends CurricularCour
         this.minimumValueForAcumulatedEnrollments = minimumValueForAcumulatedEnrollments;
     }
 
-    @Deprecated
-    public String createOldCurricularCourse() {
-        try {
-            checkCourseGroup();
-            checkCurricularSemesterAndYear();
-
-            CreateOldCurricularCourse.run(getDegreeCurricularPlanID(), getCourseGroupID(), getName(), getNameEn(), getCode(),
-                    getAcronym(), getMinimumValueForAcumulatedEnrollments(), getMaximumValueForAcumulatedEnrollments(),
-                    getWeight(), getEnrollmentWeigth(), getCredits(), getEctsCredits(), getCurricularYearID(),
-                    getCurricularSemesterID(), getBeginExecutionPeriodID(), getEndExecutionPeriodID(), getGradeScale());
-        } catch (FenixActionException e) {
-            this.addErrorMessage(BundleUtil.getString(Bundle.BOLONHA, e.getMessage()));
-            return "";
-        } catch (IllegalDataAccessException e) {
-            this.addErrorMessage(BundleUtil.getString(Bundle.BOLONHA, "error.notAuthorized"));
-            return "buildCurricularPlan";
-        } catch (FenixServiceException e) {
-            this.addErrorMessage(BundleUtil.getString(Bundle.BOLONHA, e.getMessage()));
-            return "";
-        } catch (DomainException e) {
-            this.addErrorMessage(BundleUtil.getString(Bundle.DOMAIN_EXCEPTION, e.getMessage()));
-            return "";
-        } catch (Exception e) {
-            this.addErrorMessage(BundleUtil.getString(Bundle.BOLONHA, "general.error"));
-            return "buildCurricularPlan";
-        }
-        addInfoMessage(BundleUtil.getString(Bundle.BOLONHA, "curricularCourseCreated"));
-        return "buildCurricularPlan";
-    }
-
-    @Deprecated
-    public String editOldCurricularCourse() {
-        try {
-            EditOldCurricularCourse.run(getCurricularCourseID(), getName(), getNameEn(), getCode(), getAcronym(),
-                    getMinimumValueForAcumulatedEnrollments(), getMaximumValueForAcumulatedEnrollments(), getWeight(),
-                    getEnrollmentWeigth(), getCredits(), getEctsCredits(), getTheoreticalHours(), getLabHours(),
-                    getPraticalHours(), getTheoPratHours(), getGradeScale());
-            setContextID(null); // resetContextID
-        } catch (FenixServiceException e) {
-            addErrorMessage(BundleUtil.getString(Bundle.BOLONHA, e.getMessage()));
-        }
-        addInfoMessage(BundleUtil.getString(Bundle.BOLONHA, "curricularCourseEdited"));
-        return "";
-    }
-
     @Override
     protected List<SelectItem> readExecutionYearItems() {
         final List<SelectItem> result = new ArrayList<SelectItem>();
@@ -288,8 +236,8 @@ public class ManagerCurricularCourseManagementBackingBean extends CurricularCour
             }
         } else {
             for (final ExecutionDegree executionDegree : executionDegrees) {
-                result.add(new SelectItem(executionDegree.getExecutionYear().getExternalId(), executionDegree.getExecutionYear()
-                        .getYear()));
+                result.add(new SelectItem(executionDegree.getExecutionYear().getExternalId(),
+                        executionDegree.getExecutionYear().getYear()));
             }
             if (getExecutionYearID() == null) {
                 setExecutionYearID(getDegreeCurricularPlan().getMostRecentExecutionDegree().getExecutionYear().getExternalId());
@@ -345,11 +293,11 @@ public class ManagerCurricularCourseManagementBackingBean extends CurricularCour
     }
 
     private GradeScale getGradeScale() {
-        if (this.gradeScale == null && this.getGradeScaleString() != null
-                && !this.NO_SELECTION_STRING.equals(this.getGradeScaleString())) {
+        if (this.gradeScale == null && this.getGradeScaleString() != null && !this.NO_SELECTION_STRING
+                .equals(this.getGradeScaleString())) {
             this.gradeScale = GradeScale.valueOf(getGradeScaleString());
-        } else if (this.gradeScale == null && this.getGradeScaleString() != null
-                && this.NO_SELECTION_STRING.equals(this.getGradeScaleString())) {
+        } else if (this.gradeScale == null && this.getGradeScaleString() != null && this.NO_SELECTION_STRING
+                .equals(this.getGradeScaleString())) {
             this.gradeScale = null;
         }
         return this.gradeScale;

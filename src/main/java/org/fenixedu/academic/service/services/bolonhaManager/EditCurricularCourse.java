@@ -37,6 +37,10 @@ public class EditCurricularCourse {
         curricularCourse.edit(weight, prerequisites, prerequisitesEn, CurricularStage.DRAFT, competenceCourse);
     }
 
+    /**
+     * @deprecated This will edit fields that are no longer used on regular curricular course
+     */
+    @Deprecated
     @Atomic
     public static void run(CurricularCourse curricularCourse, String name, String nameEn) throws FenixServiceException {
         curricularCourse.edit(name, nameEn, CurricularStage.DRAFT);
@@ -44,6 +48,6 @@ public class EditCurricularCourse {
 
     @Atomic
     public static void run(OptionalCurricularCourse curricularCourse, String name, String nameEn) throws FenixServiceException {
-        run((CurricularCourse) curricularCourse, name, nameEn);
+        curricularCourse.edit(name, nameEn, CurricularStage.DRAFT);
     }
 }

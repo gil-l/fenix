@@ -18,6 +18,7 @@
  */
 package org.fenixedu.academic.domain;
 
+import static org.fenixedu.academic.domain.degreeStructure.CompetenceCourseInformation.COMPARATORY_BY_EXECUTION_PERIOD;
 import static org.fenixedu.academic.predicate.AccessControl.check;
 
 import java.text.Collator;
@@ -30,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -62,20 +64,15 @@ import org.joda.time.YearMonthDay;
 
 public class CompetenceCourse extends CompetenceCourse_Base {
 
-    public static final Comparator<CompetenceCourse> COMPETENCE_COURSE_COMPARATOR_BY_NAME = new Comparator<CompetenceCourse>() {
-
-        @Override
-        public int compare(CompetenceCourse o1, CompetenceCourse o2) {
-            return Collator.getInstance().compare(o1.getName(), o2.getName());
-        }
-
-    };
+    public static final Comparator<CompetenceCourse> COMPETENCE_COURSE_COMPARATOR_BY_NAME =
+            (o1, o2) -> Collator.getInstance().compare(o1.getName(), o2.getName());
 
     protected CompetenceCourse() {
         super();
         setRootDomainObject(Bennu.getInstance());
     }
 
+    @Deprecated
     public CompetenceCourse(String code, String name, Collection<Department> departments) {
         this();
         super.setCurricularStage(CurricularStage.OLD);
@@ -101,7 +98,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
         // unique acronym creation
         try {
             final UniqueAcronymCreator<CompetenceCourse> uniqueAcronymCreator =
-                    new UniqueAcronymCreator<CompetenceCourse>(CompetenceCourse::getName, CompetenceCourse::getAcronym,
+                    new UniqueAcronymCreator<>(CompetenceCourse::getName, CompetenceCourse::getAcronym,
                             (Set<CompetenceCourse>) CompetenceCourse.readBolonhaCompetenceCourses());
             competenceCourseInformation.setAcronym(uniqueAcronymCreator.create(this).getLeft());
         } catch (Exception e) {
@@ -113,8 +110,8 @@ public class CompetenceCourse extends CompetenceCourse_Base {
             CompetenceCourseLevel competenceCourseLevel, CompetenceCourseType type, CurricularStage curricularStage,
             CompetenceCourseGroupUnit unit) {
 
-        this(name, nameEn, basic, regimeType, competenceCourseLevel, type, curricularStage, unit, ExecutionSemester
-                .readActualExecutionSemester());
+        this(name, nameEn, basic, regimeType, competenceCourseLevel, type, curricularStage, unit,
+                ExecutionSemester.readActualExecutionSemester());
     }
 
     public boolean isBolonha() {
@@ -155,14 +152,14 @@ public class CompetenceCourse extends CompetenceCourse_Base {
         return getSecondaryBibliographicReferences(null);
     }
 
-    public List<BibliographicReferences.BibliographicReference> getSecondaryBibliographicReferences(final ExecutionSemester period) {
+    public List<BibliographicReferences.BibliographicReference> getSecondaryBibliographicReferences(
+            final ExecutionSemester period) {
         return this.getBibliographicReferences(period).getSecondaryBibliographicReferences();
     }
 
     public List<BibliographicReferences.BibliographicReference> getAllBibliographicReferences(
             final ExecutionSemester executionSemester) {
-        final List<BibliographicReferences.BibliographicReference> result =
-                new ArrayList<BibliographicReferences.BibliographicReference>();
+        final List<BibliographicReferences.BibliographicReference> result = new ArrayList<>();
         result.addAll(getMainBibliographicReferences(executionSemester));
         result.addAll(getSecondaryBibliographicReferences(executionSemester));
         return result;
@@ -175,11 +172,11 @@ public class CompetenceCourse extends CompetenceCourse_Base {
         info.setBibliographicReferences(info.getBibliographicReferences().with(year, title, authors, reference, url, type));
     }
 
-    public void editBibliographicReference(Integer index, String year, String title, String authors, String reference,
-            String url, BibliographicReferenceType type) {
+    public void editBibliographicReference(Integer index, String year, String title, String authors, String reference, String url,
+            BibliographicReferenceType type) {
         CompetenceCourseInformation info = getMostRecentCompetenceCourseInformation();
-        info.setBibliographicReferences(info.getBibliographicReferences().replacing(index, year, title, authors, reference, url,
-                type));
+        info.setBibliographicReferences(
+                info.getBibliographicReferences().replacing(index, year, title, authors, reference, url, type));
     }
 
     public void deleteBibliographicReference(Integer index) {
@@ -192,6 +189,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
         info.setBibliographicReferences(info.getBibliographicReferences().movingBibliographicReference(oldPosition, newPosition));
     }
 
+    //FIXME get rid of this? these fields are present in info
     private void fillFields(String code, String name) {
         if (code == null || code.length() == 0) {
             throw new DomainException("invalid.competenceCourse.values");
@@ -203,18 +201,13 @@ public class CompetenceCourse extends CompetenceCourse_Base {
         super.setName(name);
     }
 
+    //FIXME edit function is public but unused, no problem removing it? name and code are present in info so should not be
+    // changed here.
     public void edit(String code, String name, Collection<Department> departments) {
         fillFields(code, name);
-        for (final Department department : this.getDepartmentsSet()) {
-            if (!departments.contains(department)) {
-                super.removeDepartments(department);
-            }
-        }
-        for (final Department department : departments) {
-            if (!getDepartmentsSet().contains(department)) {
-                super.addDepartments(department);
-            }
-        }
+        Set<Department> currentDepartments = getDepartmentsSet();
+        currentDepartments.stream().filter(department -> !departments.contains(department)).forEach(super::removeDepartments);
+        departments.stream().filter(department -> !currentDepartments.contains(department)).forEach(super::addDepartments);
     }
 
     public void edit(String name, String nameEn, Boolean basic, CompetenceCourseLevel competenceCourseLevel,
@@ -225,10 +218,10 @@ public class CompetenceCourse extends CompetenceCourse_Base {
         getMostRecentCompetenceCourseInformation().edit(name.trim(), nameEn.trim(), basic, competenceCourseLevel);
 
         // unique acronym creation
-        String acronym = null;
+        String acronym;
         try {
             final UniqueAcronymCreator<CompetenceCourse> uniqueAcronymCreator =
-                    new UniqueAcronymCreator<CompetenceCourse>(CompetenceCourse::getName, CompetenceCourse::getAcronym,
+                    new UniqueAcronymCreator<>(CompetenceCourse::getName, CompetenceCourse::getAcronym,
                             (Set<CompetenceCourse>) CompetenceCourse.readBolonhaCompetenceCourses());
             acronym = uniqueAcronymCreator.create(this).getLeft();
         } catch (Exception e) {
@@ -238,12 +231,14 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     public void editAcronym(String acronym) {
-        Set<CompetenceCourse> bolonhaCompetenceCourses = (Set<CompetenceCourse>) CompetenceCourse.readBolonhaCompetenceCourses();
-        for (final CompetenceCourse competenceCourse : bolonhaCompetenceCourses) {
-            if (!competenceCourse.equals(this) && competenceCourse.getAcronym().equalsIgnoreCase(acronym.trim())) {
-                throw new DomainException("competenceCourse.existing.acronym", competenceCourse.getName(), competenceCourse
-                        .getDepartmentUnit().getDepartment().getRealName());
-            }
+        Optional<CompetenceCourse> conflict = CompetenceCourse.readBolonhaCompetenceCourses().stream()
+                .filter(competence -> !competence.equals(this) && competence.getAcronym().equalsIgnoreCase(acronym.trim()))
+                .findAny();
+
+        if (conflict.isPresent()) {
+            CompetenceCourse conflicting = conflict.get();
+            throw new DomainException("competenceCourse.existing.acronym", conflicting.getName(),
+                    conflicting.getDepartmentUnit().getDepartment().getRealName());
         }
 
         getMostRecentCompetenceCourseInformation().setAcronym(acronym);
@@ -264,8 +259,8 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     public void edit(String objectives, String program, String evaluationMethod, String objectivesEn, String programEn,
             String evaluationMethodEn) {
-        getMostRecentCompetenceCourseInformation().edit(objectives, program, evaluationMethod, objectivesEn, programEn,
-                evaluationMethodEn);
+        getMostRecentCompetenceCourseInformation()
+                .edit(objectives, program, evaluationMethod, objectivesEn, programEn, evaluationMethodEn);
     }
 
     public void delete() {
@@ -275,53 +270,37 @@ public class CompetenceCourse extends CompetenceCourse_Base {
             throw new DomainException("competenceCourse.approved");
         }
         getDepartmentsSet().clear();
-        for (; !getCompetenceCourseInformationsSet().isEmpty(); getCompetenceCourseInformationsSet().iterator().next().delete()) {
-            ;
-        }
+        getCompetenceCourseInformationsSet().forEach(CompetenceCourseInformation::delete);
         setRootDomainObject(null);
         super.deleteDomainObject();
     }
 
     public void addCurricularCourses(Collection<CurricularCourse> curricularCourses) {
-        for (CurricularCourse curricularCourse : curricularCourses) {
-            addAssociatedCurricularCourses(curricularCourse);
-        }
+        curricularCourses.forEach(this::addAssociatedCurricularCourses);
     }
 
     public void addDepartments(Collection<Department> departments) {
-        for (Department department : departments) {
-            super.addDepartments(department);
-        }
+        departments.forEach(this::addDepartments);
     }
 
     private TreeSet<CompetenceCourseInformation> getOrderedCompetenceCourseInformations() {
         TreeSet<CompetenceCourseInformation> informations =
-                new TreeSet<CompetenceCourseInformation>(CompetenceCourseInformation.COMPARATORY_BY_EXECUTION_PERIOD);
+                new TreeSet<>(COMPARATORY_BY_EXECUTION_PERIOD);
         informations.addAll(getCompetenceCourseInformationsSet());
         return informations;
     }
 
     private CompetenceCourseInformation getMostRecentCompetenceCourseInformation() {
-        return getMostRecentCompetenceCourseInformationUntil(ExecutionSemester.readActualExecutionSemester());
+        return getCompetenceCourseInformationsSet().stream().max(COMPARATORY_BY_EXECUTION_PERIOD).orElse(null);
     }
 
     private CompetenceCourseInformation getMostRecentCompetenceCourseInformationUntil(ExecutionSemester semester) {
-        CompetenceCourseInformation mostRecentInformation = getOldestCompetenceCourseInformation();
-        for (CompetenceCourseInformation information : getCompetenceCourseInformationsSet()) {
-            if (information.getExecutionPeriod().isAfter(mostRecentInformation.getExecutionPeriod())
-                    && !information.getExecutionPeriod().isAfter(semester)) {
-                mostRecentInformation = information;
-            }
-        }
-        return mostRecentInformation;
+        return getCompetenceCourseInformationsSet().stream().filter(information -> information
+                .getExecutionPeriod().isBeforeOrEquals(semester)).max(COMPARATORY_BY_EXECUTION_PERIOD).orElse(null);
     }
 
     private CompetenceCourseInformation getOldestCompetenceCourseInformation() {
-        final Set<CompetenceCourseInformation> competenceCourseInformations = getCompetenceCourseInformationsSet();
-        if (competenceCourseInformations.isEmpty()) {
-            return null;
-        }
-        return Collections.min(competenceCourseInformations, CompetenceCourseInformation.COMPARATORY_BY_EXECUTION_PERIOD);
+        return getCompetenceCourseInformationsSet().stream().min(COMPARATORY_BY_EXECUTION_PERIOD).orElse(null);
     }
 
     public boolean isCompetenceCourseInformationDefinedAtExecutionPeriod(final ExecutionSemester executionSemester) {
@@ -374,7 +353,8 @@ public class CompetenceCourse extends CompetenceCourse_Base {
         return getChangeRequestDraft(semester) != null;
     }
 
-    public CompetenceCourseInformation findCompetenceCourseInformationForExecutionPeriod(final ExecutionSemester executionSemester) {
+    public CompetenceCourseInformation findCompetenceCourseInformationForExecutionPeriod(
+            final ExecutionSemester executionSemester) {
         if (executionSemester == null) {
             return getMostRecentCompetenceCourseInformation();
         }
@@ -418,6 +398,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     public String getName(final ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
+        //FIXME as a last effort should I return stored name if information is null for this period?
         if ((super.getName() == null || super.getName().length() == 0) && information != null) {
             return information.getName();
         }
@@ -534,8 +515,8 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     public LocalizedString getLocalizedEvaluationMethod(final ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
-        return information == null ? null : new LocalizedString(Locale.getDefault(), information.getEvaluationMethod()).with(
-                Locale.ENGLISH, information.getEvaluationMethodEn());
+        return information == null ? null : new LocalizedString(Locale.getDefault(), information.getEvaluationMethod())
+                .with(Locale.ENGLISH, information.getEvaluationMethodEn());
     }
 
     public String getEvaluationMethod(final ExecutionSemester period) {
@@ -813,7 +794,8 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     @SuppressWarnings("unchecked")
-    public List<CurricularCourse> getCurricularCoursesWithActiveScopesInExecutionPeriod(final ExecutionSemester executionSemester) {
+    public List<CurricularCourse> getCurricularCoursesWithActiveScopesInExecutionPeriod(
+            final ExecutionSemester executionSemester) {
         return (List<CurricularCourse>) CollectionUtils.select(getAssociatedCurricularCoursesSet(), new Predicate() {
 
             @Override
@@ -861,8 +843,8 @@ public class CompetenceCourse extends CompetenceCourse_Base {
         Collection<CurricularCourse> curricularCourses = this.getAssociatedCurricularCoursesSet();
         for (ExecutionSemester executionSemester : executionSemesters) {
             for (CurricularCourse curricularCourse : curricularCourses) {
-                if (curricularCourse.getActiveDegreeModuleScopesInAcademicInterval(executionSemester.getAcademicInterval())
-                        .size() > 0) {
+                if (curricularCourse.getActiveDegreeModuleScopesInAcademicInterval(executionSemester.getAcademicInterval()).size()
+                        > 0) {
                     return Boolean.TRUE;
                 }
             }
@@ -873,7 +855,8 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     public boolean hasActiveScopesInExecutionPeriod(ExecutionSemester executionSemester) {
         Collection<CurricularCourse> curricularCourses = this.getAssociatedCurricularCoursesSet();
         for (CurricularCourse curricularCourse : curricularCourses) {
-            if (curricularCourse.getActiveDegreeModuleScopesInAcademicInterval(executionSemester.getAcademicInterval()).size() > 0) {
+            if (curricularCourse.getActiveDegreeModuleScopesInAcademicInterval(executionSemester.getAcademicInterval()).size()
+                    > 0) {
                 return true;
             }
         }
@@ -905,14 +888,14 @@ public class CompetenceCourse extends CompetenceCourse_Base {
      * versions of CompetenceCourses (CompetenceCourseInformation). We can see
      * CompetenceCourseGroupUnit like a bag of CompetenceCourses beloging to a
      * Department.
-     * 
+     *
      * The association between a CompetenceCourse and the ExecutionSemester is
      * represented by CompetenceCourseInformation. We can see
      * CompetenceCourseInformation as a version of CompetenceCourse's
      * attributes.
-     * 
+     *
      * ExecutionSemester assumes the role of start period of this version
-     * 
+     *
      * @see CompetenceCourseInformation
      * @see CompetenceCourseGroupUnit
      */
@@ -1310,7 +1293,6 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     /**
      * Find the most recent <b>until</b> given {@link ExecutionInterval}:
      * usefull for getting current info
-     * 
      */
     public CompetenceCourseInformation findInformationMostRecentUntil(final ExecutionInterval input) {
         CompetenceCourseInformation result = null;
@@ -1321,8 +1303,8 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
             result = getOrderedCompetenceCourseInformations().first();
             for (final CompetenceCourseInformation iter : sorted) {
-                if (!iter.getExecutionInterval().isAfter(until)
-                        && iter.getExecutionInterval().isAfter(result.getExecutionInterval())) {
+                if (!iter.getExecutionInterval().isAfter(until) && iter.getExecutionInterval()
+                        .isAfter(result.getExecutionInterval())) {
                     result = iter;
                 }
             }

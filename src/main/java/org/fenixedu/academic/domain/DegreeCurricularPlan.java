@@ -113,7 +113,7 @@ public class DegreeCurricularPlan extends DegreeCurricularPlan_Base {
      * degree type 2. Reverse order of ExecutionDegrees 3. It's degree code (in
      * order to roughly order them by prebolonha/bolonha) OR reverse order of
      * their own name
-     * 
+     *
      * For an example, see the coordinator's portal.
      */
     public static final Comparator<DegreeCurricularPlan> DEGREE_CURRICULAR_PLAN_COMPARATOR_BY_DEGREE_TYPE_AND_EXECUTION_DEGREE_AND_DEGREE_CODE =
@@ -956,7 +956,7 @@ public class DegreeCurricularPlan extends DegreeCurricularPlan_Base {
     /**
      * Method to get a filtered list of a dcp's curricular courses, with at
      * least one open context in the given execution year
-     * 
+     *
      * @return All curricular courses that are present in the dcp
      */
     private Set<CurricularCourse> getCurricularCourses(final ExecutionYear executionYear) {
@@ -973,7 +973,7 @@ public class DegreeCurricularPlan extends DegreeCurricularPlan_Base {
 
     /**
      * Method to get an unfiltered list of a bolonha dcp's competence courses
-     * 
+     *
      * @return All competence courses that were or still are present in the dcp,
      *         ordered by name
      */
@@ -990,7 +990,7 @@ public class DegreeCurricularPlan extends DegreeCurricularPlan_Base {
      * Method to get a filtered list of a dcp's competence courses in the given
      * execution year. Each competence courses is connected with a curricular
      * course with at least one open context in the execution year
-     * 
+     *
      * @return All competence courses that are present in the dcp
      */
     public List<CompetenceCourse> getCompetenceCourses(ExecutionYear executionYear) {
@@ -1052,7 +1052,9 @@ public class DegreeCurricularPlan extends DegreeCurricularPlan_Base {
 
     /**
      * Used to create a CurricularCourse to non box structure
+     * @deprecated curricular courses should no longer be created without a competence
      */
+    @Deprecated
     public CurricularCourse createCurricularCourse(String name, String code, String acronym, Boolean enrolmentAllowed,
             CurricularStage curricularStage) {
         return new CurricularCourse(this, name, code, acronym, enrolmentAllowed, curricularStage);
