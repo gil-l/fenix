@@ -336,7 +336,7 @@ public class CurricularCourse extends CurricularCourse_Base {
     // -------------------------------------------------------------
 
     public boolean hasRestrictionDone(final CurricularCourse precedence) {
-        if (!isBolonhaDegree()) { //FIXME Not removing this one as it does no concern competence course information. right?
+        if (!isBolonhaDegree()) { //FIXME Not removing this one as it does not concern competence course information. right?
             throw new DomainException("CurricularCourse.method.only.appliable.to.bolonha.structure");
         }
 

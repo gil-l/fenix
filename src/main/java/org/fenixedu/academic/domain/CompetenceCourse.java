@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -34,9 +33,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.degreeStructure.BibliographicReferences;
 import org.fenixedu.academic.domain.degreeStructure.BibliographicReferences.BibliographicReference;
@@ -189,7 +188,17 @@ public class CompetenceCourse extends CompetenceCourse_Base {
         info.setBibliographicReferences(info.getBibliographicReferences().movingBibliographicReference(oldPosition, newPosition));
     }
 
-    //FIXME get rid of this? these fields are present in info
+    /**
+     * @deprecated this method does not set code and name in competence course information
+     */
+    @Deprecated
+    public void edit(String code, String name, Collection<Department> departments) {
+        fillFields(code, name);
+        Set<Department> currentDepartments = getDepartmentsSet();
+        currentDepartments.stream().filter(department -> !departments.contains(department)).forEach(super::removeDepartments);
+        departments.stream().filter(department -> !currentDepartments.contains(department)).forEach(super::addDepartments);
+    }
+
     private void fillFields(String code, String name) {
         if (code == null || code.length() == 0) {
             throw new DomainException("invalid.competenceCourse.values");
@@ -199,15 +208,6 @@ public class CompetenceCourse extends CompetenceCourse_Base {
         }
         super.setCode(code);
         super.setName(name);
-    }
-
-    //FIXME edit function is public but unused, no problem removing it? name and code are present in info so should not be
-    // changed here.
-    public void edit(String code, String name, Collection<Department> departments) {
-        fillFields(code, name);
-        Set<Department> currentDepartments = getDepartmentsSet();
-        currentDepartments.stream().filter(department -> !departments.contains(department)).forEach(super::removeDepartments);
-        departments.stream().filter(department -> !currentDepartments.contains(department)).forEach(super::addDepartments);
     }
 
     public void edit(String name, String nameEn, Boolean basic, CompetenceCourseLevel competenceCourseLevel,
@@ -283,11 +283,8 @@ public class CompetenceCourse extends CompetenceCourse_Base {
         departments.forEach(this::addDepartments);
     }
 
-    private TreeSet<CompetenceCourseInformation> getOrderedCompetenceCourseInformations() {
-        TreeSet<CompetenceCourseInformation> informations =
-                new TreeSet<>(COMPARATORY_BY_EXECUTION_PERIOD);
-        informations.addAll(getCompetenceCourseInformationsSet());
-        return informations;
+    private Stream<CompetenceCourseInformation> getOrderedCompetenceCourseInformations() {
+        return getCompetenceCourseInformationsSet().stream().sorted(COMPARATORY_BY_EXECUTION_PERIOD);
     }
 
     private CompetenceCourseInformation getMostRecentCompetenceCourseInformation() {
@@ -295,8 +292,9 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     private CompetenceCourseInformation getMostRecentCompetenceCourseInformationUntil(ExecutionSemester semester) {
-        return getCompetenceCourseInformationsSet().stream().filter(information -> information
-                .getExecutionPeriod().isBeforeOrEquals(semester)).max(COMPARATORY_BY_EXECUTION_PERIOD).orElse(null);
+        return getCompetenceCourseInformationsSet().stream()
+                .filter(information -> information.getExecutionPeriod().isBeforeOrEquals(semester))
+                .max(COMPARATORY_BY_EXECUTION_PERIOD).orElse(null);
     }
 
     private CompetenceCourseInformation getOldestCompetenceCourseInformation() {
@@ -310,43 +308,22 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     public boolean isLoggedPersonAllowedToView() {
         Person person = AccessControl.getPerson();
-        if (isApproved()) {
-            return true;
-        }
-        if (RoleType.SCIENTIFIC_COUNCIL.isMember(person.getUser())) {
-            return true;
-        }
-        if (!RoleType.BOLONHA_MANAGER.isMember(person.getUser())) {
-            return false;
-        }
-        return getDepartmentUnit().getDepartment().isUserMemberOfCompetenceCourseMembersGroup(person);
+        return isApproved() || RoleType.SCIENTIFIC_COUNCIL.isMember(person.getUser()) || (
+                RoleType.BOLONHA_MANAGER.isMember(person.getUser()) && getDepartmentUnit().getDepartment()
+                        .isUserMemberOfCompetenceCourseMembersGroup(person));
     }
 
     public boolean isLoggedPersonAllowedToViewChangeRequests() {
         Person person = AccessControl.getPerson();
-        if (RoleType.SCIENTIFIC_COUNCIL.isMember(person.getUser())) {
-            return true;
-        }
-        if (!RoleType.BOLONHA_MANAGER.isMember(person.getUser())) {
-            return false;
-        }
-        for (CompetenceCourseInformation information : getCompetenceCourseInformationsSet()) {
-            if (information.getDepartmentUnit().getDepartment().isUserMemberOfCompetenceCourseMembersGroup(person)) {
-                return true;
-            }
-        }
-        return false;
+        return RoleType.SCIENTIFIC_COUNCIL.isMember(person.getUser()) || (RoleType.BOLONHA_MANAGER.isMember(person.getUser())
+                && getCompetenceCourseInformationsSet().stream()
+                .anyMatch(info -> info.getDepartmentUnit().getDepartment().isUserMemberOfCompetenceCourseMembersGroup(person)));
     }
 
     public boolean isLoggedPersonAllowedToCreateChangeRequests(ExecutionSemester semester) {
         Person person = AccessControl.getPerson();
-        if (RoleType.SCIENTIFIC_COUNCIL.isMember(person.getUser())) {
-            return true;
-        }
-        if (!RoleType.BOLONHA_MANAGER.isMember(person.getUser())) {
-            return false;
-        }
-        return getDepartmentUnit(semester).getDepartment().isUserMemberOfCompetenceCourseMembersGroup(person);
+        return RoleType.SCIENTIFIC_COUNCIL.isMember(person.getUser()) || (RoleType.BOLONHA_MANAGER.isMember(person.getUser())
+                && getDepartmentUnit(semester).getDepartment().isUserMemberOfCompetenceCourseMembersGroup(person));
     }
 
     public boolean isRequestDraftAvailable(ExecutionSemester semester) {
@@ -359,20 +336,9 @@ public class CompetenceCourse extends CompetenceCourse_Base {
             return getMostRecentCompetenceCourseInformation();
         }
 
-        if (executionSemester.isBefore(getOldestCompetenceCourseInformation().getExecutionPeriod())) {
-            return null;
-        }
-
-        CompetenceCourseInformation minCompetenceCourseInformation = null;
-        for (final CompetenceCourseInformation competenceCourseInformation : getOrderedCompetenceCourseInformations()) {
-            if (competenceCourseInformation.getExecutionPeriod().isAfter(executionSemester)) {
-                return minCompetenceCourseInformation;
-            } else {
-                minCompetenceCourseInformation = competenceCourseInformation;
-            }
-        }
-
-        return minCompetenceCourseInformation;
+        return getCompetenceCourseInformationsSet().stream()
+                .filter(info -> info.getExecutionPeriod().isBeforeOrEquals(executionSemester))
+                .sorted(COMPARATORY_BY_EXECUTION_PERIOD.reversed()).findFirst().orElse(null);
     }
 
     public CompetenceCourseInformation findCompetenceCourseInformationForExecutionYear(final ExecutionYear executionYear) {
@@ -380,29 +346,14 @@ public class CompetenceCourse extends CompetenceCourse_Base {
             return getMostRecentCompetenceCourseInformation();
         }
 
-        if (executionYear.isBefore(getOldestCompetenceCourseInformation().getExecutionYear())) {
-            return null;
-        }
-
-        CompetenceCourseInformation minCompetenceCourseInformation = null;
-        for (final CompetenceCourseInformation competenceCourseInformation : getOrderedCompetenceCourseInformations()) {
-            if (competenceCourseInformation.getExecutionYear().isBeforeOrEquals(executionYear)) {
-                minCompetenceCourseInformation = competenceCourseInformation;
-            } else {
-                return minCompetenceCourseInformation;
-            }
-        }
-
-        return minCompetenceCourseInformation;
+        return getCompetenceCourseInformationsSet().stream()
+                .filter(info -> info.getExecutionYear().isBeforeOrEquals(executionYear))
+                .sorted(COMPARATORY_BY_EXECUTION_PERIOD.reversed()).findFirst().orElse(null);
     }
 
     public String getName(final ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
-        //FIXME as a last effort should I return stored name if information is null for this period?
-        if ((super.getName() == null || super.getName().length() == 0) && information != null) {
-            return information.getName();
-        }
-        return super.getName();
+        return information == null ? super.getName() : information.getName();
     }
 
     @Override
@@ -412,7 +363,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     public String getNameEn(final ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
-        return information != null ? information.getNameEn() : null;
+        return information == null ? null : information.getNameEn();
     }
 
     public String getNameEn() {
@@ -421,7 +372,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     public String getAcronym(final ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
-        return information != null ? information.getAcronym() : null;
+        return information == null ? null : information.getAcronym();
     }
 
     public String getAcronym() {
@@ -434,7 +385,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     public boolean isBasic(final ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
-        return information != null ? information.getBasic() : false;
+        return information == null ? false : information.getBasic();
     }
 
     public boolean isBasic() {
@@ -443,12 +394,12 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     public RegimeType getRegime(final ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
-        return information != null ? information.getRegime() : null;
+        return information == null ? null : information.getRegime();
     }
 
     public RegimeType getRegime(final ExecutionYear executionYear) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionYear(executionYear);
-        return information != null ? information.getRegime() : null;
+        return information == null ? null : information.getRegime();
     }
 
     public RegimeType getRegime() {
@@ -461,7 +412,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     public CompetenceCourseLevel getCompetenceCourseLevel(final ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
-        return information != null ? information.getCompetenceCourseLevel() : null;
+        return information == null ? null : information.getCompetenceCourseLevel();
     }
 
     public CompetenceCourseLevel getCompetenceCourseLevel() {
@@ -470,7 +421,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     public Collection<CompetenceCourseLoad> getCompetenceCourseLoads(final ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
-        return information != null ? information.getCompetenceCourseLoadsSet() : Collections.emptyList();
+        return information == null ? Collections.emptyList() : information.getCompetenceCourseLoadsSet();
     }
 
     public Collection<CompetenceCourseLoad> getCompetenceCourseLoads() {
@@ -479,7 +430,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     public int getCompetenceCourseLoadsCount(final ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
-        return information != null ? information.getCompetenceCourseLoadsSet().size() : 0;
+        return information == null ? 0 : information.getCompetenceCourseLoadsSet().size();
     }
 
     public int getCompetenceCourseLoadsCount() {
@@ -487,17 +438,12 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     public boolean hasCompetenceCourseInformationFor(ExecutionSemester semester) {
-        for (CompetenceCourseInformation competenceInfo : getCompetenceCourseInformationsSet()) {
-            if (competenceInfo.getExecutionPeriod().equals(semester)) {
-                return true;
-            }
-        }
-        return false;
+        return getCompetenceCourseInformationsSet().stream().anyMatch(info -> info.getExecutionPeriod().equals(semester));
     }
 
     public String getObjectives(final ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
-        return information != null ? information.getObjectives() : null;
+        return information == null ? null : information.getObjectives();
     }
 
     public String getObjectives() {
@@ -506,7 +452,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     public String getProgram(final ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
-        return information != null ? information.getProgram() : null;
+        return information == null ? null : information.getProgram();
     }
 
     public String getProgram() {
@@ -521,7 +467,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     public String getEvaluationMethod(final ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
-        return information != null ? information.getEvaluationMethod() : null;
+        return information == null ? null : information.getEvaluationMethod();
     }
 
     public String getEvaluationMethod() {
@@ -530,7 +476,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     public String getObjectivesEn(final ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
-        return information != null ? information.getObjectivesEn() : null;
+        return information == null ? null : information.getObjectivesEn();
     }
 
     public String getObjectivesEn() {
@@ -539,7 +485,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     public String getProgramEn(final ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
-        return information != null ? information.getProgramEn() : null;
+        return information == null ? null : information.getProgramEn();
     }
 
     public String getProgramEn() {
@@ -548,7 +494,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     public String getEvaluationMethodEn(final ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
-        return information != null ? information.getEvaluationMethodEn() : null;
+        return information == null ? null : information.getEvaluationMethodEn();
     }
 
     public String getEvaluationMethodEn() {
@@ -556,11 +502,11 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     public double getTheoreticalHours() {
-        return getTheoreticalHours((Integer) null, (ExecutionSemester) null);
+        return getTheoreticalHours(null, null);
     }
 
     public Double getTheoreticalHours(final Integer order) {
-        return getTheoreticalHours(order, (ExecutionSemester) null);
+        return getTheoreticalHours(order, null);
     }
 
     public double getTheoreticalHours(final ExecutionSemester period) {
@@ -569,15 +515,15 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     public double getTheoreticalHours(Integer order, ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
-        return (information != null) ? information.getTheoreticalHours(order) : 0.0;
+        return information == null ? 0 : information.getTheoreticalHours(order);
     }
 
     public double getProblemsHours() {
-        return getProblemsHours((Integer) null, (ExecutionSemester) null);
+        return getProblemsHours(null, null);
     }
 
     public Double getProblemsHours(final Integer order) {
-        return getProblemsHours(order, (ExecutionSemester) null);
+        return getProblemsHours(order, null);
     }
 
     public double getProblemsHours(final ExecutionSemester period) {
@@ -590,11 +536,11 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     public double getLaboratorialHours() {
-        return getLaboratorialHours((Integer) null, (ExecutionSemester) null);
+        return getLaboratorialHours(null, null);
     }
 
     public Double getLaboratorialHours(final Integer order) {
-        return getLaboratorialHours(order, (ExecutionSemester) null);
+        return getLaboratorialHours(order, null);
     }
 
     public double getLaboratorialHours(final ExecutionSemester period) {
@@ -603,11 +549,11 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     public double getLaboratorialHours(Integer order, ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
-        return (information != null) ? information.getLaboratorialHours(order) : 0.0;
+        return information == null ? 0 : information.getLaboratorialHours(order);
     }
 
     public double getSeminaryHours() {
-        return getSeminaryHours((Integer) null, (ExecutionSemester) null);
+        return getSeminaryHours(null, null);
     }
 
     public double getSeminaryHours(final ExecutionSemester period) {
@@ -615,16 +561,16 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     public Double getSeminaryHours(final Integer order) {
-        return getSeminaryHours(order, (ExecutionSemester) null);
+        return getSeminaryHours(order, null);
     }
 
     public double getSeminaryHours(final Integer order, final ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
-        return (information != null) ? information.getSeminaryHours(order) : 0.0;
+        return information == null ? 0 : information.getSeminaryHours(order);
     }
 
     public double getFieldWorkHours() {
-        return getFieldWorkHours((Integer) null, (ExecutionSemester) null);
+        return getFieldWorkHours(null, null);
     }
 
     public double getFieldWorkHours(final ExecutionSemester period) {
@@ -632,16 +578,16 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     public Double getFieldWorkHours(final Integer order) {
-        return getFieldWorkHours(order, (ExecutionSemester) null);
+        return getFieldWorkHours(order, null);
     }
 
     public double getFieldWorkHours(final Integer order, final ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
-        return (information != null) ? information.getFieldWorkHours(order) : 0.0;
+        return information == null ? 0 : information.getFieldWorkHours(order);
     }
 
     public double getTrainingPeriodHours() {
-        return getTrainingPeriodHours((Integer) null, (ExecutionSemester) null);
+        return getTrainingPeriodHours(null, null);
     }
 
     public double getTrainingPeriodHours(final ExecutionSemester period) {
@@ -649,7 +595,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     public Double getTrainingPeriodHours(final Integer order) {
-        return getTrainingPeriodHours(order, (ExecutionSemester) null);
+        return getTrainingPeriodHours(order, null);
     }
 
     public double getTrainingPeriodHours(final Integer order, final ExecutionSemester period) {
@@ -658,11 +604,11 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     public double getTutorialOrientationHours() {
-        return getTutorialOrientationHours((Integer) null, (ExecutionSemester) null);
+        return getTutorialOrientationHours(null, null);
     }
 
     public Double getTutorialOrientationHours(final Integer order) {
-        return getTutorialOrientationHours(order, (ExecutionSemester) null);
+        return getTutorialOrientationHours(order, null);
     }
 
     public double getTutorialOrientationHours(final ExecutionSemester period) {
@@ -671,15 +617,15 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     public double getTutorialOrientationHours(final Integer order, final ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
-        return (information != null) ? information.getTutorialOrientationHours(order) : 0.0;
+        return information == null ? 0 : information.getTutorialOrientationHours(order);
     }
 
     public double getAutonomousWorkHours() {
-        return getAutonomousWorkHours((Integer) null, (ExecutionSemester) null);
+        return getAutonomousWorkHours(null, (ExecutionSemester) null);
     }
 
     public double getAutonomousWorkHours(final ExecutionSemester period) {
-        return getAutonomousWorkHours((Integer) null, period);
+        return getAutonomousWorkHours(null, period);
     }
 
     public Double getAutonomousWorkHours(final Integer order) {
@@ -688,7 +634,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     final public Double getAutonomousWorkHours(final Integer order, final ExecutionYear year) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionYear(year);
-        return (information != null) ? information.getAutonomousWorkHours(order) : 0.0;
+        return information == null ? 0 : information.getAutonomousWorkHours(order);
     }
 
     public Double getAutonomousWorkHours(final Integer order, final ExecutionSemester period) {
@@ -697,7 +643,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     public double getContactLoad() {
-        return getContactLoad((Integer) null, (ExecutionSemester) null);
+        return getContactLoad(null, (ExecutionSemester) null);
     }
 
     public Double getContactLoad(final ExecutionSemester period) {
@@ -714,11 +660,11 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     public Double getContactLoad(final Integer order, final ExecutionSemester period) {
         final CompetenceCourseInformation information = findCompetenceCourseInformationForExecutionPeriod(period);
-        return (information != null) ? information.getContactLoad(order) : 0.0;
+        return information == null ? 0 : information.getContactLoad(order);
     }
 
     public double getTotalLoad() {
-        return getTotalLoad((Integer) null, (ExecutionSemester) null);
+        return getTotalLoad(null, (ExecutionSemester) null);
     }
 
     public Double getTotalLoad(final Integer order) {
@@ -726,7 +672,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     public double getTotalLoad(final ExecutionSemester period) {
-        return getTotalLoad((Integer) null, period);
+        return getTotalLoad(null, period);
     }
 
     final public Double getTotalLoad(final Integer order, final ExecutionYear executionYear) {
@@ -739,7 +685,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     public double getEctsCredits() {
-        return getEctsCredits((Integer) null, (ExecutionSemester) null);
+        return getEctsCredits(null, (ExecutionSemester) null);
     }
 
     public double getEctsCredits(final Integer order) {
@@ -747,7 +693,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     public double getEctsCredits(final ExecutionSemester executionSemester) {
-        return getEctsCredits((Integer) null, executionSemester);
+        return getEctsCredits(null, executionSemester);
     }
 
     final public Double getEctsCredits(final Integer order, final ExecutionYear executionYear) {
@@ -760,107 +706,50 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     public Map<Degree, List<CurricularCourse>> getAssociatedCurricularCoursesGroupedByDegree() {
-        Map<Degree, List<CurricularCourse>> curricularCoursesMap = new HashMap<Degree, List<CurricularCourse>>();
-        for (CurricularCourse curricularCourse : getAssociatedCurricularCoursesSet()) {
-            Degree degree = curricularCourse.getDegreeCurricularPlan().getDegree();
-            List<CurricularCourse> curricularCourses = curricularCoursesMap.get(degree);
-            if (curricularCourses == null) {
-                curricularCourses = new ArrayList<CurricularCourse>();
-                curricularCoursesMap.put(degree, curricularCourses);
-            }
-            curricularCourses.add(curricularCourse);
-        }
-        return curricularCoursesMap;
+        return getAssociatedCurricularCoursesSet().stream()
+                .collect(Collectors.groupingBy(curricular -> curricular.getDegreeCurricularPlan().getDegree()));
     }
 
     public Set<DegreeCurricularPlan> presentIn() {
-        Set<DegreeCurricularPlan> result = new HashSet<DegreeCurricularPlan>();
-        for (CurricularCourse curricularCourse : this.getAssociatedCurricularCoursesSet()) {
-            result.add(curricularCourse.getDegreeCurricularPlan());
-        }
-
-        return result;
+        return getAssociatedCurricularCoursesSet().stream().map(CurricularCourse::getDegreeCurricularPlan)
+                .collect(Collectors.toSet());
     }
 
     public boolean isAssociatedToAnyDegree(final Set<Degree> degrees) {
-        for (final CurricularCourse curricularCourse : getAssociatedCurricularCoursesSet()) {
-            final DegreeCurricularPlan degreeCurricularPlan = curricularCourse.getDegreeCurricularPlan();
-            final Degree degree = degreeCurricularPlan.getDegree();
-            if (degrees.contains(degree)) {
-                return true;
-            }
-        }
-        return false;
+        return getAssociatedCurricularCoursesSet().stream().map(curricular -> curricular.getDegreeCurricularPlan().getDegree())
+                .anyMatch(degrees::contains);
     }
 
-    @SuppressWarnings("unchecked")
     public List<CurricularCourse> getCurricularCoursesWithActiveScopesInExecutionPeriod(
             final ExecutionSemester executionSemester) {
-        return (List<CurricularCourse>) CollectionUtils.select(getAssociatedCurricularCoursesSet(), new Predicate() {
-
-            @Override
-            public boolean evaluate(Object arg0) {
-                CurricularCourse curricularCourse = (CurricularCourse) arg0;
-
-                for (DegreeModuleScope moduleScope : curricularCourse.getDegreeModuleScopes()) {
-                    if (moduleScope.isActiveForExecutionPeriod(executionSemester)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-        });
+        return getAssociatedCurricularCoursesSet().stream().filter(curricular -> curricular.getDegreeModuleScopes().stream()
+                .anyMatch(scope -> scope.isActiveForExecutionPeriod(executionSemester))).collect(Collectors.toList());
     }
 
     public CurricularCourse getCurricularCourse(final DegreeCurricularPlan degreeCurricularPlan) {
-        for (final CurricularCourse curricularCourse : getAssociatedCurricularCoursesSet()) {
-            if (curricularCourse.getDegreeCurricularPlan() == degreeCurricularPlan) {
-                return curricularCourse;
-            }
-        }
-
-        return null;
+        return getAssociatedCurricularCoursesSet().stream()
+                .filter(curricular -> curricular.getDegreeCurricularPlan() == degreeCurricularPlan).findFirst().orElse(null);
     }
 
     public List<Enrolment> getActiveEnrollments(ExecutionYear executionYear) {
-        List<Enrolment> results = new ArrayList<Enrolment>();
-        for (CurricularCourse curricularCourse : getAssociatedCurricularCoursesSet()) {
-            results.addAll(curricularCourse.getActiveEnrollments(executionYear));
-        }
-        return results;
+        return getAssociatedCurricularCoursesSet().stream()
+                .flatMap(curricular -> curricular.getActiveEnrollments(executionYear).stream()).collect(Collectors.toList());
     }
 
     public List<Enrolment> getActiveEnrollments(ExecutionSemester executionSemester) {
-        List<Enrolment> results = new ArrayList<Enrolment>();
-        for (CurricularCourse curricularCourse : getAssociatedCurricularCoursesSet()) {
-            curricularCourse.addActiveEnrollments(results, executionSemester);
-        }
-        return results;
+        return getAssociatedCurricularCoursesSet().stream()
+                .flatMap(curricular -> curricular.getActiveEnrollments(executionSemester).stream()).collect(Collectors.toList());
     }
 
     public Boolean hasActiveScopesInExecutionYear(ExecutionYear executionYear) {
-        Collection<ExecutionSemester> executionSemesters = executionYear.getExecutionPeriodsSet();
-        Collection<CurricularCourse> curricularCourses = this.getAssociatedCurricularCoursesSet();
-        for (ExecutionSemester executionSemester : executionSemesters) {
-            for (CurricularCourse curricularCourse : curricularCourses) {
-                if (curricularCourse.getActiveDegreeModuleScopesInAcademicInterval(executionSemester.getAcademicInterval()).size()
-                        > 0) {
-                    return Boolean.TRUE;
-                }
-            }
-        }
-        return Boolean.FALSE;
+        return executionYear.getExecutionPeriodsSet().stream().anyMatch(semester -> getAssociatedCurricularCoursesSet().stream()
+                .anyMatch(curricular ->
+                        curricular.getActiveDegreeModuleScopesInAcademicInterval(semester.getAcademicInterval()).size() > 0));
     }
 
     public boolean hasActiveScopesInExecutionPeriod(ExecutionSemester executionSemester) {
-        Collection<CurricularCourse> curricularCourses = this.getAssociatedCurricularCoursesSet();
-        for (CurricularCourse curricularCourse : curricularCourses) {
-            if (curricularCourse.getActiveDegreeModuleScopesInAcademicInterval(executionSemester.getAcademicInterval()).size()
-                    > 0) {
-                return true;
-            }
-        }
-        return false;
+        return getAssociatedCurricularCoursesSet().stream().anyMatch(curricular ->
+                curricular.getActiveDegreeModuleScopesInAcademicInterval(executionSemester.getAcademicInterval()).size() > 0);
     }
 
     public boolean hasDepartmentUnit() {
@@ -868,14 +757,14 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     /**
-     * @see #getDeparmentUnit(ExecutionYear)
+     * @see #getDepartmentUnit(ExecutionYear)
      */
     public DepartmentUnit getDepartmentUnit() {
         return getDepartmentUnit(ExecutionSemester.readActualExecutionSemester());
     }
 
     /**
-     * @see #getDeparmentUnit(ExecutionSemester)
+     * @see #getDepartmentUnit(ExecutionSemester)
      */
     public DepartmentUnit getDepartmentUnit(ExecutionYear executionYear) {
         ExecutionSemester semester = ExecutionSemester.readBySemesterAndExecutionYear(2, executionYear.getYear());
@@ -904,14 +793,14 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     /**
-     * @see #getDeparmentUnit(ExecutionSemester)
+     * @see #getDepartmentUnit(ExecutionSemester)
      */
     public CompetenceCourseGroupUnit getCompetenceCourseGroupUnit() {
         return getCompetenceCourseGroupUnit(ExecutionSemester.readActualExecutionSemester());
     }
 
     /**
-     * @see #getDeparmentUnit(ExecutionSemester)
+     * @see #getDepartmentUnit(ExecutionSemester)
      */
     public CompetenceCourseGroupUnit getCompetenceCourseGroupUnit(ExecutionYear executionYear) {
         ExecutionSemester semester = ExecutionSemester.readBySemesterAndExecutionYear(2, executionYear.getYear());
@@ -923,6 +812,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     public CompetenceCourseGroupUnit getMostRecentGroupInDepartment(DepartmentUnit departmentUnit) {
+        //TODO
         ExecutionSemester semester = ExecutionSemester.readActualExecutionSemester();
         while (semester != null) {
             if (getDepartmentUnit(semester) == departmentUnit) {
@@ -934,17 +824,11 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     public List<CompetenceCourseLoad> getSortedCompetenceCourseLoads(final ExecutionSemester period) {
-        final List<CompetenceCourseLoad> result = new ArrayList<CompetenceCourseLoad>(getCompetenceCourseLoadsCount(period));
-        result.addAll(getCompetenceCourseLoads(period));
-        Collections.sort(result);
-        return result;
+        return getCompetenceCourseLoads(period).stream().sorted().collect(Collectors.toList());
     }
 
     public List<CompetenceCourseLoad> getSortedCompetenceCourseLoads() {
-        final List<CompetenceCourseLoad> result = new ArrayList<CompetenceCourseLoad>(getCompetenceCourseLoadsCount());
-        result.addAll(getCompetenceCourseLoads());
-        Collections.sort(result);
-        return result;
+        return getCompetenceCourseLoads().stream().sorted().collect(Collectors.toList());
     }
 
     @Override
@@ -1038,12 +922,10 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     public void transfer(CompetenceCourseGroupUnit competenceCourseGroupUnit, ExecutionSemester period, String justification,
             Person requester) {
 
-        CompetenceCourseInformation information = null;
-        for (CompetenceCourseInformation existingInformation : getCompetenceCourseInformationsSet()) {
-            if (existingInformation.getExecutionPeriod() == period) {
-                information = existingInformation;
-            }
-        }
+        CompetenceCourseInformation information =
+                getCompetenceCourseInformationsSet().stream().filter(info -> info.getExecutionPeriod() == period).findFirst()
+                        .orElse(null);
+
         if (information == null) {
             CompetenceCourseInformation latestInformation = getMostRecentCompetenceCourseInformationUntil(period);
             information = new CompetenceCourseInformation(latestInformation);
@@ -1106,10 +988,10 @@ public class CompetenceCourse extends CompetenceCourse_Base {
         }
         return multiLanguageString;
     }
-
+//TODO from here down
     public List<ExecutionCourse> getExecutionCoursesByExecutionPeriod(final ExecutionSemester executionSemester) {
-        List<ExecutionCourse> executionCourseList = new ArrayList<ExecutionCourse>();
-        executionCourseList.addAll(getExecutionCoursesByExecutionPeriod(executionSemester, new HashSet<ExecutionCourse>()));
+        List<ExecutionCourse> executionCourseList = new ArrayList<>();
+        executionCourseList.addAll(getExecutionCoursesByExecutionPeriod(executionSemester, new HashSet<>()));
         return executionCourseList;
     }
 
@@ -1150,7 +1032,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
 
     public Set<CompetenceCourseInformationChangeRequest> getCompetenceCourseInformationChangeRequests(
             final ExecutionSemester semester) {
-        Set<CompetenceCourseInformationChangeRequest> changeRequests = new HashSet<CompetenceCourseInformationChangeRequest>();
+        Set<CompetenceCourseInformationChangeRequest> changeRequests = new HashSet<>();
         for (CompetenceCourseInformationChangeRequest request : getCompetenceCourseInformationChangeRequestsSet()) {
             if (request.getExecutionPeriod() == semester) {
                 changeRequests.add(request);
@@ -1207,7 +1089,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     // read static methods
     // -------------------------------------------------------------
     static public List<CompetenceCourse> readOldCompetenceCourses() {
-        final List<CompetenceCourse> result = new ArrayList<CompetenceCourse>();
+        final List<CompetenceCourse> result = new ArrayList<>();
         for (final CompetenceCourse competenceCourse : Bennu.getInstance().getCompetenceCoursesSet()) {
             if (!competenceCourse.isBolonha()) {
                 result.add(competenceCourse);
@@ -1217,7 +1099,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     static public Collection<CompetenceCourse> readBolonhaCompetenceCourses() {
-        final Set<CompetenceCourse> result = new TreeSet<CompetenceCourse>(COMPETENCE_COURSE_COMPARATOR_BY_NAME);
+        final Set<CompetenceCourse> result = new TreeSet<>(COMPETENCE_COURSE_COMPARATOR_BY_NAME);
         for (final CompetenceCourse competenceCourse : Bennu.getInstance().getCompetenceCoursesSet()) {
             if (competenceCourse.isBolonha()) {
                 result.add(competenceCourse);
@@ -1227,7 +1109,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     static public Collection<CompetenceCourse> searchBolonhaCompetenceCourses(String searchName, String searchCode) {
-        final Set<CompetenceCourse> result = new TreeSet<CompetenceCourse>(COMPETENCE_COURSE_COMPARATOR_BY_NAME);
+        final Set<CompetenceCourse> result = new TreeSet<>(COMPETENCE_COURSE_COMPARATOR_BY_NAME);
         for (final CompetenceCourse competenceCourse : Bennu.getInstance().getCompetenceCoursesSet()) {
             if (!competenceCourse.isBolonha()) {
                 continue;
@@ -1244,7 +1126,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     static public Collection<CompetenceCourse> readApprovedBolonhaCompetenceCourses() {
-        final Set<CompetenceCourse> result = new TreeSet<CompetenceCourse>(COMPETENCE_COURSE_COMPARATOR_BY_NAME);
+        final Set<CompetenceCourse> result = new TreeSet<>(COMPETENCE_COURSE_COMPARATOR_BY_NAME);
         for (final CompetenceCourse competenceCourse : Bennu.getInstance().getCompetenceCoursesSet()) {
             if (competenceCourse.isBolonha() && competenceCourse.isApproved()) {
                 result.add(competenceCourse);
@@ -1254,7 +1136,7 @@ public class CompetenceCourse extends CompetenceCourse_Base {
     }
 
     static public Collection<CompetenceCourse> readApprovedBolonhaDissertations() {
-        final List<CompetenceCourse> result = new ArrayList<CompetenceCourse>();
+        final List<CompetenceCourse> result = new ArrayList<>();
         for (final CompetenceCourse competenceCourse : Bennu.getInstance().getCompetenceCoursesSet()) {
             if (competenceCourse.isBolonha() && competenceCourse.isApproved() && competenceCourse.isDissertation()) {
                 result.add(competenceCourse);
