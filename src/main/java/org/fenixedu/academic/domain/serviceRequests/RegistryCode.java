@@ -19,20 +19,24 @@
 package org.fenixedu.academic.domain.serviceRequests;
 
 import java.util.Comparator;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.DomainObjectUtil;
+import org.fenixedu.academic.domain.phd.serviceRequests.documentRequests.PhdDiplomaRequest;
+import org.fenixedu.academic.domain.phd.serviceRequests.documentRequests.PhdDiplomaSupplementRequest;
+import org.fenixedu.academic.domain.phd.serviceRequests.documentRequests.PhdRegistryDiplomaRequest;
+import org.fenixedu.academic.domain.phd.serviceRequests.documentRequests.certificates.PhdFinalizationCertificateRequest;
+import org.fenixedu.academic.domain.serviceRequests.documentRequests.DegreeFinalizationCertificateRequest;
+import org.fenixedu.academic.domain.serviceRequests.documentRequests.DiplomaRequest;
+import org.fenixedu.academic.domain.serviceRequests.documentRequests.DiplomaSupplementRequest;
+import org.fenixedu.academic.domain.serviceRequests.documentRequests.RegistryDiplomaRequest;
 import org.fenixedu.bennu.core.domain.Bennu;
 
 public class RegistryCode extends RegistryCode_Base {
-    public static Comparator<RegistryCode> COMPARATOR_BY_CODE = new Comparator<RegistryCode>() {
-        @Override
-        public int compare(RegistryCode o1, RegistryCode o2) {
-            if (o1.getCode().compareTo(o2.getCode()) != 0) {
-                return o1.getCode().compareTo(o2.getCode());
-            }
-            return DomainObjectUtil.COMPARATOR_BY_ID.compare(o1, o2);
-        }
-    };
+    public static Comparator<RegistryCode> COMPARATOR_BY_CODE =
+            Comparator.comparing(RegistryCode::getCode).thenComparing(DomainObjectUtil.COMPARATOR_BY_ID);
 
     protected RegistryCode(InstitutionRegistryCodeGenerator generator, AcademicServiceRequest request) {
         setRegistryCodeGenerator(generator);
@@ -42,5 +46,54 @@ public class RegistryCode extends RegistryCode_Base {
 
     protected Bennu getRootDomainObject() {
         return getRegistryCodeGenerator().getRootDomainObject();
+    }
+
+    //XXX Registry code is either linked to a set of documents for either phd or other degrees, not a mix of both
+    //XXX Registry code is to be linked at most to 1 of each of the following documents
+
+    public DiplomaSupplementRequest getDiplomaSupplement() {
+        return getDocumentsOfClass(DiplomaSupplementRequest.class).findAny().orElse(null);
+    }
+
+    public DiplomaRequest getDiploma() {
+        return getDocumentsOfClass(DiplomaRequest.class).findAny().orElse(null);
+    }
+
+    public RegistryDiplomaRequest getRegistryDiploma() {
+        return getDocumentsOfClass(RegistryDiplomaRequest.class).findAny().orElse(null);
+    }
+
+    public PhdDiplomaRequest getPhdDiploma() {
+        return getDocumentsOfClass(PhdDiplomaRequest.class).findAny().orElse(null);
+    }
+
+    public PhdRegistryDiplomaRequest getPhdRegistryDiploma() {
+        return getDocumentsOfClass(PhdRegistryDiplomaRequest.class).findAny().orElse(null);
+    }
+
+    public PhdDiplomaSupplementRequest getPhdDiplomaSupplement() {
+        return getDocumentsOfClass(PhdDiplomaSupplementRequest.class).findAny().orElse(null);
+    }
+
+    //XXX Registry code may have multiple of the following documents
+
+    public Set<DegreeFinalizationCertificateRequest> getDegreeFinalizationCertificates() {
+        return getDocumentsOfClass(DegreeFinalizationCertificateRequest.class).collect(Collectors.toSet());
+    }
+
+    public Set<PhdFinalizationCertificateRequest> getPhdFinalizationCertificates() {
+        return getDocumentsOfClass(PhdFinalizationCertificateRequest.class).collect(Collectors.toSet());
+    }
+
+    public boolean safeDelete() {
+        if (getDocumentRequestSet().isEmpty()) {
+            deleteDomainObject();
+            return true;
+        }
+        return false;
+    }
+
+    private <T extends AcademicServiceRequest> Stream<T> getDocumentsOfClass(Class<T> c) {
+        return getDocumentRequestSet().stream().filter(c::isInstance).map(c::cast);
     }
 }
