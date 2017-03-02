@@ -30,6 +30,7 @@ import org.fenixedu.academic.domain.degreeStructure.EctsGraduationGradeConversio
 import org.fenixedu.academic.domain.degreeStructure.EctsTableIndex;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.serviceRequests.IDiplomaSupplementRequest;
+import org.fenixedu.academic.domain.serviceRequests.RegistryCode;
 import org.fenixedu.academic.domain.student.curriculum.ConclusionProcess;
 import org.fenixedu.academic.domain.studentCurriculum.CurriculumGroup;
 import org.fenixedu.academic.domain.studentCurriculum.CycleCurriculumGroup;
@@ -51,6 +52,8 @@ public class DiplomaSupplementRequest extends DiplomaSupplementRequest_Base impl
         this();
         super.init(bean);
         checkParameters(bean);
+        setRegistryCode(bean.getRegistryCode());
+
         setLanguage(MultiLanguageString.pt);
         setProgramConclusion(bean.getProgramConclusion());
     }
@@ -71,15 +74,14 @@ public class DiplomaSupplementRequest extends DiplomaSupplementRequest_Base impl
             throw new DomainException("error.diplomaSupplementRequest.splittedNamesDoNotMatch");
         }
         getRegistration().getPerson().getProfile().changeName(bean.getGivenNames(), bean.getFamilyNames(), null);
-        RegistryDiplomaRequest registry = getRegistration().getRegistryDiplomaRequest(bean.getProgramConclusion());
-        DiplomaRequest diploma = getRegistration().getDiplomaRequest(bean.getProgramConclusion());
-        if (registry == null && diploma == null) {
-            throw new DomainException(
-                    "error.diplomaSupplementRequest.cannotAskForSupplementWithoutEitherRegistryDiplomaOrDiplomaRequest");
+
+        RegistryCode code = bean.getRegistryCode();
+        if (code == null || (code.getRegistryDiploma() == null && code.getDiploma() == null)) {
+            throw new DomainException("error.diplomaSupplementRequest.cannotAskForSupplementWithoutEitherRegistryDiplomaOrDiplomaRequest");
         }
-        final DiplomaSupplementRequest supplement = getRegistration().getDiplomaSupplementRequest(bean.getProgramConclusion());
-        if (supplement != null) {
-            throw new DomainException("error.diplomaSupplementRequest.alreadyRequested");
+
+        if(code.getDiplomaSupplement() != null) {
+            throw new DomainException("error.diplomaSupplementRequest.codeAlreadyHasSupplement");
         }
     }
 
@@ -163,17 +165,6 @@ public class DiplomaSupplementRequest extends DiplomaSupplementRequest_Base impl
         if (academicServiceRequestBean.isToProcess()) {
             if (!getProgramConclusion().isConclusionProcessed(getRegistration())) {
                 throw new DomainException("error.diplomaSupplement.registration.not.submited.to.conclusion.process");
-            }
-            if (getRegistryCode() == null) {
-                RegistryDiplomaRequest registryRequest = getRegistration().getRegistryDiplomaRequest(getProgramConclusion());
-                DiplomaRequest diploma = getRegistration().getDiplomaRequest(getProgramConclusion());
-                if (registryRequest != null) {
-                    registryRequest.getRegistryCode().addDocumentRequest(this);
-                } else if (diploma != null && diploma.hasRegistryCode()) {
-                    diploma.getRegistryCode().addDocumentRequest(this);
-                } else {
-                    getRootDomainObject().getInstitutionUnit().getRegistryCodeGenerator().createRegistryFor(this);
-                }
             }
             if (getLastGeneratedDocument() == null) {
                 generateDocument();
