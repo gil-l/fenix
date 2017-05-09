@@ -18,10 +18,6 @@
  */
 package org.fenixedu.academic.domain.phd.alert;
 
-import java.util.Collections;
-import java.util.Locale;
-
-import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.phd.InternalPhdParticipant;
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramDocumentType;
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
@@ -29,12 +25,11 @@ import org.fenixedu.academic.domain.phd.PhdParticipant;
 import org.fenixedu.academic.domain.phd.PhdProgramProcessDocument;
 import org.fenixedu.academic.domain.phd.alert.AlertService.AlertMessage;
 import org.fenixedu.academic.domain.phd.thesis.activities.PhdThesisActivity;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.ReplyTo;
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.commons.i18n.LocalizedString;
+import org.fenixedu.messaging.core.domain.Message;
+import org.fenixedu.messaging.core.domain.Message.MessageBuilder;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
 
@@ -45,7 +40,7 @@ public class PhdReporterReviewAlert extends PhdReporterReviewAlert_Base {
 
     public PhdReporterReviewAlert(final PhdIndividualProgramProcess process, PhdParticipant participant) {
         super();
-        super.init(process, buildSubject(process), buildBody(process, participant));
+        super.init(process, buildSubject(process),buildBody(process, participant));
         setPhdParticipant(participant);
     }
 
@@ -100,37 +95,29 @@ public class PhdReporterReviewAlert extends PhdReporterReviewAlert_Base {
 
     @Override
     protected void generateMessage() {
-        generateMessageForReporters();
-    }
-
-    private LocalizedString buildSubject(final PhdIndividualProgramProcess process) {
-        final ExecutionYear executionYear = process.getExecutionYear();
-        return new LocalizedString(Locale.getDefault(), AlertMessage.get(
-                "message.phd.request.jury.reviews.external.access.subject", process.getPhdProgram().getName(executionYear).getContent()));
-    }
-
-    private LocalizedString buildBody(final PhdIndividualProgramProcess process, PhdParticipant participant) {
-        return new LocalizedString(Locale.getDefault(), AlertMessage.get(
-                "message.phd.request.reminder.jury.reviews.reporter.body", process.getPerson().getName(),
-                process.getProcessNumber(), getDaysLeftUntilDeadline(process))
-                + "\n\n"
-                + PhdThesisActivity.getAccessInformation(process, participant,
-                        "message.phd.request.jury.reviews.coordinator.access", "message.phd.request.jury.reviews.teacher.access"));
-    }
-
-    private void generateMessageForReporters() {
+        MessageBuilder builder = Message.from(getSender()).subject(getFormattedSubject())
+                .textBody(getFormattedBody());
         PhdParticipant participant = getPhdParticipant();
         if (participant.isInternal()) {
             InternalPhdParticipant internalParticipant = (InternalPhdParticipant) participant;
-            new PhdAlertMessage(getProcess(), internalParticipant.getPerson(), getFormattedSubject(), buildBody(getProcess(),
-                    participant));
-            new Message(getSender(), new Recipient(Collections.singleton(internalParticipant.getPerson())), buildMailSubject(),
-                    buildMailBody());
+            new PhdAlertMessage(getProcess(), internalParticipant.getPerson(), getFormattedSubject(),
+                    buildBody(getProcess(), participant));
+            builder.bcc(internalParticipant.getPerson().getPersonGroup());
         } else {
-            new Message(getSender(), Collections.<ReplyTo> emptyList(), Collections.<Recipient> emptyList(), buildMailSubject(),
-                    buildMailBody(), Collections.singleton(participant.getEmail()));
+            builder.singleBcc(participant.getEmail());
         }
+        builder.send();
+    }
 
+    private LocalizedString buildSubject(final PhdIndividualProgramProcess process) {
+        return AlertMessage.get("message.phd.request.jury.reviews.external.access.subject", process.getPhdProgram().getName());
+    }
+
+    private LocalizedString buildBody(final PhdIndividualProgramProcess process, PhdParticipant participant) {
+        return AlertMessage.get("message.phd.request.reminder.jury.reviews.reporter.body", process.getPerson().getName(),
+                process.getProcessNumber(), getDaysLeftUntilDeadline(process)).append("\n\n").append(PhdThesisActivity
+                .getAccessInformation(process, participant, "message.phd.request.jury.reviews.coordinator.access",
+                        "message.phd.request.jury.reviews.teacher.access"));
     }
 
     @Override

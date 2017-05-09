@@ -34,6 +34,7 @@ import org.fenixedu.academic.domain.util.email.SystemSender;
 import org.fenixedu.academic.util.phd.PhdProperties;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.commons.i18n.LocalizedString;
 
 abstract public class PhdThesisActivity extends Activity<PhdThesisProcess> {
 
@@ -48,7 +49,7 @@ abstract public class PhdThesisActivity extends Activity<PhdThesisProcess> {
 
     abstract protected void activityPreConditions(final PhdThesisProcess process, final User userView);
 
-    public static String getAccessInformation(PhdIndividualProgramProcess process, PhdParticipant participant,
+    public static LocalizedString getAccessInformation(PhdIndividualProgramProcess process, PhdParticipant participant,
             String coordinatorMessage, String teacherMessage) {
 
         if (!participant.isInternal()) {

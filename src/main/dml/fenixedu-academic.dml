@@ -3340,6 +3340,13 @@ valueType org.fenixedu.academic.domain.accounting.EventTypes as EventTypes {
         class transactions.ReimbursementTransaction extends transactions.Transaction {
         }
 
+
+//TODO place this properly
+relation UnitSender {
+    .org.fenixedu.messaging.core.domain.Sender playsRole sender;
+    organizationalStructure.Unit playsRole unit;
+}
+
     class util.Email  {
         EmailAddressList bccAddresses;
         EmailAddressList ccAddresses;

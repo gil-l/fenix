@@ -23,11 +23,10 @@ import java.util.Set;
 
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
 import org.fenixedu.academic.domain.phd.candidacy.PhdProgramCandidacyProcess;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.commons.i18n.LocalizedString;
+import org.fenixedu.messaging.core.domain.Message;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
@@ -57,7 +56,10 @@ public class PublicPhdMissingCandidacyValidationAlert extends PublicPhdMissingCa
 
     @Override
     protected void generateMessage() {
-        new Message(getSender(), null, Collections.<Recipient> emptyList(), buildMailSubject(), buildMailBody(), getEmail());
+        Message.from(getSender()).subject(getSubject()).textBody(getBody()).preferredLocale(getProcess().getPerson().getProfile
+                ().getPreferredLocale())
+                .singleBcc
+                (getEmail()).send();
     }
 
     private Set<String> getEmail() {

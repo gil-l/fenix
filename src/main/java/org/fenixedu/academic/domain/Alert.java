@@ -65,24 +65,6 @@ public abstract class Alert extends Alert_Base {
         throw new DomainException("error.org.fenixedu.academic.domain.alert.Alert.cannot.modify.active");
     }
 
-    @Override
-    public LocalizedString getBody() {
-        throw new DomainException("error.org.fenixedu.academic.domain.alert.Alert.use.getFormattedBody.instead");
-    }
-
-    @Override
-    public LocalizedString getSubject() {
-        throw new DomainException("error.org.fenixedu.academic.domain.alert.Alert.use.getFormattedSubject.instead");
-    }
-
-    public LocalizedString getFormattedBody() {
-        return super.getBody();
-    }
-
-    public LocalizedString getFormattedSubject() {
-        return super.getSubject();
-    }
-
     public void fire() {
         if (isToDiscard()) {
             discard();

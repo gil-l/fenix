@@ -19,275 +19,230 @@
 package org.fenixedu.academic.domain.phd.alert;
 
 import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accessControl.AcademicAuthorizationGroup;
 import org.fenixedu.academic.domain.accessControl.academicAdministration.AcademicOperationType;
-import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.phd.InternalPhdParticipant;
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
 import org.fenixedu.academic.domain.phd.PhdParticipant;
-import org.fenixedu.academic.domain.phd.PhdProgram;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.ReplyTo;
-import org.fenixedu.academic.domain.util.email.UnitBasedSender;
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.commons.i18n.LocalizedString;
+import org.fenixedu.messaging.core.domain.Message;
+import org.fenixedu.messaging.core.domain.Message.MessageBuilder;
+import org.fenixedu.messaging.core.domain.MessageTemplate;
+import org.fenixedu.messaging.core.domain.Sender;
+import org.fenixedu.messaging.core.template.DeclareMessageTemplate;
+import org.fenixedu.messaging.core.template.TemplateParameter;
 import org.joda.time.LocalDate;
 
-import pt.ist.fenixframework.DomainObject;
+import com.google.common.collect.ImmutableMap;
 
+//XXX HTML is not currently used though the interface supports it
+@DeclareMessageTemplate(id = "org.fenixedu.academic.phd.alert.wrapper", description = "org.fenixedu.academic.phd.alert.wrapper.description", subject = "org.fenixedu.academic.phd.alert.wrapper.subject", text = "org.fenixedu.academic.phd.alert.wrapper.text", html = "org.fenixedu.academic.phd.alert.wrapper.html", parameters = {
+        @TemplateParameter(id = "process", description = "org.fenixedu.academic.phd.alert.wrapper.parameter.process"),
+        @TemplateParameter(id = "subject", description = "org.fenixedu.academic.phd.alert.wrapper.parameter.subject"),
+        @TemplateParameter(id = "text", description = "org.fenixedu.academic.phd.alert.wrapper.parameter.text"),
+        @TemplateParameter(id = "html", description = "org.fenixedu.academic.phd.alert.wrapper.parameter.html") }, bundle = Bundle.PHD)
 public class AlertService {
 
-    static private final String PREFIX_PHD_LABEL = "label.phds";
-
-    public static String getSubjectPrefixed(PhdIndividualProgramProcess process, String subjectKey) {
-        return getProcessNumberPrefix(process) + getMessageFromResource(subjectKey);
-    }
-
-    static public String getProcessNumberPrefix(PhdIndividualProgramProcess process) {
-        return "[" + getMessageFromResource(PREFIX_PHD_LABEL) + " - " + process.getProcessNumber() + "] ";
-    }
-
-    static public String getMessageFromResource(String key) {
-        return BundleUtil.getString(Bundle.PHD, key);
-    }
-
-    static private String getBodyCommonText(final PhdIndividualProgramProcess process) {
-        final StringBuilder builder = new StringBuilder();
-
-        builder.append("------------------------------------------------------\n");
-
-        if (process.getPerson().getStudent() != null) {
-            builder.append(getSlotLabel(PhdIndividualProgramProcess.class, "student.number"));
-            builder.append(": ").append(process.getPerson().getStudent().getNumber());
+    static void sendMessage(PhdAlert alert, Group bcc, String... bccs) {
+        //XXX In an existing alert we expect the body and subject to have already been wrapped or not according to it's type's use
+        MessageBuilder builder = Message.from(alert.getSender());
+        if (bcc != null) {
+            builder.bcc(bcc);
         }
-        builder.append("\n");
-
-        builder.append(getSlotLabel(PhdIndividualProgramProcess.class, "processNumber"));
-        builder.append(": ").append(process.getPhdIndividualProcessNumber().getFullProcessNumber()).append("\n");
-
-        builder.append(getSlotLabel(PhdIndividualProgramProcess.class, "person.name"));
-        builder.append(": ").append(process.getPerson().getName()).append("\n");
-
-        builder.append(getSlotLabel(PhdIndividualProgramProcess.class, "phdProgram"));
-        if (process.getPhdProgram() != null) {
-            builder.append(": ").append(process.getPhdProgram().getName(process.getExecutionYear()).getContent());
+        if (bccs != null) {
+            builder.singleBcc(bccs);
         }
-        builder.append("\n");
+        builder.subject(alert.getSubject()).textBody(alert.getBody()).send();
+    }
 
-        builder.append(getSlotLabel(PhdIndividualProgramProcess.class, "activeState"));
-        builder.append(": ").append(process.getActiveState().getLocalizedName()).append("\n");
+    static void sendMessage(PhdAlert alert, Group bcc) {
+        sendMessage(alert,bcc,null);
+    }
 
-        if (process.getCandidacyProcess() != null) {
-            builder.append(getMessageFromResource("label.phd.candidacy")).append(": ");
-            builder.append(process.getCandidacyProcess().getActiveState().getLocalizedName()).append("\n");
+    static void sendMessage(PhdAlert alert, String... bccs) {
+        sendMessage(alert,null,bccs);
+    }
+
+    static Message sendMessage(PhdIndividualProgramProcess process, boolean displayProcessInfo, Sender sender,
+            LocalizedString subject, LocalizedString body, Group bcc, String... bccs) {
+        MessageBuilder builder = Message.from(sender);
+        if (bccs != null) {
+            builder.singleBcc(bccs);
         }
-
-        if (process.getSeminarProcess() != null) {
-            builder.append(getMessageFromResource("label.phd.publicPresentationSeminar")).append(": ");
-            builder.append(process.getSeminarProcess().getActiveState().getLocalizedName()).append("\n");
+        if (bcc != null) {
+            builder.bcc(bcc);
         }
-
-        if (process.getThesisProcess() != null) {
-            builder.append(getMessageFromResource("label.phd.thesis")).append(": ");
-            builder.append(process.getThesisProcess().getActiveState().getLocalizedName()).append("\n");
+        if (displayProcessInfo) {
+            builder.template("org.fenixedu.academic.phd.alert.wrapper").parameter("process", process)
+                    .parameter("subject", subject).parameter("text", body).and();
+        } else {
+            builder.subject(subject).textBody(body);
         }
-
-        builder.append(getSlotLabel(PhdIndividualProgramProcess.class, "executionYear"));
-        builder.append(": ").append(process.getExecutionYear().getQualifiedName()).append("\n");
-
-        builder.append("------------------------------------------------------\n\n");
-
-        return builder.toString();
+        return builder.send();
     }
 
-    static public String getBodyText(PhdIndividualProgramProcess process, String bodyText) {
-        return getBodyCommonText(process) + getMessageFromResource(bodyText);
+    static void sendMessage(PhdIndividualProgramProcess process, boolean displayProcessInfo, LocalizedString subject,
+            LocalizedString body, Group bcc, String... bccs) {
+        sendMessage(process, displayProcessInfo, process.getAdministrativeOffice().getUnit().getSender(), subject, body, bcc,
+                bccs);
     }
 
-    static private String getSlotLabel(Class<? extends DomainObject> clazz, String slotName) {
-        return getMessageFromResource("label." + clazz.getName() + "." + slotName);
+    static void sendMessage(PhdIndividualProgramProcess process, boolean displayProcessInfo, LocalizedString subject,
+            LocalizedString body, Group bcc) {
+        sendMessage(process, displayProcessInfo, process.getAdministrativeOffice().getUnit().getSender(), subject, body, bcc,
+                null);
     }
 
-    static public void alertStudent(PhdIndividualProgramProcess process, String subjectKey, String bodyKey) {
-        final PhdCustomAlertBean alertBean = new PhdCustomAlertBean(process, true, false, false);
-
-        alertBean.setSubject(getSubjectPrefixed(process, subjectKey));
-        alertBean.setBody(getBodyText(process, bodyKey));
-        alertBean.setFireDate(new LocalDate());
-        alertBean.setTargetGroup(process.getPerson().getUser().groupOf());
-
-        new PhdCustomAlert(alertBean);
+    static void sendMessage(PhdIndividualProgramProcess process, boolean displayProcessInfo, LocalizedString subject,
+            LocalizedString body, String... bccs) {
+        sendMessage(process, displayProcessInfo, process.getAdministrativeOffice().getUnit().getSender(), subject, body, null,
+                bccs);
     }
 
-    static public void alertStudent(PhdIndividualProgramProcess process, AlertMessage subject, AlertMessage body) {
-        final PhdCustomAlertBean alertBean = new PhdCustomAlertBean(process, true, false, false);
-
-        alertBean.setSubject(getSubjectPrefixed(process, subject));
-        alertBean.setBody(getBodyText(process, body));
-        alertBean.setFireDate(new LocalDate());
-        alertBean.setTargetGroup(process.getPerson().getUser().groupOf());
-
-        new PhdCustomAlert(alertBean);
+    static LocalizedString wrapAsAlertBody(PhdAlert alert, LocalizedString body) {
+        return MessageTemplate.get("org.fenixedu.academic.phd.alert.wrapper")
+                .getCompiledTextBody(ImmutableMap.of("process", alert.getProcess(), "text", body));
     }
 
-    static public void alertGuiders(PhdIndividualProgramProcess process, String subjectKey, String bodyKey) {
-
-        final Set<Person> toNotify = new HashSet<Person>();
-        for (final PhdParticipant guiding : process.getGuidingsAndAssistantGuidings()) {
-            if (guiding.isInternal()) {
-                toNotify.add(((InternalPhdParticipant) guiding).getPerson());
-            } else {
-                guiding.ensureExternalAccess();
-                new Message(Bennu.getInstance().getSystemSender(), Collections.<ReplyTo> emptyList(),
-                        Collections.<Recipient> emptyList(), getSubjectPrefixed(process, subjectKey), getBodyText(process,
-                                bodyKey), Collections.singleton(guiding.getEmail()));
-            }
-        }
-
-        final PhdCustomAlertBean alertBean = new PhdCustomAlertBean(process, true, false, false);
-        alertBean.setSubject(getSubjectPrefixed(process, subjectKey));
-        alertBean.setBody(getBodyText(process, bodyKey));
-        alertBean.setFireDate(new LocalDate());
-        alertBean.setTargetGroup(Person.convertToUserGroup(toNotify));
-
-        new PhdCustomAlert(alertBean);
-
+    static LocalizedString wrapAsAlertSubject(PhdAlert alert, LocalizedString subject) {
+        return MessageTemplate.get("org.fenixedu.academic.phd.alert.wrapper")
+                .getCompiledSubject(ImmutableMap.of("process", alert.getProcess(), "subject", subject));
     }
 
-    static public void alertGuiders(PhdIndividualProgramProcess process, AlertMessage subjectMessage, AlertMessage bodyMessage) {
-
-        final Set<Person> toNotify = new HashSet<Person>();
-
-        for (final PhdParticipant guiding : process.getGuidingsAndAssistantGuidings()) {
-            if (guiding.isInternal()) {
-                toNotify.add(((InternalPhdParticipant) guiding).getPerson());
-            } else {
-                guiding.ensureExternalAccess();
-                new Message(Bennu.getInstance().getSystemSender(), Collections.<ReplyTo> emptyList(),
-                        Collections.<Recipient> emptyList(), getSubjectPrefixed(process, subjectMessage), getBodyText(process,
-                                bodyMessage), Collections.singleton(guiding.getEmail()));
-            }
-        }
-
-        final PhdCustomAlertBean alertBean = new PhdCustomAlertBean(process, true, false, false);
-        alertBean.setSubject(getSubjectPrefixed(process, subjectMessage));
-        alertBean.setBody(getBodyText(process, bodyMessage));
-        alertBean.setFireDate(new LocalDate());
-        alertBean.setTargetGroup(Person.convertToUserGroup(toNotify));
-
-        new PhdCustomAlert(alertBean);
-
+    private static LocalizedString getMessageFromResource(String key) {
+        return BundleUtil.getLocalizedString(Bundle.PHD, key);
     }
 
-    static public void alertAcademicOffice(PhdIndividualProgramProcess process, String subjectKey, String bodyKey) {
-        final PhdCustomAlertBean alertBean = new PhdCustomAlertBean(process, true, false, true);
-        alertBean.setSubject(getSubjectPrefixed(process, subjectKey));
-        alertBean.setBody(getBodyText(process, bodyKey));
-        alertBean.setFireDate(new LocalDate());
-        alertBean.setTargetGroup(AcademicAuthorizationGroup.get(AcademicOperationType.MANAGE_PHD_PROCESSES,
-                process.getPhdProgram()));
-
-        new PhdCustomAlert(alertBean);
+    static public void alertGuiders(PhdIndividualProgramProcess process, String subjectKey, String bodyKey,
+            boolean displayProcessInfo) {
+        alertGuiders(process, AlertMessage.create(subjectKey), AlertMessage.create(bodyKey), displayProcessInfo);
     }
 
-    static public void alertAcademicOffice(PhdIndividualProgramProcess process, AcademicOperationType permissionType,
-            String subjectKey, String bodyKey) {
-        final PhdCustomAlertBean alertBean = new PhdCustomAlertBean(process, true, false, true);
-        alertBean.setSubject(getSubjectPrefixed(process, subjectKey));
-        alertBean.setBody(getBodyText(process, bodyKey));
-        alertBean.setFireDate(new LocalDate());
-        alertBean.setTargetGroup(getTargetGroup(permissionType, process.getPhdProgram()));
-
-        new PhdCustomAlert(alertBean);
+    static public void alertGuiders(PhdIndividualProgramProcess process, AlertMessage subject, AlertMessage body,
+            boolean displayProcessInfo) {
+        alertGuiders(process, subject.getMessage(), body.getMessage(), displayProcessInfo);
     }
 
-    static public void alertAcademicOffice(PhdIndividualProgramProcess process, AcademicOperationType permissionType,
-            AlertMessage subjectMessage, AlertMessage bodyMessage) {
-        final PhdCustomAlertBean alertBean = new PhdCustomAlertBean(process, true, false, true);
-        alertBean.setSubject(getSubjectPrefixed(process, subjectMessage));
-        alertBean.setBody(getBodyText(process, bodyMessage));
-        alertBean.setFireDate(new LocalDate());
-        alertBean.setTargetGroup(getTargetGroup(permissionType, process.getPhdProgram()));
+    //TODO refactor AlertMessage... is it still worth to keep? what work can be done by it with the template?
+    //FIXME I forgot the prefixed option. it must now come in general for the whole and not for each content.
+    //FIXME also, how do we treat this now? wrapped boolean params instead of the alertmessage params?
+    //FIXME AlertMessage also standardized the message format templating
 
-        new PhdCustomAlert(alertBean);
-    }
+    //TODO have PhDAlert class decide on wrapped? new slot
 
-    static private Group getTargetGroup(AcademicOperationType permissionType, PhdProgram program) {
-        return AcademicAuthorizationGroup.get(permissionType, program);
-    }
+    //TODO Alert
 
-    static public void alertCoordinators(PhdIndividualProgramProcess process, String subjectKey, String bodyKey) {
-        alertCoordinators(process, process.getCoordinatorsFor(ExecutionYear.readCurrentExecutionYear()), subjectKey, bodyKey);
-    }
+    //FIXME for external participants we do not know any language preferences so alerts must have both languages? uh oh
 
-    static private void alertCoordinators(PhdIndividualProgramProcess process, Set<Person> persons, String subjectKey,
-            String bodyKey) {
-        final PhdCustomAlertBean alertBean = new PhdCustomAlertBean(process, true, false, false);
-        alertBean.setSubject(getSubjectPrefixed(process, subjectKey));
-        alertBean.setBody(getBodyText(process, bodyKey));
-        alertBean.setTargetGroup(Person.convertToUserGroup(persons));
-        alertBean.setFireDate(new LocalDate());
+    static private void alertGuiders(PhdIndividualProgramProcess process, LocalizedString subject, LocalizedString body,
+            boolean displayProcessInfo) {
 
-        new PhdCustomAlert(alertBean);
-    }
+        Map<Boolean, List<PhdParticipant>> p =
+                process.getGuidingsAndAssistantGuidings().stream().collect(Collectors.partitioningBy(PhdParticipant::isInternal));
 
-    static public void alertCoordinators(PhdIndividualProgramProcess process, AlertMessage subject, AlertMessage body) {
-        alertCoordinators(process, process.getCoordinatorsFor(ExecutionYear.readCurrentExecutionYear()), subject, body);
-    }
+        p.get(false).forEach(guider -> {
+            guider.ensureExternalAccess();
+            sendMessage(process, displayProcessInfo, subject, body, guider.getEmail());
+        });
 
-    static public void alertResponsibleCoordinators(PhdIndividualProgramProcess process, AlertMessage subject, AlertMessage body) {
-        alertCoordinators(process, process.getResponsibleCoordinatorsFor(ExecutionYear.readCurrentExecutionYear()), subject, body);
-    }
-
-    static private void alertCoordinators(PhdIndividualProgramProcess process, Set<Person> persons, AlertMessage subject,
-            AlertMessage body) {
-        final PhdCustomAlertBean alertBean = new PhdCustomAlertBean(process, true, false, false);
-        alertBean.setSubject(getSubjectPrefixed(process, subject));
-        alertBean.setBody(getBodyText(process, body));
-        alertBean.setTargetGroup(Person.convertToUserGroup(persons));
-        alertBean.setFireDate(new LocalDate());
-        new PhdCustomAlert(alertBean);
-    }
-
-    static public String getSubjectPrefixed(PhdIndividualProgramProcess process, AlertMessage message) {
-        return (message.withPrefix() ? getProcessNumberPrefix(process) : "") + message.getMessage();
-    }
-
-    static public String getBodyText(PhdIndividualProgramProcess process, AlertMessage body) {
-        return (body.withPrefix() ? getBodyCommonText(process) : "") + body.getMessage();
-    }
-
-    static public void alertParticipants(PhdIndividualProgramProcess process, AlertMessage subject, AlertMessage body,
-            PhdParticipant... participants) {
-
-        final Set<Person> toNotify = new HashSet<Person>();
-        for (final PhdParticipant participant : participants) {
-            if (participant.isInternal()) {
-                toNotify.add(((InternalPhdParticipant) participant).getPerson());
-            } else {
-                Unit unit = process.getAdministrativeOffice().getUnit();
-                UnitBasedSender sender = unit.getUnitBasedSenderSet().iterator().next();
-                new Message(sender, Collections.<ReplyTo> emptyList(), Collections.<Recipient> emptyList(), getSubjectPrefixed(
-                        process, subject), getBodyText(process, body), Collections.singleton(participant.getEmail()));
-            }
-        }
+        final Set<Person> toNotify =
+                p.get(true).stream().map(InternalPhdParticipant.class::cast).map(InternalPhdParticipant::getPerson)
+                        .collect(Collectors.toSet());
 
         if (!toNotify.isEmpty()) {
-            final PhdCustomAlertBean alertBean = new PhdCustomAlertBean(process, true, false, false);
-            alertBean.setSubject(getSubjectPrefixed(process, subject));
-            alertBean.setBody(getBodyText(process, body));
-            alertBean.setTargetGroup(Person.convertToUserGroup(toNotify));
-            alertBean.setFireDate(new LocalDate());
-            new PhdCustomAlert(alertBean);
+            createPhdCustomAlert(process, subject, body, Person.convertToUserGroup(toNotify), false, displayProcessInfo);
+        }
+
+    }
+
+    static public void alertStudent(PhdIndividualProgramProcess process, String subjectKey, String bodyKey,
+            boolean displayProcessInfo) {
+        createPhdCustomAlert(process, subjectKey, bodyKey, process.getPerson().getUser().groupOf(), false, displayProcessInfo);
+    }
+
+    static public void alertStudent(PhdIndividualProgramProcess process, AlertMessage subject, AlertMessage body,
+            boolean displayProcessInfo) {
+        createPhdCustomAlert(process, subject, body, process.getPerson().getUser().groupOf(), false, displayProcessInfo);
+    }
+
+    static public void alertAcademicOffice(PhdIndividualProgramProcess process, String subjectKey, String bodyKey,
+            boolean displayProcessInfo) {
+        alertAcademicOffice(process, AcademicOperationType.MANAGE_PHD_PROCESSES, subjectKey, bodyKey, displayProcessInfo);
+    }
+
+    static public void alertAcademicOffice(PhdIndividualProgramProcess process, AcademicOperationType permissionType,
+            String subjectKey, String bodyKey, boolean displayProcessInfo) {
+        Group target = AcademicAuthorizationGroup.get(permissionType, process.getPhdProgram());
+        createPhdCustomAlert(process, subjectKey, bodyKey, target, true, displayProcessInfo);
+    }
+
+    static public void alertAcademicOffice(PhdIndividualProgramProcess process, AcademicOperationType permissionType,
+            AlertMessage subject, AlertMessage body, boolean displayProcessInfo) {
+        Group target = AcademicAuthorizationGroup.get(permissionType, process.getPhdProgram());
+        createPhdCustomAlert(process, subject, body, target, true, displayProcessInfo);
+    }
+
+    static public void alertCoordinators(PhdIndividualProgramProcess process, String subjectKey, String bodyKey,
+            boolean displayProcessInfo) {
+        Group target = Person.convertToUserGroup(process.getCoordinatorsFor(ExecutionYear.readCurrentExecutionYear()));
+        createPhdCustomAlert(process, subjectKey, bodyKey, target, false, displayProcessInfo);
+    }
+
+    static public void alertCoordinators(PhdIndividualProgramProcess process, AlertMessage subject, AlertMessage body,
+            boolean displayProcessInfo) {
+        Group target = Person.convertToUserGroup(process.getCoordinatorsFor(ExecutionYear.readCurrentExecutionYear()));
+        createPhdCustomAlert(process, subject, body, target, false, displayProcessInfo);
+    }
+
+    static public void alertResponsibleCoordinators(PhdIndividualProgramProcess process, AlertMessage subject, AlertMessage body,
+            boolean displayProcessInfo) {
+        Group target = Person.convertToUserGroup(process.getResponsibleCoordinatorsFor(ExecutionYear.readCurrentExecutionYear()));
+        createPhdCustomAlert(process, subject, body, target, false, displayProcessInfo);
+    }
+
+    static private void createPhdCustomAlert(PhdIndividualProgramProcess process, String subjectKey, String bodyKey, Group target,
+            boolean shared, boolean displayProcessInfo) {
+        createPhdCustomAlert(process, AlertMessage.create(subjectKey), AlertMessage.create(bodyKey), target, shared,
+                displayProcessInfo);
+    }
+
+    static private void createPhdCustomAlert(PhdIndividualProgramProcess process, AlertMessage subject, AlertMessage body,
+            Group target, boolean shared, boolean displayProcessInfo) {
+        createPhdCustomAlert(process, subject.getMessage(), body.getMessage(), target, shared, displayProcessInfo);
+    }
+
+    static private void createPhdCustomAlert(PhdIndividualProgramProcess process, LocalizedString subject, LocalizedString body,
+            Group target, boolean shared, boolean displayProcessInfo) {
+        new PhdCustomAlert(process, target, subject, body, true, new LocalDate(), false, shared, displayProcessInfo);
+    }
+
+    static public void alertParticipants(PhdIndividualProgramProcess process, LocalizedString subject, LocalizedString body,
+            boolean displayProcessInfo, PhdParticipant... participants) {
+
+        Map<Boolean, List<PhdParticipant>> p =
+                Stream.of(participants).collect(Collectors.partitioningBy(PhdParticipant::isInternal));
+
+        p.get(false).stream().map(PhdParticipant::getEmail)
+                .forEach(email -> sendMessage(process, displayProcessInfo, subject, body, email));
+
+        final Set<Person> toNotify =
+                p.get(true).stream().map(InternalPhdParticipant.class::cast).map(InternalPhdParticipant::getPerson)
+                        .collect(Collectors.toSet());
+
+        if (!toNotify.isEmpty()) {
+            createPhdCustomAlert(process, subject, body, Person.convertToUserGroup(toNotify), false, displayProcessInfo);
         }
     }
 
@@ -295,7 +250,6 @@ public class AlertService {
         private String label;
         private Object[] args;
         private boolean isKey = true;
-        private boolean withPrefix = true;
 
         public AlertMessage label(String label) {
             this.label = label;
@@ -312,24 +266,23 @@ public class AlertService {
             return this;
         }
 
-        protected boolean withPrefix() {
-            return withPrefix;
-        }
-
-        public AlertMessage withPrefix(boolean value) {
-            withPrefix = value;
-            return this;
-        }
-
-        public String getMessage() {
-            return isKey ? MessageFormat.format(getMessageFromResource(label), args) : label;
+        public LocalizedString getMessage() {
+            if (isKey) {
+                LocalizedString template = getMessageFromResource(label);
+                for (Locale l : template.getLocales()) {
+                    template = template.with(l, MessageFormat.format(template.getContent(l), args));
+                }
+                return template;
+            } else {
+                return new LocalizedString(Locale.getDefault(), label);
+            }
         }
 
         static public AlertMessage create(String label, Object... args) {
             return new AlertMessage().label(label).args(args);
         }
 
-        static public String get(String label, Object... args) {
+        static public LocalizedString get(String label, Object... args) {
             return new AlertMessage().label(label).args(args).getMessage();
         }
     }

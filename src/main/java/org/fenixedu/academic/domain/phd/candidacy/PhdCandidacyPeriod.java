@@ -27,8 +27,8 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.period.CandidacyPeriod;
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
-import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;
@@ -107,7 +107,7 @@ public abstract class PhdCandidacyPeriod extends PhdCandidacyPeriod_Base {
         super.edit(start, end);
     }
 
-    public abstract String getEmailMessageBodyForRefereeForm(final PhdCandidacyReferee referee);
+    public abstract LocalizedString getEmailMessageBodyForRefereeForm(final PhdCandidacyReferee referee);
 
     public abstract LocalizedString getEmailMessageSubjectForMissingCandidacyValidation(
             final PhdIndividualProgramProcess process);

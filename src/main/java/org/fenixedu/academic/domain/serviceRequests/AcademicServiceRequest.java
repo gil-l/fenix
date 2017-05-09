@@ -41,9 +41,7 @@ import org.fenixedu.academic.domain.documents.GeneratedDocument;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.serviceRequests.documentRequests.AcademicServiceRequestType;
 import org.fenixedu.academic.domain.serviceRequests.documentRequests.DocumentRequest;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.Sender;
+import org.fenixedu.academic.domain.util.MessageUtil;
 import org.fenixedu.academic.dto.serviceRequests.AcademicServiceRequestBean;
 import org.fenixedu.academic.dto.serviceRequests.AcademicServiceRequestCreateBean;
 import org.fenixedu.academic.predicate.AccessControl;
@@ -51,6 +49,8 @@ import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
+import org.fenixedu.messaging.core.domain.Message;
+import org.fenixedu.messaging.core.domain.Sender;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.YearMonthDay;
@@ -187,20 +187,21 @@ abstract public class AcademicServiceRequest extends AcademicServiceRequest_Base
     abstract public boolean isPayedUponCreation();
 
     public boolean isPaymentsAccessible() {
-    	final AcademicProgram program = getAcademicProgram();
+        final AcademicProgram program = getAcademicProgram();
         return AcademicAccessRule
                 .getProgramsAccessibleToFunction(AcademicOperationType.MANAGE_STUDENT_PAYMENTS, Authenticate.getUser())
                 .anyMatch(p -> p == program);
     }
 
     public boolean isRegistrationAccessible() {
-    	final AcademicProgram program = getAcademicProgram();
+        final AcademicProgram program = getAcademicProgram();
         return AcademicAccessRule
                 .getProgramsAccessibleToFunction(AcademicOperationType.MANAGE_REGISTRATIONS, Authenticate.getUser())
                 .anyMatch(p -> p == program);
     }
 
-    protected String getDescription(final AcademicServiceRequestType academicServiceRequestType, final String specificServiceType) {
+    protected String getDescription(final AcademicServiceRequestType academicServiceRequestType,
+            final String specificServiceType) {
         final StringBuilder result = new StringBuilder();
         result.append(BundleUtil.getString(Bundle.ENUMERATION, academicServiceRequestType.getQualifiedName()));
         if (specificServiceType != null) {
@@ -311,9 +312,9 @@ abstract public class AcademicServiceRequest extends AcademicServiceRequest_Base
 
         }
 
-        final Sender sender = getAdministrativeOffice().getUnit().getUnitBasedSenderSet().iterator().next();
-        final Recipient recipient = new Recipient(getPerson().getUser().groupOf());
-        new Message(sender, sender.getReplyTosSet(), recipient.asCollection(), getDescription(), body, "");
+        Sender sender = getAdministrativeOffice().getUnit().getSender();
+        Message.from(sender).subject(getDescription()).textBody(body)
+                .replyTo(MessageUtil.getReplyToWithCurrentUserDefault(sender)).bcc(getPerson().getPersonGroup());
     }
 
     @Atomic
@@ -481,7 +482,8 @@ abstract public class AcademicServiceRequest extends AcademicServiceRequest_Base
         return finishedSuccessfully() && isToPrint();
     }
 
-    private List<AcademicServiceRequestSituationType> getAcceptedSituationTypes(AcademicServiceRequestSituationType situationType) {
+    private List<AcademicServiceRequestSituationType> getAcceptedSituationTypes(
+            AcademicServiceRequestSituationType situationType) {
 
         switch (situationType) {
 
@@ -506,36 +508,42 @@ abstract public class AcademicServiceRequest extends AcademicServiceRequest_Base
     }
 
     protected List<AcademicServiceRequestSituationType> getNewSituationAcceptedSituationsTypes() {
-        return Collections.unmodifiableList(Arrays.asList(AcademicServiceRequestSituationType.CANCELLED,
-                AcademicServiceRequestSituationType.REJECTED, AcademicServiceRequestSituationType.PROCESSING));
+        return Collections.unmodifiableList(
+                Arrays.asList(AcademicServiceRequestSituationType.CANCELLED, AcademicServiceRequestSituationType.REJECTED,
+                        AcademicServiceRequestSituationType.PROCESSING));
     }
 
     protected List<AcademicServiceRequestSituationType> getProcessingSituationAcceptedSituationsTypes() {
         if (isPossibleToSendToOtherEntity()) {
-            return Collections.unmodifiableList(Arrays.asList(AcademicServiceRequestSituationType.CANCELLED,
-                    AcademicServiceRequestSituationType.REJECTED, AcademicServiceRequestSituationType.SENT_TO_EXTERNAL_ENTITY));
+            return Collections.unmodifiableList(
+                    Arrays.asList(AcademicServiceRequestSituationType.CANCELLED, AcademicServiceRequestSituationType.REJECTED,
+                            AcademicServiceRequestSituationType.SENT_TO_EXTERNAL_ENTITY));
         } else {
-            return Collections.unmodifiableList(Arrays.asList(AcademicServiceRequestSituationType.CANCELLED,
-                    AcademicServiceRequestSituationType.REJECTED, AcademicServiceRequestSituationType.CONCLUDED));
+            return Collections.unmodifiableList(
+                    Arrays.asList(AcademicServiceRequestSituationType.CANCELLED, AcademicServiceRequestSituationType.REJECTED,
+                            AcademicServiceRequestSituationType.CONCLUDED));
         }
     }
 
     protected List<AcademicServiceRequestSituationType> getSentToExternalEntitySituationAcceptedSituationsTypes() {
-        return Collections.unmodifiableList(Collections
-                .singletonList(AcademicServiceRequestSituationType.RECEIVED_FROM_EXTERNAL_ENTITY));
+        return Collections
+                .unmodifiableList(Collections.singletonList(AcademicServiceRequestSituationType.RECEIVED_FROM_EXTERNAL_ENTITY));
     }
 
     protected List<AcademicServiceRequestSituationType> getReceivedFromExternalEntitySituationAcceptedSituationsTypes() {
-        return Collections.unmodifiableList(Arrays.asList(AcademicServiceRequestSituationType.CANCELLED,
-                AcademicServiceRequestSituationType.REJECTED, AcademicServiceRequestSituationType.CONCLUDED));
+        return Collections.unmodifiableList(
+                Arrays.asList(AcademicServiceRequestSituationType.CANCELLED, AcademicServiceRequestSituationType.REJECTED,
+                        AcademicServiceRequestSituationType.CONCLUDED));
     }
 
     protected List<AcademicServiceRequestSituationType> getConcludedSituationAcceptedSituationsTypes() {
-        return Collections.unmodifiableList(Arrays.asList(AcademicServiceRequestSituationType.CANCELLED,
-                AcademicServiceRequestSituationType.DELIVERED));
+        return Collections.unmodifiableList(
+                Arrays.asList(AcademicServiceRequestSituationType.CANCELLED, AcademicServiceRequestSituationType.DELIVERED));
     }
 
-    /** This method is overwritten in the subclasses */
+    /**
+     * This method is overwritten in the subclasses
+     */
     protected void internalChangeState(final AcademicServiceRequestBean academicServiceRequestBean) {
 
         if (academicServiceRequestBean.isToCancelOrReject() && getEvent() != null) {
@@ -644,7 +652,7 @@ abstract public class AcademicServiceRequest extends AcademicServiceRequest_Base
      * Indicates that the document external shipping to rectorate is done using
      * the rectorate batches. The {@link AcademicServiceRequestSituationType#SENT_TO_EXTERNAL_ENTITY} and
      * {@link AcademicServiceRequestSituationType#RECEIVED_FROM_EXTERNAL_ENTITY} states are handled through this system.
-     * 
+     *
      * @return true if managed by batch, false otherwise.
      */
     abstract public boolean isManagedWithRectorateSubmissionBatch();
@@ -666,10 +674,10 @@ abstract public class AcademicServiceRequest extends AcademicServiceRequest_Base
      */
     @Deprecated
     final public boolean getLoggedPersonCanCancel() {
-        return isCancelledSituationAccepted()
-                && (!isPayable() || getEvent() == null || !isPayed())
-                && (createdByStudent() && !isConcluded() || AcademicAccessRule.isProgramAccessibleToFunction(
-                        AcademicOperationType.SERVICE_REQUESTS, this.getAcademicProgram(), Authenticate.getUser()));
+        return isCancelledSituationAccepted() && (!isPayable() || getEvent() == null || !isPayed()) && (
+                createdByStudent() && !isConcluded() || AcademicAccessRule
+                        .isProgramAccessibleToFunction(AcademicOperationType.SERVICE_REQUESTS, this.getAcademicProgram(),
+                                Authenticate.getUser()));
     }
 
     final public DateTime getCreationDate() {

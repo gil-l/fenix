@@ -22,6 +22,7 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.joda.time.DateTime;
 
 public abstract class PhdEmailBean implements java.io.Serializable {
@@ -30,8 +31,8 @@ public abstract class PhdEmailBean implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
     protected String bccs;
-    protected String subject;
-    protected String message;
+    protected LocalizedString subject;
+    protected LocalizedString message;
     protected DateTime creationDate;
     protected Person creator;
 
@@ -43,19 +44,19 @@ public abstract class PhdEmailBean implements java.io.Serializable {
         this.bccs = bccs;
     }
 
-    public String getSubject() {
+    public LocalizedString getSubject() {
         return subject;
     }
 
-    public void setSubject(String subject) {
+    public void setSubject(LocalizedString subject) {
         this.subject = subject;
     }
 
-    public String getMessage() {
+    public LocalizedString getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
+    public void setMessage(LocalizedString message) {
         this.message = message;
     }
 

@@ -18,35 +18,29 @@
  */
 package org.fenixedu.academic.domain.phd.alert;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.DomainObjectUtil;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.UnitBasedSender;
-import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.commons.i18n.LocalizedString;
+import org.fenixedu.messaging.core.domain.Message;
+import org.fenixedu.messaging.core.domain.Sender;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;
 
 public class PhdAlertMessage extends PhdAlertMessage_Base {
 
-    static final public Comparator<PhdAlertMessage> COMPARATOR_BY_WHEN_CREATED_AND_ID = new Comparator<PhdAlertMessage>() {
-        @Override
-        public int compare(PhdAlertMessage m1, PhdAlertMessage m2) {
-            int comp = m1.getWhenCreated().compareTo(m2.getWhenCreated());
-            return (comp != 0) ? comp : DomainObjectUtil.COMPARATOR_BY_ID.compare(m1, m2);
-        }
-    };
+    static final public Comparator<PhdAlertMessage> COMPARATOR_BY_WHEN_CREATED_AND_ID =
+            Comparator.comparing(PhdAlertMessage::getWhenCreated).thenComparing(DomainObjectUtil.COMPARATOR_BY_ID);
 
     protected PhdAlertMessage() {
         super();
@@ -54,8 +48,7 @@ public class PhdAlertMessage extends PhdAlertMessage_Base {
         setWhenCreated(new DateTime());
     }
 
-    public PhdAlertMessage(PhdIndividualProgramProcess process, Person person, LocalizedString subject,
-            LocalizedString body) {
+    public PhdAlertMessage(PhdIndividualProgramProcess process, Person person, LocalizedString subject, LocalizedString body) {
         this();
         init(process, Collections.singletonList(person), subject, body);
     }
@@ -80,7 +73,8 @@ public class PhdAlertMessage extends PhdAlertMessage_Base {
             LocalizedString body) {
         String[] args = {};
         if (process == null) {
-            throw new DomainException("error.org.fenixedu.academic.domain.phd.alert.PhdAlertMessage.process.cannot.be.null", args);
+            throw new DomainException("error.org.fenixedu.academic.domain.phd.alert.PhdAlertMessage.process.cannot.be.null",
+                    args);
         }
         String[] args1 = {};
         if (persons == null) {
@@ -150,7 +144,7 @@ public class PhdAlertMessage extends PhdAlertMessage_Base {
     }
 
     public boolean isReaded() {
-        return getReaded().booleanValue();
+        return getReaded();
     }
 
     public boolean isFor(Person person) {
@@ -158,37 +152,18 @@ public class PhdAlertMessage extends PhdAlertMessage_Base {
     }
 
     public List<PhdAlert> getAlertsPossibleResponsibleForMessageGeneration() {
-        List<PhdAlert> result = new ArrayList<PhdAlert>();
-        Collection<PhdAlert> alerts = getProcess().getAlertsSet();
-
-        for (PhdAlert phdAlert : alerts) {
-            if (getSubject().getContent().contentEquals(phdAlert.getFormattedSubject().getContent())) {
-                result.add(phdAlert);
-            }
-        }
-
-        return result;
+        LocalizedString subject = getSubject();
+        return getProcess().getAlertsSet().stream().filter(a -> a.getSubject().equals(subject))
+                .collect(Collectors.toList());
     }
 
-    protected UnitBasedSender getSender() {
-        AdministrativeOffice administrativeOffice = this.getProcess().getAdministrativeOffice();
-        return administrativeOffice.getUnit().getUnitBasedSenderSet().iterator().next();
+    protected Sender getSender() {
+        return this.getProcess().getAdministrativeOffice().getUnit().getSender();
     }
 
     public List<Message> getEmailsWithMatchWithThisMessage() {
-        List<Message> result = new ArrayList<Message>();
-
-        UnitBasedSender sender = getSender();
-
-        Collection<Message> messages = sender.getMessagesSet();
-
-        for (Message message : messages) {
-            if (getSubject().getContent().contentEquals(message.getSubject())) {
-                result.add(message);
-            }
-        }
-
-        return result;
+        LocalizedString subject = getSubject();
+        return getSender().getMessageSet().stream().filter(m -> m.getSubject().equals(subject)).collect(Collectors.toList());
     }
 
 }

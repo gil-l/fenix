@@ -19,16 +19,16 @@
 package org.fenixedu.academic.domain.phd.alert;
 
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Set;
 
 import org.fenixedu.academic.FenixEduAcademicConfiguration;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.phd.candidacy.PhdProgramPublicCandidacyHashCode;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.messaging.core.domain.Message;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
@@ -53,17 +53,17 @@ public class PublicPhdMissingCandidacyAlert extends PublicPhdMissingCandidacyAle
 
     private LocalizedString generateSubject(final PhdProgramPublicCandidacyHashCode candidacyHashCode) {
         // TODO: if collaboration type change, then message must be different
-        return new LocalizedString().with(org.fenixedu.academic.util.LocaleUtils.EN,
-                BundleUtil.getString(Bundle.PHD, "message.phd.email.subject.missing.candidacy"));
+        return BundleUtil.getLocalizedString(Bundle.PHD, "message.phd.email.subject.missing.candidacy");
     }
 
     private LocalizedString generateBody(final PhdProgramPublicCandidacyHashCode hashCode) {
         // TODO: if collaboration type change, then message must be different
         String submissionAccessURL = FenixEduAcademicConfiguration.getConfiguration().getPhdPublicCandidacySubmissionLink();
-        final String body =
-                String.format(BundleUtil.getString(Bundle.PHD, "message.phd.email.body.missing.candidacy"), submissionAccessURL,
-                        hashCode.getValue());
-        return new LocalizedString().with(org.fenixedu.academic.util.LocaleUtils.EN, body);
+        LocalizedString body = BundleUtil.getLocalizedString(Bundle.PHD, "message.phd.email.body.missing.candidacy");
+        for (Locale l : body.getLocales()) {
+            body = body.with(l, String.format(body.getContent(l), submissionAccessURL, hashCode.getValue()));
+        }
+        return body;
     }
 
     @Override
@@ -86,13 +86,13 @@ public class PublicPhdMissingCandidacyAlert extends PublicPhdMissingCandidacyAle
      * previously created
      */
     private boolean candidacyPeriodIsOver() {
-        return new DateTime().isAfter(getCandidacyHashCode().getPhdProgramCandidacyProcess().getPublicPhdCandidacyPeriod()
-                .getEnd());
+        return new DateTime()
+                .isAfter(getCandidacyHashCode().getPhdProgramCandidacyProcess().getPublicPhdCandidacyPeriod().getEnd());
     }
 
     @Override
     protected void generateMessage() {
-        new Message(getSender(), null, Collections.<Recipient> emptyList(), buildMailSubject(), buildMailBody(), getEmail());
+        Message.from(getSender()).subject(getFormattedSubject()).textBody(getFormattedBody()).singleBcc(getEmail()).send();
     }
 
     private Set<String> getEmail() {

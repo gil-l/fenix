@@ -18,16 +18,12 @@
  */
 package org.fenixedu.academic.domain.phd.alert;
 
-import java.util.Collections;
-import java.util.Locale;
-
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
 import org.fenixedu.academic.domain.phd.PhdProgramCalendarUtil;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.commons.i18n.LocalizedString;
+import org.fenixedu.messaging.core.domain.Message;
 import org.joda.time.LocalDate;
 
 public class PhdFinalProofRequestAlert extends PhdFinalProofRequestAlert_Base {
@@ -44,13 +40,11 @@ public class PhdFinalProofRequestAlert extends PhdFinalProofRequestAlert_Base {
     }
 
     private LocalizedString buildSubject(final PhdIndividualProgramProcess process) {
-        return new LocalizedString(Locale.getDefault(), AlertService.getSubjectPrefixed(process,
-                "message.phd.alert.final.proof.request.subject"));
+        return AlertService.getSubjectPrefixed(process, "message.phd.alert.final.proof.request.subject");
     }
 
     private LocalizedString buildBody(final PhdIndividualProgramProcess process) {
-        return new LocalizedString(Locale.getDefault(), AlertService.getBodyText(process,
-                "message.phd.alert.final.proof.request.body"));
+        return AlertService.getBodyText(process, "message.phd.alert.final.proof.request.body");
     }
 
     @Override
@@ -80,8 +74,8 @@ public class PhdFinalProofRequestAlert extends PhdFinalProofRequestAlert_Base {
 
         // TODO: add missing elements (Coordinator, AcademicOffice?)
         new PhdAlertMessage(getProcess(), getProcess().getPerson(), getFormattedSubject(), getFormattedBody());
-        new Message(getSender(), new Recipient(Collections.singletonList(getProcess().getPerson())), buildMailSubject(),
-                buildMailBody());
+        Message.from(getSender()).subject(getFormattedSubject()).textBody(getFormattedBody())
+                .bcc(getProcess().getPerson().getPersonGroup()).send();
     }
 
     @Override

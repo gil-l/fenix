@@ -37,13 +37,13 @@ public abstract class PhdEmail extends PhdEmail_Base {
         super();
     }
 
-    protected void init(final String subject, final String body, String additionalTo, String additionalBcc) {
-        super.init(new LocalizedString(I18N.getLocale(), subject), new LocalizedString(I18N.getLocale(), body));
+    protected void init(final LocalizedString subject, final LocalizedString body, String additionalTo, String additionalBcc) {
+        super.init(subject, body);
     }
 
-    protected void init(final String subject, final String body, String additionalTo, String additionalBcc, Person creator,
+    protected void init(final LocalizedString subject, final LocalizedString body, String additionalTo, String additionalBcc, Person creator,
             DateTime whenCreated) {
-        super.init(new LocalizedString(I18N.getLocale(), subject), new LocalizedString(I18N.getLocale(), body));
+        super.init(subject, body);
         setAdditionalTo(additionalTo);
         setAdditionalBcc(additionalBcc);
         setPerson(creator);

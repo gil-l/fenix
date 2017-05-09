@@ -28,6 +28,7 @@ import org.fenixedu.academic.util.phd.EPFLPhdCandidacyProcessProperties;
 import org.fenixedu.academic.util.phd.PhdProperties;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;
@@ -124,7 +125,7 @@ public class EPFLPhdCandidacyPeriod extends EPFLPhdCandidacyPeriod_Base {
     }
 
     @Override
-    public String getEmailMessageBodyForRefereeForm(final PhdCandidacyReferee referee) {
+    public LocalizedString getEmailMessageBodyForRefereeForm(final PhdCandidacyReferee referee) {
         return String.format(BundleUtil.getString(Bundle.PHD, "message.phd.epfl.email.body.referee"), referee
                 .getPhdProgramCandidacyProcess().getIndividualProgramProcess().getPhdProgramFocusArea().getName().getContent(),
                 EPFLPhdCandidacyProcessProperties.getConfiguration().getPublicCandidacyRefereeFormLink(), referee.getValue(),

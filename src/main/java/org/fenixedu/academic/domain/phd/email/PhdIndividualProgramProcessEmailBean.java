@@ -35,6 +35,7 @@ import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
 import org.fenixedu.academic.domain.phd.PhdParticipant;
 import org.fenixedu.academic.domain.phd.alert.AlertService.AlertMessage;
 import org.fenixedu.academic.domain.phd.thesis.ThesisJuryElement;
+import org.fenixedu.commons.i18n.LocalizedString;
 
 import pt.ist.fenixWebFramework.renderers.DataProvider;
 import pt.ist.fenixWebFramework.renderers.components.converters.Converter;
@@ -71,11 +72,11 @@ public class PhdIndividualProgramProcessEmailBean extends PhdEmailBean implement
             return label + ".body";
         }
 
-        public String getTemplateSubject() {
+        public LocalizedString getTemplateSubject() {
             return AlertMessage.get(getLabelForSubject());
         }
 
-        public String getTemplateBody() {
+        public LocalizedString getTemplateBody() {
             return AlertMessage.get(getLabelForBody());
         }
 
@@ -93,7 +94,7 @@ public class PhdIndividualProgramProcessEmailBean extends PhdEmailBean implement
         public PhdEmailParticipantsGroup() {
         }
 
-        public String getGroupLabel() {
+        public LocalizedString getGroupLabel() {
             return AlertMessage.get(this.label);
         }
 
@@ -232,8 +233,8 @@ public class PhdIndividualProgramProcessEmailBean extends PhdEmailBean implement
     }
 
     public PhdIndividualProgramProcessEmailBean(PhdIndividualProgramProcessEmail email) {
-        this.subject = email.getFormattedSubject().getContent(org.fenixedu.academic.util.LocaleUtils.PT);
-        this.message = email.getFormattedBody().getContent(org.fenixedu.academic.util.LocaleUtils.PT);
+        this.subject = email.getFormattedSubject();
+        this.message = email.getFormattedBody();
         this.bccs = email.getBccs();
         this.creationDate = email.getWhenCreated();
         this.creator = email.getPerson();
@@ -369,8 +370,8 @@ public class PhdIndividualProgramProcessEmailBean extends PhdEmailBean implement
             setSubject(getTemplate().getTemplateSubject());
             setMessage(getTemplate().getTemplateBody());
         } else {
-            setSubject("");
-            setMessage("");
+            setSubject(new LocalizedString());
+            setMessage(new LocalizedString());
         }
     }
 

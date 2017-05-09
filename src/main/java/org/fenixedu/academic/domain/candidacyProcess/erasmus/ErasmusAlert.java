@@ -28,14 +28,7 @@ import org.joda.time.LocalDate;
 
 public class ErasmusAlert extends ErasmusAlert_Base {
 
-    public static final Comparator<ErasmusAlert> WHEN_CREATED_COMPARATOR = new Comparator<ErasmusAlert>() {
-
-        @Override
-        public int compare(ErasmusAlert o1, ErasmusAlert o2) {
-            return o1.getWhenCreated().compareTo(o2.getWhenCreated());
-        }
-
-    };
+    public static final Comparator<ErasmusAlert> WHEN_CREATED_COMPARATOR = Comparator.comparing(ErasmusAlert::getWhenCreated);
 
     public ErasmusAlert() {
         super();
@@ -71,29 +64,6 @@ public class ErasmusAlert extends ErasmusAlert_Base {
         // new Message(getRootDomainObject().getSystemSender(), null,
         // Collections.EMPTY_LIST, buildMailSubject(), buildMailBody(),
         // getProcess().getPersonalDetails().getEmail());
-    }
-
-    protected String buildMailBody() {
-        final StringBuilder result = new StringBuilder();
-
-        getFormattedBody().forEach((l, s) -> result.append(s).append("\n").append(" ------------------------- "));
-
-        result.delete(result.lastIndexOf("\n") + 1, result.length());
-
-        return result.toString();
-
-    }
-
-    protected String buildMailSubject() {
-        final StringBuilder result = new StringBuilder();
-
-        getFormattedSubject().forEach((l, s) -> result.append(s).append(" / "));
-
-        if (result.toString().endsWith(" / ")) {
-            result.delete(result.length() - 3, result.length());
-        }
-
-        return result.toString();
     }
 
     @Override

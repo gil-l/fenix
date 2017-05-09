@@ -33,6 +33,7 @@ import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.academic.util.phd.InstitutionPhdCandidacyProcessProperties;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;
@@ -152,7 +153,7 @@ public class InstitutionPhdCandidacyPeriod extends InstitutionPhdCandidacyPeriod
     }
 
     @Override
-    public String getEmailMessageBodyForRefereeForm(final PhdCandidacyReferee referee) {
+    public LocalizedString getEmailMessageBodyForRefereeForm(final PhdCandidacyReferee referee) {
         final ExecutionYear executionYear = ExecutionYear.readByDateTime(referee.getPhdProgramCandidacyProcess().getCandidacyDate());
         return MessageFormat.format(String.format(BundleUtil.getString(Bundle.PHD, "message.phd.institution.email.body.referee"),
                 referee.getPhdProgramCandidacyProcess().getPhdProgram().getName(executionYear).getContent(org.fenixedu.academic.util.LocaleUtils.EN),

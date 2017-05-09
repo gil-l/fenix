@@ -18,11 +18,10 @@
  */
 package org.fenixedu.academic.domain.phd.alert;
 
-import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
-import org.fenixedu.academic.domain.util.email.UnitBasedSender;
 import org.fenixedu.commons.i18n.LocalizedString;
+import org.fenixedu.messaging.core.domain.Sender;
 
 abstract public class PhdAlert extends PhdAlert_Base {
 
@@ -44,29 +43,6 @@ abstract public class PhdAlert extends PhdAlert_Base {
         throw new DomainException("error.phd.alert.PhdAlert.cannot.modify.process");
     }
 
-    protected String buildMailBody() {
-        final StringBuilder result = new StringBuilder();
-
-        getFormattedBody().forEach((l, s) ->  result.append(s).append("\n").append(" ------------------------- "));
-
-        result.delete(result.lastIndexOf("\n") + 1, result.length());
-
-        return result.toString();
-
-    }
-
-    protected String buildMailSubject() {
-        final StringBuilder result = new StringBuilder();
-
-        getFormattedSubject().forEach((l, s) -> result.append(s).append(" / "));
-
-        if (result.toString().endsWith(" / ")) {
-            result.delete(result.length() - 3, result.length());
-        }
-
-        return result.toString();
-    }
-
     public boolean isSystemAlert() {
         return false;
     }
@@ -74,6 +50,8 @@ abstract public class PhdAlert extends PhdAlert_Base {
     public boolean isCustomAlert() {
         return false;
     }
+
+    public boolean isToDisplayProcess() { return false; }
 
     protected void disconnect() {
         super.setProcess(null);
@@ -87,12 +65,11 @@ abstract public class PhdAlert extends PhdAlert_Base {
     }
 
     public boolean isActive() {
-        return getActive().booleanValue();
+        return getActive();
     }
 
-    protected UnitBasedSender getSender() {
-        AdministrativeOffice administrativeOffice = this.getProcess().getAdministrativeOffice();
-        return administrativeOffice.getUnit().getUnitBasedSenderSet().iterator().next();
+    protected Sender getSender() {
+        return this.getProcess().getAdministrativeOffice().getUnit().getSender();
     }
 
 }
